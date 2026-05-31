@@ -1,0 +1,47 @@
+# Xcode & User Settings
+xcuserdata/
+DerivedData/
+*.hmap
+*.xcresult
+
+# App Packaging & Crash Logs
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.crash
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+# Package.swift와 Sources 같은 로컬 패키지 소스는 추적
+.build/
+.swiftpm/
+Packages/
+
+# Tuist
+# 현재 프로젝트에서는 Tuist를 쓰지 않으므로 필요해지면 주석 해제
+# Derived/
+# .tuist-bin/
+# Tuist/Dependencies/
+# *.xcodeproj
+# *.xcworkspace
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Ruby & Bundler
+.bundle/
+vendor/bundle/
+
+# macOS & System
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Secret
+.netrc
