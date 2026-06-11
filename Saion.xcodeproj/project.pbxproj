@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		51B3DE992FDB0D5200285A92 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE982FDB0D5200285A92 /* DesignSystem */; };
+		51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE9B2FDB0E3E00285A92 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		512430B62FCC4957004D7929 /* Saion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Saion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51B3DE992FDB0D5200285A92 /* DesignSystem in Frameworks */,
+				51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = Saion;
 			packageProductDependencies = (
+				51B3DE982FDB0D5200285A92 /* DesignSystem */,
+				51B3DE9B2FDB0E3E00285A92 /* SnapKit */,
 			);
 			productName = Saion;
 			productReference = 512430B62FCC4957004D7929 /* Saion.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = 512430AD2FCC4957004D7929;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				51B3DE972FDB0D5200285A92 /* XCLocalSwiftPackageReference "DesignSystem" */,
+				51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 512430B72FCC4957004D7929 /* Products */;
 			projectDirPath = "";
@@ -353,6 +366,36 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		51B3DE972FDB0D5200285A92 /* XCLocalSwiftPackageReference "DesignSystem" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = DesignSystem;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		51B3DE982FDB0D5200285A92 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
+		};
+		51B3DE9B2FDB0E3E00285A92 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 512430AE2FCC4957004D7929 /* Project object */;
 }
