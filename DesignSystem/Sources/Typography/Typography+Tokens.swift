@@ -82,6 +82,7 @@ extension Typography {
             self.rawValue = CGFloat(value)
         }
         
+        public static let px14: LineHeight = 14.0
         public static let px16: LineHeight = 16.0
         public static let px17: LineHeight = 17.0
         public static let px20: LineHeight = 20.0
@@ -121,8 +122,8 @@ extension Typography {
         public static let tighter: LetterSpacing    = -1.0
         public static let tight: LetterSpacing      = -0.5
         public static let normal: LetterSpacing     = 0.0
-        public static let wide: LetterSpacing       = 0.5
-        public static let wider: LetterSpacing      = 1.0
-        public static let widest: LetterSpacing     = 2.0
+        public static let wide: LetterSpacing       = 0.25
+        public static let wider: LetterSpacing      = 0.5
+        public static let widest: LetterSpacing     = 1.0
     }
 }

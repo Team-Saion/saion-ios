@@ -14,9 +14,8 @@ import UIKit
 extension UIColor {
     // Primary
     public static let primaryDefault = UIColor(resource: .green500)
-    public static let primaryPressed = UIColor(resource: .green700)
+    public static let primaryStrong = UIColor(resource: .green700)
     public static let primarySubtle = UIColor(resource: .green50)
-    public static let primaryDisabled = UIColor(resource: .grey300)
     
     // Label
     public static let labelDefault = UIColor(resource: .grey900)
@@ -35,8 +34,8 @@ extension UIColor {
     public static let lineSubtle = UIColor(resource: .grey100)
     
     // Status
-    public static let statusPositiveDefault = UIColor(resource: .blue500)
-    public static let statusPositiveSubtle = UIColor(resource: .blue50)
+    public static let statusPositiveDefault = UIColor(resource: .green500)
+    public static let statusPositiveSubtle = UIColor(resource: .green50)
     public static let statusCautionaryDefault = UIColor(resource: .orange500)
     public static let statusCautionarySubtle = UIColor(resource: .orange50)
     public static let statusNegativeDefault = UIColor(resource: .red500)
@@ -50,6 +49,8 @@ extension UIColor {
     // Overlay
     public static let overlayDimmer = UIColor(resource: .opacity28)
     public static let overlayPressed = UIColor(resource: .opacity12)
+    public static let overlayDisabled = UIColor(resource: .opacityWhite76)
+    public static let overlayPressedSubtle = UIColor(resource: .opacity4)
 }
 
 // MARK: Color
@@ -58,9 +59,8 @@ extension UIColor {
 extension Color {
     // Primary
     public static let primaryDefault = Color(.green500)
-    public static let primaryPressed = Color(.green700)
+    public static let primaryStrong = Color(.green700)
     public static let primarySubtle = Color(.green50)
-    public static let primaryDisabled = Color(.grey300)
     
     // Label
     public static let labelDefault = Color(.grey900)
@@ -79,8 +79,8 @@ extension Color {
     public static let lineSubtle = Color(.grey100)
     
     // Status
-    public static let statusPositiveDefault = Color(.blue500)
-    public static let statusPositiveSubtle = Color(.blue50)
+    public static let statusPositiveDefault = Color(.green500)
+    public static let statusPositiveSubtle = Color(.green50)
     public static let statusCautionaryDefault = Color(.orange500)
     public static let statusCautionarySubtle = Color(.orange50)
     public static let statusNegativeDefault = Color(.red500)
@@ -94,4 +94,6 @@ extension Color {
     // Overlay
     public static let overlayDimmer = Color(.opacity28)
     public static let overlayPressed = Color(.opacity12)
+    public static let overlayDisabled = Color(.opacityWhite76)
+    public static let overlayPressedSubtle = Color(.opacity4)
 }

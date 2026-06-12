@@ -51,7 +51,7 @@ extension Typography {
     )
     
     public static let body1 = Typography(
-        font: .pretendard(size: .px16, weight: .regular),
+        font: .pretendard(size: .px16, weight: .medium),
         lineHeight: .px24,
         letterSpacing: .normal
     )
@@ -75,7 +75,7 @@ extension Typography {
     )
     
     public static let label2 = Typography(
-        font: .pretendard(size: .px12, weight: .medium),
+        font: .pretendard(size: .px12, weight: .semiBold),
         lineHeight: .px17,
         letterSpacing: .normal
     )
@@ -123,8 +123,8 @@ extension Typography {
     )
     
     public static let caption2Strong = Typography(
-        font: .pretendard(size: .px11, weight: .medium),
-        lineHeight: .px16,
+        font: .pretendard(size: .px11, weight: .semiBold),
+        lineHeight: .px14,
         letterSpacing: .wide
     )
 }
