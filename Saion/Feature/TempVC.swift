@@ -26,6 +26,13 @@ final class TempVC: UIViewController {
         return label
     }()
     
+    private let testView = {
+        let view = UIView()
+        view.backgroundColor = .systemBlue
+        view.layer.cornerRadius = .componentRadius.xsmall
+        return view
+    }()
+    
     // MARK: Life Cycle
     
     override func viewDidLoad() {
@@ -41,9 +48,20 @@ final class TempVC: UIViewController {
     
     private func setupLayout() {
         view.addSubview(label)
+        view.addSubview(testView)
         
-        label.snp.makeConstraints { $0.center.equalToSuperview() }
+        label.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
+        testView.snp.makeConstraints {
+            $0.top.equalTo(label.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(100)
+            $0.height.equalTo(50)
+        }
     }
+
     
     // MARK: Bindings
     

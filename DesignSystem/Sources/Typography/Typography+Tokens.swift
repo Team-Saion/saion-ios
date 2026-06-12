@@ -9,7 +9,7 @@ import Foundation
 
 extension Typography {
     
-    // MARK: FontWeight
+    // MARK: - FontWeight
     
     public enum FontWeight: String, CaseIterable, Sendable {
         case black      = "Pretendard-Black"
@@ -23,7 +23,7 @@ extension Typography {
         case thin       = "Pretendard-Thin"
     }
     
-    // MARK: FontSize
+    // MARK: - FontSize
     
     public struct FontSize:
         RawRepresentable,
@@ -46,20 +46,20 @@ extension Typography {
             self.rawValue = CGFloat(value)
         }
         
-        public static let size11: FontSize = 11.0
-        public static let size12: FontSize = 12.0
-        public static let size13: FontSize = 13.0
-        public static let size14: FontSize = 14.0
-        public static let size15: FontSize = 15.0
-        public static let size16: FontSize = 16.0
-        public static let size18: FontSize = 18.0
-        public static let size20: FontSize = 20.0
-        public static let size24: FontSize = 24.0
-        public static let size32: FontSize = 32.0
-        public static let size40: FontSize = 40.0
+        public static let px11: FontSize = 11.0
+        public static let px12: FontSize = 12.0
+        public static let px13: FontSize = 13.0
+        public static let px14: FontSize = 14.0
+        public static let px15: FontSize = 15.0
+        public static let px16: FontSize = 16.0
+        public static let px18: FontSize = 18.0
+        public static let px20: FontSize = 20.0
+        public static let px24: FontSize = 24.0
+        public static let px32: FontSize = 32.0
+        public static let px40: FontSize = 40.0
     }
     
-    // MARK: LineHeight
+    // MARK: - LineHeight
     
     public struct LineHeight:
         RawRepresentable,
@@ -82,20 +82,20 @@ extension Typography {
             self.rawValue = CGFloat(value)
         }
         
-        public static let height16: LineHeight = 16.0
-        public static let height17: LineHeight = 17.0
-        public static let height20: LineHeight = 20.0
-        public static let height21: LineHeight = 21.0
-        public static let height22: LineHeight = 22.0
-        public static let height24: LineHeight = 24.0
-        public static let height25: LineHeight = 25.0
-        public static let height28: LineHeight = 28.0
-        public static let height31: LineHeight = 31.0
-        public static let height40: LineHeight = 40.0
-        public static let height48: LineHeight = 48.0
+        public static let px16: LineHeight = 16.0
+        public static let px17: LineHeight = 17.0
+        public static let px20: LineHeight = 20.0
+        public static let px21: LineHeight = 21.0
+        public static let px22: LineHeight = 22.0
+        public static let px24: LineHeight = 24.0
+        public static let px25: LineHeight = 25.0
+        public static let px28: LineHeight = 28.0
+        public static let px31: LineHeight = 31.0
+        public static let px40: LineHeight = 40.0
+        public static let px48: LineHeight = 48.0
     }
     
-    // MARK: LetterSpacing
+    // MARK: - LetterSpacing
     
     public struct LetterSpacing:
         RawRepresentable,
@@ -118,11 +118,11 @@ extension Typography {
             self.rawValue = CGFloat(value)
         }
         
-        public static let tighter: LetterSpacing = -1.0
-        public static let tight: LetterSpacing = -0.5
-        public static let normal: LetterSpacing = 0.0
-        public static let wide: LetterSpacing = 0.5
-        public static let wider: LetterSpacing = 1.0
-        public static let widest: LetterSpacing = 2.0
+        public static let tighter: LetterSpacing    = -1.0
+        public static let tight: LetterSpacing      = -0.5
+        public static let normal: LetterSpacing     = 0.0
+        public static let wide: LetterSpacing       = 0.5
+        public static let wider: LetterSpacing      = 1.0
+        public static let widest: LetterSpacing     = 2.0
     }
 }

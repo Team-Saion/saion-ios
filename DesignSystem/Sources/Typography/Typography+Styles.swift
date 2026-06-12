@@ -9,122 +9,122 @@ import UIKit
 
 extension Typography {
     public static let display1 = Typography(
-        font: .pretendard(size: .size40, weight: .bold),
-        lineHeight: .height48,
+        font: .pretendard(size: .px40, weight: .bold),
+        lineHeight: .px48,
         letterSpacing: .tight
     )
     
     public static let display2 = Typography(
-        font: .pretendard(size: .size32, weight: .bold),
-        lineHeight: .height40,
+        font: .pretendard(size: .px32, weight: .bold),
+        lineHeight: .px40,
         letterSpacing: .tight
     )
     
     public static let heading1 = Typography(
-        font: .pretendard(size: .size24, weight: .bold),
-        lineHeight: .height31,
+        font: .pretendard(size: .px24, weight: .bold),
+        lineHeight: .px31,
         letterSpacing: .tight
     )
     
     public static let heading2 = Typography(
-        font: .pretendard(size: .size20, weight: .bold),
-        lineHeight: .height28,
+        font: .pretendard(size: .px20, weight: .bold),
+        lineHeight: .px28,
         letterSpacing: .normal
     )
     
     public static let title1 = Typography(
-        font: .pretendard(size: .size18, weight: .semiBold),
-        lineHeight: .height25,
+        font: .pretendard(size: .px18, weight: .semiBold),
+        lineHeight: .px25,
         letterSpacing: .normal
     )
     
     public static let title2 = Typography(
-        font: .pretendard(size: .size16, weight: .semiBold),
-        lineHeight: .height22,
+        font: .pretendard(size: .px16, weight: .semiBold),
+        lineHeight: .px22,
         letterSpacing: .normal
     )
     
     public static let title3 = Typography(
-        font: .pretendard(size: .size15, weight: .medium),
-        lineHeight: .height22,
+        font: .pretendard(size: .px15, weight: .medium),
+        lineHeight: .px22,
         letterSpacing: .normal
     )
     
     public static let body1 = Typography(
-        font: .pretendard(size: .size16, weight: .regular),
-        lineHeight: .height24,
+        font: .pretendard(size: .px16, weight: .regular),
+        lineHeight: .px24,
         letterSpacing: .normal
     )
     
     public static let body2 = Typography(
-        font: .pretendard(size: .size14, weight: .regular),
-        lineHeight: .height21,
+        font: .pretendard(size: .px14, weight: .regular),
+        lineHeight: .px21,
         letterSpacing: .normal
     )
     
     public static let body3 = Typography(
-        font: .pretendard(size: .size13, weight: .regular),
-        lineHeight: .height20,
+        font: .pretendard(size: .px13, weight: .regular),
+        lineHeight: .px20,
         letterSpacing: .normal
     )
     
     public static let label1 = Typography(
-        font: .pretendard(size: .size14, weight: .semiBold),
-        lineHeight: .height20,
+        font: .pretendard(size: .px14, weight: .semiBold),
+        lineHeight: .px20,
         letterSpacing: .normal
     )
     
     public static let label2 = Typography(
-        font: .pretendard(size: .size12, weight: .medium),
-        lineHeight: .height17,
+        font: .pretendard(size: .px12, weight: .medium),
+        lineHeight: .px17,
         letterSpacing: .normal
     )
     
     public static let caption1 = Typography(
-        font: .pretendard(size: .size12, weight: .regular),
-        lineHeight: .height17,
+        font: .pretendard(size: .px12, weight: .regular),
+        lineHeight: .px17,
         letterSpacing: .normal
     )
     
     public static let caption2 = Typography(
-        font: .pretendard(size: .size11, weight: .regular),
-        lineHeight: .height16,
+        font: .pretendard(size: .px11, weight: .regular),
+        lineHeight: .px16,
         letterSpacing: .wide
     )
     
     public static let title1Subtle = Typography(
-        font: .pretendard(size: .size18, weight: .medium),
-        lineHeight: .height25,
+        font: .pretendard(size: .px18, weight: .medium),
+        lineHeight: .px25,
         letterSpacing: .normal
     )
     
     public static let title3Strong = Typography(
-        font: .pretendard(size: .size15, weight: .semiBold),
-        lineHeight: .height22,
+        font: .pretendard(size: .px15, weight: .semiBold),
+        lineHeight: .px22,
         letterSpacing: .normal
     )
     
     public static let label1Strong = Typography(
-        font: .pretendard(size: .size14, weight: .bold),
-        lineHeight: .height20,
+        font: .pretendard(size: .px14, weight: .bold),
+        lineHeight: .px20,
         letterSpacing: .normal
     )
     
     public static let label1Subtle = Typography(
-        font: .pretendard(size: .size14, weight: .medium),
-        lineHeight: .height21,
+        font: .pretendard(size: .px14, weight: .medium),
+        lineHeight: .px21,
         letterSpacing: .normal
     )
     
     public static let label2Strong = Typography(
-        font: .pretendard(size: .size12, weight: .bold),
-        lineHeight: .height17,
+        font: .pretendard(size: .px12, weight: .bold),
+        lineHeight: .px17,
         letterSpacing: .normal
     )
     
     public static let caption2Strong = Typography(
-        font: .pretendard(size: .size11, weight: .medium),
-        lineHeight: .height16,
+        font: .pretendard(size: .px11, weight: .medium),
+        lineHeight: .px16,
         letterSpacing: .wide
     )
 }
