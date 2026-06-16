@@ -14,9 +14,8 @@ extension UIFont {
         size: Typography.FontSize,
         weight: Typography.FontWeight
     ) -> UIFont {
-        FontRegistry.registerFonts()
-        return UIFont(name: weight.rawValue, size: size.rawValue)
-        ?? .systemFont(ofSize: size.rawValue)
+        FontRegistrar.registerFonts()
+        return UIFont(name: weight.rawValue, size: size.rawValue)!
     }
 }
 
@@ -26,7 +25,7 @@ extension Font {
         size: Typography.FontSize,
         weight: Typography.FontWeight
     ) -> Font {
-        FontRegistry.registerFonts()
+        FontRegistrar.registerFonts()
         return Font.custom(weight.rawValue, size: size.rawValue)
     }
 }

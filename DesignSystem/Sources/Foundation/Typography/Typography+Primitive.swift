@@ -1,5 +1,5 @@
 //
-//  Typography+Tokens.swift
+//  Typography+Primitive.swift
 //  DesignSystem
 //
 //  Created by 신정욱 on 6/12/26.

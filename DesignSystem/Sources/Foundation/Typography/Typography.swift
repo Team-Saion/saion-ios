@@ -31,4 +31,3 @@ public struct Typography: Sendable {
     /// 한글 단어 단위 줄바꿈 등의 줄바꿈 전략 (기본값은 .hangulWordPriority)
     public var lineBreakStrategy: NSParagraphStyle.LineBreakStrategy? = .hangulWordPriority
 }
-

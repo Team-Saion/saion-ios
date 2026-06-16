@@ -19,7 +19,7 @@ final class TempVC: UIViewController {
     // MARK: Components
     
     private let label = {
-        var typo = Typography.body2
+        var typo = Typography.display2
         typo.foregroundColor = .labelStrong
         let label = UILabel()
         label.attributedText = typo.toNSAttributedString("아무말이나 해볼까 해용")
@@ -29,7 +29,7 @@ final class TempVC: UIViewController {
     private let testView = {
         let view = UIView()
         view.backgroundColor = .systemBlue
-        view.layer.cornerRadius = .componentRadius.xsmall
+        view.layer.cornerRadius = Radius.componentFull
         return view
     }()
     
@@ -71,4 +71,4 @@ final class TempVC: UIViewController {
 // MARK: - Preview
 
 @available(iOS 17.0, *)
-#Preview { TempVC() }
+#Preview { return TempVC() }
