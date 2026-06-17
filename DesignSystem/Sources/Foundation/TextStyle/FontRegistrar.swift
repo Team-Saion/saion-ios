@@ -26,7 +26,7 @@ final class FontRegistrar {
         defer { lock.unlock() }
         guard !isRegistered else { return }
         
-        Typography.FontWeight.allCases.forEach {
+        TextStyle.Typography.FontWeight.allCases.forEach {
             registerFont(name: $0.rawValue)
         }
         

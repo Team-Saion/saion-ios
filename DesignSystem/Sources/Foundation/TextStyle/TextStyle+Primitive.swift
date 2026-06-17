@@ -1,5 +1,5 @@
 //
-//  Typography+Primitive.swift
+//  TextStyle+Primitive.swift
 //  DesignSystem
 //
 //  Created by 신정욱 on 6/12/26.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Typography {
+extension TextStyle.Typography {
     
     // MARK: - FontWeight
     
@@ -54,6 +54,7 @@ extension Typography {
         public static let px16: FontSize = 16.0
         public static let px18: FontSize = 18.0
         public static let px20: FontSize = 20.0
+        public static let px22: FontSize = 22.0
         public static let px24: FontSize = 24.0
         public static let px32: FontSize = 32.0
         public static let px40: FontSize = 40.0

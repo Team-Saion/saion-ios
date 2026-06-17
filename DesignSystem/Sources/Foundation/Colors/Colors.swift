@@ -21,7 +21,9 @@ extension UIColor {
     public static let labelDefault = UIColor(resource: .grey900)
     public static let labelStrong = UIColor(resource: .grey800)
     public static let labelSubtle = UIColor(resource: .grey600)
-    public static let labelDisabled = UIColor(resource: .grey400)
+    public static let labelDisabled = UIColor(resource: .grey300)
+    public static let labelMuted = UIColor(resource: .grey500)
+    public static let labelInverse = UIColor(resource: .common0)
     
     // Background
     public static let backgroundDefault = UIColor(resource: .common0)
@@ -66,7 +68,9 @@ extension Color {
     public static let labelDefault = Color(.grey900)
     public static let labelStrong = Color(.grey800)
     public static let labelSubtle = Color(.grey600)
-    public static let labelDisabled = Color(.grey400)
+    public static let labelDisabled = Color(.grey300)
+    public static let labelMuted = Color(.grey500)
+    public static let labelInverse = Color(.common0)
     
     // Background
     public static let backgroundDefault = Color(.common0)

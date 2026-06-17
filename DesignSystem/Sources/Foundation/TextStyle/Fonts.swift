@@ -11,8 +11,8 @@ import UIKit
 extension UIFont {
     /// UIKit용 Pretendard 폰트를 반환
     public static func pretendard(
-        size: Typography.FontSize,
-        weight: Typography.FontWeight
+        size: DesignSystem.TextStyle.Typography.FontSize,
+        weight: DesignSystem.TextStyle.Typography.FontWeight
     ) -> UIFont {
         FontRegistrar.registerFonts()
         return UIFont(name: weight.rawValue, size: size.rawValue)!
@@ -22,8 +22,8 @@ extension UIFont {
 extension Font {
     /// SwiftUI용 Pretendard 폰트를 반환
     public static func pretendard(
-        size: Typography.FontSize,
-        weight: Typography.FontWeight
+        size: DesignSystem.TextStyle.Typography.FontSize,
+        weight: DesignSystem.TextStyle.Typography.FontWeight
     ) -> Font {
         FontRegistrar.registerFonts()
         return Font.custom(weight.rawValue, size: size.rawValue)

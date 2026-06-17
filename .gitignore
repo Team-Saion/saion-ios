@@ -34,6 +34,10 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Build Logs
+*.log
+build_log*.txt
+
 # Ruby & Bundler
 .bundle/
 vendor/bundle/

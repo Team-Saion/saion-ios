@@ -19,10 +19,12 @@ final class TempVC: UIViewController {
     // MARK: Components
     
     private let label = {
-        var typo = Typography.display2
-        typo.foregroundColor = .labelStrong
+        let typo = TextStyle(
+            typography: .display2,
+            decoration: .init(foregroundColor: .labelStrong)
+        )
         let label = UILabel()
-        label.attributedText = typo.toNSAttributedString("아무말이나 해볼까 해용")
+        label.attributedText = typo.toNSAttrStr("아무말이나 해볼까 해용")
         return label
     }()
     
