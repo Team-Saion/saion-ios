@@ -58,7 +58,7 @@ extension SaionButton {
     }
 }
 
-// MARK: Size Tokens
+// MARK: - Size Tokens
 
 extension SaionButton.Appearance.SizeMetrics {
     public static let small: Self = .init(
@@ -86,7 +86,7 @@ extension SaionButton.Appearance.SizeMetrics {
     )
 }
 
-// MARK: Variant Tokens
+// MARK: - Variant Tokens
 
 extension SaionButton.Appearance.Variant {
     public static let primary: Self = .init(

@@ -1,26 +1,24 @@
 //
-//  SaionButton.swift
+//  SaionIconButton.swift
 //  DesignSystem
 //
-//  Created by 신정욱 on 6/17/26.
+//  Created by 신정욱 on 6/18/26.
 //
 
 import UIKit
 
 import SnapKit
 
-/// 디자인 시스템 공통 커스텀 버튼 컴포넌트
-/// UIButton.Configuration 및 SaionButton.Appearance 기반으로 동작
-public final class SaionButton: UIButton {
+public final class SaionIconButton: UIButton {
     
     // MARK: Properties
     
     /// 버튼의 크기, 색상, 이미지 등 스타일 사양을 정의하는 디자인 토큰 객체
-    public let appearance: SaionButton.Appearance
+    public let appearance: SaionIconButton.Appearance
     
-    /// 버튼 표시 텍스트
-    /// 값 변경 시 버튼 설정 업데이트 요청
-    public var title: String? {
+    /// 버튼 표시 이미지
+    /// /// 값 변경 시 버튼 설정 업데이트 요청
+    public var image: UIImage? {
         didSet { setNeedsUpdateConfiguration() }
     }
     
@@ -31,7 +29,7 @@ public final class SaionButton: UIButton {
     
     // MARK: Life Cycle
     
-    public init(with appearance: SaionButton.Appearance) {
+    public init(with appearance: SaionIconButton.Appearance) {
         self.appearance = appearance
         super.init(frame: .zero)
         setupDefaults()
@@ -52,14 +50,10 @@ public final class SaionButton: UIButton {
     private func setupDefaults() {
         // UIButton.Configuration 기반의 인셋, 이미지, 기본 배경색 등 기본 UI 속성 설정
         var config = UIButton.Configuration.plain()
-        
-        config.image = appearance.image?.withTintColor(appearance.variant.foregroundColor)
-        config.imagePlacement = appearance.imagePlacement
-        config.imagePadding = 4
-        
-        config.background.backgroundColor = appearance.variant.backgroundColor
-        config.contentInsets = appearance.size.contentInset
-        config.cornerStyle = .capsule
+        config.background.backgroundColor = .clear
+        config.contentInsets = .zero
+        config.background.cornerRadius = Radius.componentLarge
+        config.cornerStyle = .fixed
         
         configuration = config
         clipsToBounds = true
@@ -70,7 +64,7 @@ public final class SaionButton: UIButton {
     private func setupLayout() {
         layer.addSublayer(overlayLayer)
         
-        self.snp.makeConstraints { $0.height.equalTo(appearance.size.height) }
+        self.snp.makeConstraints { $0.size.equalTo(appearance.size.buttonSize) }
     }
     
     // MARK: Overrides
@@ -80,15 +74,13 @@ public final class SaionButton: UIButton {
         
         /// 상태별 오버레이 색상
         let overlayColor: UIColor = switch state {
-        case .highlighted:  .overlayPressed
-        case .disabled:     .overlayDisabled
+        case .highlighted:  .overlayPressedSubtle
         default:            .clear
         }
         
         /// 상태별 스케일
         let scale: CGAffineTransform = switch state {
         case .highlighted:  CGAffineTransform(scaleX: 0.95, y: 0.95)
-        case .disabled:     .identity
         default:            .identity
         }
         
@@ -107,24 +99,35 @@ public final class SaionButton: UIButton {
             }
         )
         
-        /// 타이틀 스타일 반영
-        var titleStyle = TextStyle()
-        titleStyle.typography = appearance.size.typography
-        titleStyle.decoration.foregroundColor = appearance.variant.foregroundColor
-        configuration.attributedTitle = title.map { titleStyle.toAttrStr($0) }
+        // 이미지 스타일 반영
+        configuration.image = image?
+            .resized(to: appearance.size.imageSize)
+            .withTintColor(.labelStrong)
         
         self.configuration = configuration
     }
 }
 
+// MARK: - UIImage
+
+extension UIImage {
+    /// 버튼 이미지 리사이징 목적의 확장 헬퍼 메서드
+    fileprivate func resized(to size: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        
+        let resizedImage = renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: size))
+        }
+        
+        return resizedImage.withRenderingMode(renderingMode)
+    }
+}
+
 // MARK: - Preview
 
-@available(iOS 17.0, *)
 #Preview {
-    let appearance = SaionButton.Appearance(size: .large, variant: .neutral)
-    let button = SaionButton(with: appearance)
-    button.title = "버튼입니당"
-    //    button.isEnabled = false
-    //    button.title = "근데 비활성화된.."
+    let appearance = SaionIconButton.Appearance(size: .medium)
+    let button = SaionIconButton(with: appearance)
+    button.image = UIImage(resource: .chevronRightMedium)
     return button
 }

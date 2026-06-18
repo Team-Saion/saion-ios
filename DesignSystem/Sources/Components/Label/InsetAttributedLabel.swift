@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class InsetLabel: UILabel {
+open class InsetAttributedLabel: AttributedLabel {
     
     // MARK: Properties
     

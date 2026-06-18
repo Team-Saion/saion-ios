@@ -12,11 +12,27 @@ let package = Package(
             targets: ["DesignSystem"]
         ),
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/SnapKit/SnapKit",
+            from: "6.0.0"
+        ),
+        .package(
+            url: "https://github.com/ReactiveX/RxSwift.git",
+            from: "6.0.0"
+        ),
+    ],
     targets: [
         .target(
             name: "DesignSystem",
+            dependencies: [
+                .product(name: "SnapKit", package: "SnapKit"),
+                .product(name: "RxSwift", package: "RxSwift"),
+                .product(name: "RxCocoa", package: "RxSwift"),
+            ],
             path: "Sources",
-            resources: [.process("Resources")]
+            resources: [.process("Resources")],
+            swiftSettings: [.defaultIsolation(.none)]
         ),
     ]
 )
