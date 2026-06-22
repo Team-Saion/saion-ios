@@ -7,8 +7,8 @@
 
 import UIKit
 
-import RxSwift
-import RxCocoa
+import Combine
+import CombineCocoa
 import SnapKit
 
 // FIXME: 접근 레벨 손봐야 함..
@@ -16,20 +16,9 @@ final class SaionBoxTextForm: UIStackView {
     
     // MARK: Properties
     
-    private let disposeBag = DisposeBag()
+    private var cancellables = Set<AnyCancellable>()
     
-    // FIXME: 그냥 스트림으로 제공하는 게 낫지 않을까..?
-    var hasError: Bool {
-        // 내부적으로 에러를 발생시키지 않으므로 try! 처리
-        // (BehaviorRelay 까지 끌고오기 싫음..)
-        get { try! hasErrorSubject.value() }
-        set { hasErrorSubject.onNext(newValue) }
-    }
-    
-    // MARK: Subjects
-    
-    /// 현재 에러 상태 서브젝트
-    private let hasErrorSubject = BehaviorSubject(value: false)
+    @Published var hasError: Bool = false
     
     // MARK: Components
     
@@ -98,32 +87,31 @@ final class SaionBoxTextForm: UIStackView {
     
     private func setupBindings() {
         /// 텍스트 필드의 포커스(편집 시작 및 종료) 상태
-        let isFocused = Observable
-            .merge(
-                textField.rx.controlEvent(.editingDidBegin).map { true },
-                textField.rx.controlEvent(.editingDidEnd).map { false }
-            )
-            .startWith(textField.isEditing)
-            .distinctUntilChanged()
+        let isFocused = Publishers.Merge(
+            textField.controlEventPublisher(for: .editingDidBegin).map { true },
+            textField.controlEventPublisher(for: .editingDidEnd).map { false }
+        )
+            .prepend(textField.isEditing)
+            .removeDuplicates()
         
         /// 텍스트 필드의 활성/비활성(isEnabled) 상태
-        let isEnabled = textField.rx.observe(\.isEnabled)
-            .startWith(textField.isEnabled)
-            .distinctUntilChanged()
+        let isEnabled = textField.publisher(for: \.isEnabled)
+            .prepend(textField.isEnabled)
+            .removeDuplicates()
         
         /// 텍스트 필드에 글자가 입력되어 있는지 여부
-        let isFilled = textField.rx.text
+        let isFilled = textField.textPublisher
             .map { $0?.isEmpty == false }
-            .startWith(textField.text?.isEmpty == false)
-            .distinctUntilChanged()
+            .prepend(textField.text?.isEmpty == false)
+            .removeDuplicates()
         
         /// 에러 발생 여부
-        let hasError = hasErrorSubject
-            .distinctUntilChanged()
+        let hasError = $hasError
+            .removeDuplicates()
         
         /// 여러 상태를 조합하여 현재 상태에 맞는 UI 스타일(Appearance)을 결정
-        let currentAppearance = Observable
-            .combineLatest(isEnabled, hasError, isFocused, isFilled)
+        let currentAppearance = Publishers
+            .CombineLatest4(isEnabled, hasError, isFocused, isFilled)
             .map { isEnabled, hasError, isFocused, isFilled -> TextFormAppearance in
                 if !isEnabled { return .disabled }
                 if hasError { return .error }
@@ -131,12 +119,12 @@ final class SaionBoxTextForm: UIStackView {
                 if isFilled { return .filled }
                 return .normal
             }
-            .distinctUntilChanged()
+            .removeDuplicates()
         
         // 주어진 appearance로 UI 갱신
         currentAppearance
-            .bind(with: self) { $0.updateUI(appearance: $1) }
-            .disposed(by: disposeBag)
+            .sink { [weak self] in self?.updateUI(appearance: $0) }
+            .store(in: &cancellables)
     }
 }
 

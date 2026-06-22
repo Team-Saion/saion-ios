@@ -2,12 +2,12 @@
   "originHash" : "e87954b8ed55c301affcdc2781ef34053645d631fff733d1c4055d0beff9a31e",
   "pins" : [
     {
-      "identity" : "rxswift",
+      "identity" : "combinecocoa",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactiveX/RxSwift.git",
+      "location" : "https://github.com/CombineCommunity/CombineCocoa.git",
       "state" : {
-        "revision" : "132aea4f236ccadc51590b38af0357a331d51fa2",
-        "version" : "6.10.2"
+        "revision" : "7300c75ff9e072aa7fd0fccefcc88f74aae9bf56",
+        "version" : "0.4.1"
       }
     },
     {

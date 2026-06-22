@@ -18,8 +18,8 @@ let package = Package(
             from: "6.0.0"
         ),
         .package(
-            url: "https://github.com/ReactiveX/RxSwift.git",
-            from: "6.0.0"
+            url: "https://github.com/CombineCommunity/CombineCocoa.git",
+            from: "0.4.1"
         ),
     ],
     targets: [
@@ -27,12 +27,12 @@ let package = Package(
             name: "DesignSystem",
             dependencies: [
                 .product(name: "SnapKit", package: "SnapKit"),
-                .product(name: "RxSwift", package: "RxSwift"),
-                .product(name: "RxCocoa", package: "RxSwift"),
+                .product(name: "CombineCocoa", package: "CombineCocoa"),
             ],
             path: "Sources",
             resources: [.process("Resources")],
             swiftSettings: [.defaultIsolation(.none)]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v5]
 )
