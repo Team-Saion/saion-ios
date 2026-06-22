@@ -63,11 +63,10 @@ final class TempVC: UIViewController {
             $0.height.equalTo(50)
         }
     }
-
     
     // MARK: Bindings
     
-    private func setupBindings() {}
+    private func setupBindings() { }
 }
 
 // MARK: - Preview

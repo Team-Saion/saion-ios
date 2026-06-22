@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		51040FAB2FE971E200439ACF /* CombineCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 51040FAA2FE971E200439ACF /* CombineCocoa */; };
+		510412572FE9778B00439ACF /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 510412562FE9778B00439ACF /* Alamofire */; };
+		5104125A2FE977A400439ACF /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 510412592FE977A400439ACF /* Kingfisher */; };
+		5104125D2FE9783800439ACF /* CasePaths in Frameworks */ = {isa = PBXBuildFile; productRef = 5104125C2FE9783800439ACF /* CasePaths */; };
+		5104126C2FE97A2300439ACF /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 5104126B2FE97A2300439ACF /* Navigation */; };
+		5104126F2FE97A3600439ACF /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 5104126E2FE97A3600439ACF /* Navigation */; };
 		51B3DE992FDB0D5200285A92 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE982FDB0D5200285A92 /* DesignSystem */; };
 		51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE9B2FDB0E3E00285A92 /* SnapKit */; };
 /* End PBXBuildFile section */
@@ -43,8 +48,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				51B3DE992FDB0D5200285A92 /* DesignSystem in Frameworks */,
+				510412572FE9778B00439ACF /* Alamofire in Frameworks */,
+				5104126F2FE97A3600439ACF /* Navigation in Frameworks */,
 				51040FAB2FE971E200439ACF /* CombineCocoa in Frameworks */,
 				51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */,
+				5104126C2FE97A2300439ACF /* Navigation in Frameworks */,
+				5104125A2FE977A400439ACF /* Kingfisher in Frameworks */,
+				5104125D2FE9783800439ACF /* CasePaths in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +100,11 @@
 				51B3DE982FDB0D5200285A92 /* DesignSystem */,
 				51B3DE9B2FDB0E3E00285A92 /* SnapKit */,
 				51040FAA2FE971E200439ACF /* CombineCocoa */,
+				510412562FE9778B00439ACF /* Alamofire */,
+				510412592FE977A400439ACF /* Kingfisher */,
+				5104125C2FE9783800439ACF /* CasePaths */,
+				5104126B2FE97A2300439ACF /* Navigation */,
+				5104126E2FE97A3600439ACF /* Navigation */,
 			);
 			productName = Saion;
 			productReference = 512430B62FCC4957004D7929 /* Saion.app */;
@@ -123,6 +138,10 @@
 				51B3DE972FDB0D5200285A92 /* XCLocalSwiftPackageReference "DesignSystem" */,
 				51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				51040FA92FE971E200439ACF /* XCRemoteSwiftPackageReference "CombineCocoa" */,
+				510412552FE9778B00439ACF /* XCRemoteSwiftPackageReference "Alamofire" */,
+				510412582FE977A400439ACF /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				5104125B2FE9783800439ACF /* XCRemoteSwiftPackageReference "swift-case-paths" */,
+				5104126D2FE97A3600439ACF /* XCLocalSwiftPackageReference "Navigation" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 512430B72FCC4957004D7929 /* Products */;
@@ -372,6 +391,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		5104126D2FE97A3600439ACF /* XCLocalSwiftPackageReference "Navigation" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Navigation;
+		};
 		51B3DE972FDB0D5200285A92 /* XCLocalSwiftPackageReference "DesignSystem" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = DesignSystem;
@@ -385,6 +408,30 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.4.1;
+			};
+		};
+		510412552FE9778B00439ACF /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.12.0;
+			};
+		};
+		510412582FE977A400439ACF /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.10.0;
+			};
+		};
+		5104125B2FE9783800439ACF /* XCRemoteSwiftPackageReference "swift-case-paths" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-case-paths.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.0;
 			};
 		};
 		51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
@@ -402,6 +449,30 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 51040FA92FE971E200439ACF /* XCRemoteSwiftPackageReference "CombineCocoa" */;
 			productName = CombineCocoa;
+		};
+		510412562FE9778B00439ACF /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 510412552FE9778B00439ACF /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		510412592FE977A400439ACF /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 510412582FE977A400439ACF /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		5104125C2FE9783800439ACF /* CasePaths */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5104125B2FE9783800439ACF /* XCRemoteSwiftPackageReference "swift-case-paths" */;
+			productName = CasePaths;
+		};
+		5104126B2FE97A2300439ACF /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5104125B2FE9783800439ACF /* XCRemoteSwiftPackageReference "swift-case-paths" */;
+			productName = Navigation;
+		};
+		5104126E2FE97A3600439ACF /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Navigation;
 		};
 		51B3DE982FDB0D5200285A92 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
