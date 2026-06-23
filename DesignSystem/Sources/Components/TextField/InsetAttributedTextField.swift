@@ -7,51 +7,51 @@
 
 import UIKit
 
-class InsetAttributedTextField: AttributedTextField {
+open class InsetAttributedTextField: AttributedTextField {
     
     // MARK: Properties
     
     /// 텍스트 필드 바깥 여백
-    var inset: UIEdgeInsets = .zero {
+    open var inset: UIEdgeInsets = .zero {
         didSet { setNeedsLayout() }
     }
     
     /// leftView와 텍스트 사이 간격
-    var leftViewPadding: CGFloat = .zero {
+    open var leftViewPadding: CGFloat = .zero {
         didSet { setNeedsLayout() }
     }
     
     /// rightView와 텍스트 사이 간격
-    var rightViewPadding: CGFloat = .zero {
+    open var rightViewPadding: CGFloat = .zero {
         didSet { setNeedsLayout() }
     }
     
     // MARK: Overrides
     
     /// 일반 상태에서 표시할 텍스트 영역을 계산
-    override func textRect(forBounds bounds: CGRect) -> CGRect {
+    open override func textRect(forBounds bounds: CGRect) -> CGRect {
         contentRect(forBounds: bounds, isEditing: false)
     }
     
     /// 편집 중에 표시할 텍스트 영역을 계산
-    override func editingRect(forBounds bounds: CGRect) -> CGRect {
+    open override func editingRect(forBounds bounds: CGRect) -> CGRect {
         contentRect(forBounds: bounds, isEditing: true)
     }
     
     /// 플레이스홀더가 표시될 영역을 계산
-    override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
+    open override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         contentRect(forBounds: bounds, isEditing: isEditing)
     }
     
     /// leftView를 왼쪽 inset 기준에 맞춰 배치
-    override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+    open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
         var leftViewRect = super.leftViewRect(forBounds: bounds)
         leftViewRect.origin.x = inset.left
         return leftViewRect
     }
     
     /// rightView를 오른쪽 inset 안쪽에 맞춰 배치
-    override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
+    open override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
         var rightViewRect = super.rightViewRect(forBounds: bounds)
         rightViewRect.origin.x = bounds.width - inset.right - rightViewRect.width
         return rightViewRect

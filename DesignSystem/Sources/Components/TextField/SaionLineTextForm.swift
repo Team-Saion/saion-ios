@@ -1,8 +1,8 @@
 //
-//  SaionBoxTextForm.swift
+//  SaionLineTextForm.swift
 //  DesignSystem
 //
-//  Created by 신정욱 on 6/18/26.
+//  Created by 신정욱 on 6/22/26.
 //
 
 import Combine
@@ -11,11 +11,12 @@ import UIKit
 import CombineCocoa
 import SnapKit
 
-public final class SaionBoxTextForm: UIStackView {
+public final class SaionLineTextForm: UIStackView {
     
     // MARK: Properties
     
     private var cancellables = Set<AnyCancellable>()
+    private var constraint: Constraint?
     
     @Published public var hasError: Bool = false
     
@@ -31,18 +32,16 @@ public final class SaionBoxTextForm: UIStackView {
     
     public let textField =  {
         var placeholderStyle = TextStyle()
-        placeholderStyle.typography = .title1Subtle
+        placeholderStyle.typography = .heading1Subtle
         
         var textStyle = TextStyle()
-        textStyle.typography = .title1Subtle
+        textStyle.typography = .heading1Subtle
         
         var field = InsetAttributedTextField()
         field.placeholderAttributes = placeholderStyle.toDictionary()
         field.defaultTextAttributes = textStyle.toDictionary()
-        field.layer.cornerRadius = Radius.componentXlarge
         
-        field.inset = .init(left: 16, right: 8)
-        field.snp.makeConstraints { $0.height.equalTo(52) }
+        field.snp.makeConstraints { $0.height.equalTo(44) }
         return field
     }()
     
@@ -53,6 +52,8 @@ public final class SaionBoxTextForm: UIStackView {
         label.textAttributes = style.toDictionary()
         return label
     }()
+    
+    private let underline = UIView()
     
     // MARK: Life Cycle
     
@@ -80,16 +81,24 @@ public final class SaionBoxTextForm: UIStackView {
         addArrangedSubview(titleLabel)
         addArrangedSubview(textField)
         addArrangedSubview(captionLabel)
+        
+        textField.addSubview(underline)
+        
+        underline.snp.makeConstraints {
+            $0.horizontalEdges.bottom.equalToSuperview()
+            constraint = $0.height.equalTo(1).constraint
+        }
     }
     
     // MARK: Bindings
     
     private func setupBindings() {
         /// 텍스트 필드의 포커스(편집 시작 및 종료) 상태
-        let isFocused = Publishers.Merge(
-            textField.controlEventPublisher(for: .editingDidBegin).map { true },
-            textField.controlEventPublisher(for: .editingDidEnd).map { false }
-        )
+        let isFocused = Publishers
+            .Merge(
+                textField.controlEventPublisher(for: .editingDidBegin).map { true },
+                textField.controlEventPublisher(for: .editingDidEnd).map { false }
+            )
             .prepend(textField.isEditing)
             .removeDuplicates()
         
@@ -129,7 +138,7 @@ public final class SaionBoxTextForm: UIStackView {
 
 // MARK: - Reactive Interface
 
-extension SaionBoxTextForm {
+extension SaionLineTextForm {
     /// 주어진 appearance로 UI 갱신
     private func updateUI(appearance: TextFormAppearance) {
         titleLabel.textAttributes[.foregroundColor] = appearance.titleColor
@@ -137,16 +146,15 @@ extension SaionBoxTextForm {
         textField.placeholderAttributes[.foregroundColor] = appearance.placeholderColor
         textField.defaultTextAttributes[.foregroundColor] = appearance.textColor
         
-        textField.backgroundColor = appearance.backgroundColor
-        textField.layer.borderColor = appearance.strokeColor.cgColor
-        textField.layer.borderWidth = appearance.strokeWidth
+        underline.backgroundColor = appearance.strokeColor
+        constraint?.update(offset: appearance.strokeWidth)
     }
 }
 
 // MARK: - Preview
 
 #Preview {
-    let form = SaionBoxTextForm()
+    let form = SaionLineTextForm()
     form.titleLabel.text = "아이디"
     form.textField.placeholder = "아이디를 입력해주세요."
     form.captionLabel.text = "캡션이 꼭 노출되어 있어야하나 싶긴 하네요."
