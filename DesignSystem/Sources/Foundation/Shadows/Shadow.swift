@@ -9,7 +9,7 @@ import UIKit
 
 public struct Shadow: Sendable {
     public let shadowColor: UIColor
-    public let shadowOpacity: CGFloat
+    public let shadowOpacity: Float
     public let shadowOffset: CGSize
     public let shadowRadius: CGFloat
 }
