@@ -13,6 +13,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        // 인증 상태 매니저 초기화
+        AuthManager.shared.store.send(.appDidLaunch)
         return true
     }
 }
