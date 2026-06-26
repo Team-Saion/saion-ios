@@ -13,6 +13,7 @@
 		5104125D2FE9783800439ACF /* CasePaths in Frameworks */ = {isa = PBXBuildFile; productRef = 5104125C2FE9783800439ACF /* CasePaths */; };
 		5104126C2FE97A2300439ACF /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 5104126B2FE97A2300439ACF /* Navigation */; };
 		5104126F2FE97A3600439ACF /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 5104126E2FE97A3600439ACF /* Navigation */; };
+		511D79FC2FEECB680093272A /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 511D79FB2FEECB680093272A /* KakaoSDK */; };
 		51B3DE992FDB0D5200285A92 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE982FDB0D5200285A92 /* DesignSystem */; };
 		51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE9B2FDB0E3E00285A92 /* SnapKit */; };
 /* End PBXBuildFile section */
@@ -55,6 +56,7 @@
 				5104126C2FE97A2300439ACF /* Navigation in Frameworks */,
 				5104125A2FE977A400439ACF /* Kingfisher in Frameworks */,
 				5104125D2FE9783800439ACF /* CasePaths in Frameworks */,
+				511D79FC2FEECB680093272A /* KakaoSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +107,7 @@
 				5104125C2FE9783800439ACF /* CasePaths */,
 				5104126B2FE97A2300439ACF /* Navigation */,
 				5104126E2FE97A3600439ACF /* Navigation */,
+				511D79FB2FEECB680093272A /* KakaoSDK */,
 			);
 			productName = Saion;
 			productReference = 512430B62FCC4957004D7929 /* Saion.app */;
@@ -126,11 +129,11 @@
 				};
 			};
 			buildConfigurationList = 512430B12FCC4957004D7929 /* Build configuration list for PBXProject "Saion" */;
-			developmentRegion = en;
+			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				ko,
 			);
 			mainGroup = 512430AD2FCC4957004D7929;
 			minimizedProjectReferenceProxies = 1;
@@ -142,6 +145,7 @@
 				510412582FE977A400439ACF /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				5104125B2FE9783800439ACF /* XCRemoteSwiftPackageReference "swift-case-paths" */,
 				5104126D2FE97A3600439ACF /* XCLocalSwiftPackageReference "Navigation" */,
+				511D79FA2FEECB680093272A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 512430B72FCC4957004D7929 /* Products */;
@@ -248,9 +252,12 @@
 		};
 		512430CC2FCC4958004D7929 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 512430B82FCC4957004D7929 /* Saion */;
+			baseConfigurationReferenceRelativePath = Resource/ConfigDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -312,9 +319,12 @@
 		};
 		512430CD2FCC4958004D7929 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 512430B82FCC4957004D7929 /* Saion */;
+			baseConfigurationReferenceRelativePath = Resource/ConfigRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -434,6 +444,14 @@
 				minimumVersion = 1.8.0;
 			};
 		};
+		511D79FA2FEECB680093272A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -473,6 +491,11 @@
 		5104126E2FE97A3600439ACF /* Navigation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Navigation;
+		};
+		511D79FB2FEECB680093272A /* KakaoSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 511D79FA2FEECB680093272A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDK;
 		};
 		51B3DE982FDB0D5200285A92 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;

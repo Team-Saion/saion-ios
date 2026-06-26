@@ -49,3 +49,8 @@ vendor/bundle/
 
 # Secret
 .netrc
+
+# Configurations
+ConfigDebug.xcconfig
+ConfigRelease.xcconfig
+

@@ -7,6 +7,8 @@
 
 import UIKit
 
+import KakaoSDKCommon
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(
@@ -15,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         // 인증 상태 매니저 초기화
         AuthManager.shared.store.send(.appDidLaunch)
+        // Kakao SDK 초기화(소셜 로그인)
+        KakaoSDK.initSDK(appKey: Bundle.main.kakaoNativeAppKey)
         return true
     }
 }
