@@ -5,8 +5,11 @@
 //  Created by 신정욱 on 6/26/26.
 //
 
+import Combine
 import UIKit
 
+import CasePaths
+import CombineCocoa
 import SnapKit
 
 import DesignSystem
@@ -15,6 +18,8 @@ final class LoginVC: UIViewController {
     
     // MARK: Properties
     
+    private var cancellables = Set<AnyCancellable>()
+    private let vm = AuthDI.shared.makeLoginVM()
     
     // MARK: Components
     
@@ -24,7 +29,7 @@ final class LoginVC: UIViewController {
         let appearance = SaionButton.Appearance(
             size: .xlarge,
             variant: .init(
-                foregroundColor: .common100,
+                foregroundColor: .labelDefault,
                 backgroundColor: .hex(0xFFEB00)
             ),
             image: .authKakao,
@@ -42,6 +47,7 @@ final class LoginVC: UIViewController {
         super.viewDidLoad()
         setupDefaults()
         setupLayout()
+        setupBindings()
     }
     
     // MARK: Defaults
@@ -64,7 +70,17 @@ final class LoginVC: UIViewController {
     
     // MARK: Bindings
     
-    private func setupBindings() {}
+    private func setupBindings() {
+        loginButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.kakaoLoginTapped) }
+            .store(in: &cancellables)
+        
+        vm.effectPublisher
+            .compactMap { $0[case: \.presentError] }
+            .print("🥕")
+            .sink { [weak self] _ in }
+            .store(in: &cancellables)
+    }
 }
 
 // MARK: - Preview

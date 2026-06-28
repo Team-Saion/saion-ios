@@ -31,10 +31,10 @@ final class AuthManagerStore {
         fileprivate var isFirstLaunch: Bool = true
         /// 액세스 토큰
         @SecureStorage("accessToken")
-        fileprivate var accessToken: String?
+        var accessToken: String?
         /// 리프레시 토큰
         @SecureStorage("refreshToken")
-        fileprivate var refreshToken: String?
+        var refreshToken: String?
         /// 현재 인증 상태
         var authState: AuthState = .unknown
     }
@@ -75,7 +75,7 @@ final class AuthManagerStore {
             state.authState = .invalid
             state.accessToken = nil
             state.refreshToken = nil
-
+            
         case .appDidBecomeActive:
             // 토큰 유무 및 유효성 검사
             if validateTokenUC.execute(with: state.accessToken) {
@@ -92,7 +92,7 @@ final class AuthManagerStore {
             state.authState = .valid
             state.accessToken = accessToken
             state.refreshToken = refreshToken
-
+            
         case .userDidLogout:
             state.authState = .invalid
             state.accessToken = nil

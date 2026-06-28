@@ -8,12 +8,17 @@
 import Combine
 import Foundation
 
+import Alamofire
+
 final class AuthManager {
     
     // MARK: Properties
     
     let store = AuthManagerStore()
     private var cancellables = Set<AnyCancellable>()
+    
+    var accessToken: String? { store.state.accessToken }
+    var refreshToken: String? { store.state.refreshToken }
     
     // MARK: Singleton
     
@@ -33,4 +38,10 @@ final class AuthManager {
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
+}
+
+// MARK: - AuthenticationCredential
+
+extension AuthManager: AuthenticationCredential {
+    var requiresRefresh: Bool { store.state.authState == .invalid }
 }

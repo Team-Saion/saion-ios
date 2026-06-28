@@ -7,11 +7,14 @@
 
 import UIKit
 
+import KakaoSDKAuth
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // MARK: Properties
     
-    var window: UIWindow?
+    var mainWindow: UIWindow?
+    var appCoord: AppCoord?
     
     // MARK: Methods
     
@@ -22,11 +25,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        window = UIWindow(windowScene: windowScene)
+        // 메인 윈도우 설정
+        let mainWindow = UIWindow(windowScene: windowScene)
+        mainWindow.makeKeyAndVisible()
+        self.mainWindow = mainWindow
         
-        // TODO: 메인화면 진입 로직 추가해야 함
+        // 루트 뷰 컨트롤러는 AppCoord 내부에서 설정
+        appCoord = AppCoord(window: mainWindow)
+        appCoord?.start()
+    }
+    
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        // 씬이 활성화 됐을 때, 토큰 유효기간 체크 및 상태 갱신
+        AuthManager.shared.store.send(.appDidBecomeActive)
+    }
+    
+    /// 딥링크나 유니버설 링크를 처리하는 메서드
+    func scene(
+        _ scene: UIScene,
+        openURLContexts URLContexts: Set<UIOpenURLContext>
+    ) {
+        // 들어온 URL 정보가 있는지 확인
+        guard let url = URLContexts.first?.url else { return }
         
-        window?.makeKeyAndVisible()
+        // 카카오톡 앱을 통한 인증 후 돌아왔을 때, SDK에 전달해 로그인을 완료
+        if AuthApi.isKakaoTalkLoginUrl(url) {
+            _ = AuthController.handleOpenUrl(url: url)
+        }
     }
 }
-
