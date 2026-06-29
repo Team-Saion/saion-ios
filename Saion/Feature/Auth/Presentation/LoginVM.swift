@@ -64,12 +64,13 @@ final class LoginVM {
         switch action {
         case .kakaoLoginTapped:
             let idToken = try await kakaoAuthRepo.fetchKakaoIDToken()
-            let (accessToken, refreshToken) =
+            let (accessToken, refreshToken, role) =
             try await loginRepo.requestLoginWithKakao(idToken: idToken)
             
             AuthManager.shared.store.send(.userDidLogin(
                 accessToken: accessToken,
-                refreshToken: refreshToken
+                refreshToken: refreshToken,
+                role: role
             ))
         }
     }

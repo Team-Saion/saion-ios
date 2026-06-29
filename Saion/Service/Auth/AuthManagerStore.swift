@@ -17,25 +17,27 @@ final class AuthManagerStore {
     enum Action {
         /// 앱이 실행됨
         case appDidLaunch
-        /// 앱이 활성화 상태에 진입함
-        case appDidBecomeActive
         /// 사용자가 로그인함
-        case userDidLogin(accessToken: String, refreshToken: String)
+        case userDidLogin(
+            accessToken: String,
+            refreshToken: String,
+            role: AuthState.Role
+        )
         /// 사용자가 로그아웃함
         case userDidLogout
+        /// 토큰이 재발급(리프레시)됨
+        case tokensDidRefresh(
+            accessToken: String,
+            refreshToken: String
+        )
     }
     
     struct State {
         /// 앱 설치 후 최초 실행 여부 (키체인 초기화 용도)
         @Storage("isFirstLaunch")
         fileprivate var isFirstLaunch: Bool = true
-        /// 액세스 토큰
-        @SecureStorage("accessToken")
-        var accessToken: String?
-        /// 리프레시 토큰
-        @SecureStorage("refreshToken")
-        var refreshToken: String?
         /// 현재 인증 상태
+        @SecureStorage("authState")
         var authState: AuthState = .unknown
     }
     
@@ -73,30 +75,29 @@ final class AuthManagerStore {
             guard state.isFirstLaunch else { return }
             state.isFirstLaunch = false
             state.authState = .invalid
-            state.accessToken = nil
-            state.refreshToken = nil
             
-        case .appDidBecomeActive:
-            // 토큰 유무 및 유효성 검사
-            if validateTokenUC.execute(with: state.accessToken) {
-                // 유효한 경우 인증 상태만 갱신
-                state.authState = .valid
-            } else {
-                // 무효한 경우 상태를 변경하고 토큰을 삭제
-                state.authState = .invalid
-                state.accessToken = nil
-                state.refreshToken = nil
-            }
-            
-        case .userDidLogin(let accessToken, let refreshToken):
-            state.authState = .valid
-            state.accessToken = accessToken
-            state.refreshToken = refreshToken
+        case .userDidLogin(let accessToken, let refreshToken, let role):
+            state.authState = .valid(
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                role: role
+            )
             
         case .userDidLogout:
             state.authState = .invalid
-            state.accessToken = nil
-            state.refreshToken = nil
+            
+        case .tokensDidRefresh(let accessToken, let refreshToken):
+            // 토큰만 갱신하고, 기존 사용자 권한은 유지
+            if case let .valid(_, _, role) = state.authState {
+                state.authState = .valid(
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                    role: role
+                )
+                
+            } else {
+                state.authState = .invalid
+            }
         }
     }
 }

@@ -35,11 +35,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appCoord?.start()
     }
     
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // 씬이 활성화 됐을 때, 토큰 유효기간 체크 및 상태 갱신
-        AuthManager.shared.store.send(.appDidBecomeActive)
-    }
-    
     /// 딥링크나 유니버설 링크를 처리하는 메서드
     func scene(
         _ scene: UIScene,

@@ -50,7 +50,7 @@ final class TokenAuthenticator: Authenticator {
         )
         .decodeResponse(decodeType: TokenResDTO.self) { dto in
             if let dto {
-                credential.store.send(.userDidLogin(
+                credential.store.send(.tokensDidRefresh(
                     accessToken: dto.accessToken,
                     refreshToken: dto.refreshToken
                 ))
