@@ -2,13 +2,13 @@
 //  UIEdgeInsets+.swift
 //  DesignSystem
 //
-//  Created by 신정욱 on 6/17/26.
+//  Created by 신정욱 on 6/22/26.
 //
 
 import UIKit
 
 extension UIEdgeInsets {
-    static func + (
+    public static func + (
         lhs: UIEdgeInsets,
         rhs: UIEdgeInsets
     ) -> UIEdgeInsets {
@@ -20,7 +20,7 @@ extension UIEdgeInsets {
         )
     }
     
-    init(
+    public init(
         top: CGFloat = .zero,
         left: CGFloat = .zero,
         bottom: CGFloat = .zero,
@@ -35,7 +35,7 @@ extension UIEdgeInsets {
         )
     }
     
-    init(
+    public init(
         horizontal: CGFloat = .zero,
         vertical: CGFloat = .zero
     ) {
@@ -47,7 +47,7 @@ extension UIEdgeInsets {
         )
     }
     
-    init(edges: CGFloat) {
+    public init(edges: CGFloat) {
         self.init(
             top: edges,
             left: edges,

@@ -1,13 +1,13 @@
 //
 //  UIDivider.swift
-//  Saion
+//  DesignSystem
 //
 //  Created by 신정욱 on 6/22/26.
 //
 
 import UIKit
 
-final class UIDivider: UIView {
+public final class UIDivider: UIView {
     
     // MARK: Properties
     
@@ -16,7 +16,7 @@ final class UIDivider: UIView {
     
     // MARK: Life Cycle
     
-    init(
+    public init(
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         color: UIColor
@@ -27,13 +27,13 @@ final class UIDivider: UIView {
         backgroundColor = color
     }
     
-    @MainActor required init?(coder: NSCoder) {
+    @MainActor public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: Intrinsic Content Size
     
-    override var intrinsicContentSize: CGSize {
+    public override var intrinsicContentSize: CGSize {
         CGSize(
             width: width ?? super.intrinsicContentSize.width,
             height: height ?? super.intrinsicContentSize.height

@@ -8,7 +8,7 @@
 import UIKit
 
 public struct Shadow: Sendable {
-    public let shadowColor: UIColor
+    public let shadowColor: CGColor
     public let shadowOpacity: Float
     public let shadowOffset: CGSize
     public let shadowRadius: CGFloat
@@ -16,14 +16,14 @@ public struct Shadow: Sendable {
 
 public extension Shadow {
     static let container = Shadow(
-        shadowColor: .black,
+        shadowColor: UIColor.black.cgColor,
         shadowOpacity: 0.08,
         shadowOffset: CGSize(width: 0, height: 4),
         shadowRadius: 10
     )
 
     static let component = Shadow(
-        shadowColor: .black,
+        shadowColor: UIColor.black.cgColor,
         shadowOpacity: 0.16,
         shadowOffset: CGSize(width: 0, height: 0),
         shadowRadius: 24

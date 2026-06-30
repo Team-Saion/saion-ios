@@ -46,18 +46,31 @@ extension TextStyle.Typography {
             self.rawValue = CGFloat(value)
         }
         
+        public static let px10: FontSize = 10.0
         public static let px11: FontSize = 11.0
         public static let px12: FontSize = 12.0
         public static let px13: FontSize = 13.0
         public static let px14: FontSize = 14.0
         public static let px15: FontSize = 15.0
         public static let px16: FontSize = 16.0
+        public static let px17: FontSize = 17.0
         public static let px18: FontSize = 18.0
+        public static let px19: FontSize = 19.0
         public static let px20: FontSize = 20.0
+        public static let px21: FontSize = 21.0
         public static let px22: FontSize = 22.0
+        public static let px23: FontSize = 23.0
         public static let px24: FontSize = 24.0
+        public static let px25: FontSize = 25.0
+        public static let px26: FontSize = 26.0
+        public static let px27: FontSize = 27.0
+        public static let px28: FontSize = 28.0
+        public static let px29: FontSize = 29.0
+        public static let px30: FontSize = 30.0
         public static let px32: FontSize = 32.0
+        public static let px38: FontSize = 38.0
         public static let px40: FontSize = 40.0
+        public static let px48: FontSize = 48.0
     }
     
     // MARK: - LineHeight

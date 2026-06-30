@@ -98,6 +98,12 @@ extension TextStyle.Typography {
         letterSpacing: .normal
     )
     
+    public static let title1Strong = TextStyle.Typography(
+        font: .pretendard(size: .px18, weight: .bold),
+        lineHeight: .px25,
+        letterSpacing: .normal
+    )
+    
     public static let heading1Subtle = TextStyle.Typography(
         font: .pretendard(size: .px22, weight: .medium),
         lineHeight: .px31,

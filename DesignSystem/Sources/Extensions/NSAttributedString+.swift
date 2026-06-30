@@ -2,13 +2,13 @@
 //  NSAttributedString+.swift
 //  DesignSystem
 //
-//  Created by 신정욱 on 6/16/26.
+//  Created by 신정욱 on 6/22/26.
 //
 
 import Foundation
 
 extension NSAttributedString {
-    static func + (
+    public static func + (
         lhs: NSAttributedString,
         rhs: NSAttributedString
     ) -> NSAttributedString {

@@ -1,6 +1,6 @@
 //
 //  UIStackView+.swift
-//  Saion
+//  DesignSystem
 //
 //  Created by 신정욱 on 6/22/26.
 //
@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIStackView {
-    convenience init(
+    public convenience init(
         _ axis: NSLayoutConstraint.Axis = .horizontal,
         alignment: UIStackView.Alignment = .fill,
         spacing: CGFloat = 0,
@@ -26,7 +26,7 @@ extension UIStackView {
         }
     }
     
-    var inset: NSDirectionalEdgeInsets {
+    public var inset: NSDirectionalEdgeInsets {
         get { self.directionalLayoutMargins }
         set {
             self.isLayoutMarginsRelativeArrangement = true

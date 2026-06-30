@@ -147,9 +147,9 @@ extension UIColor {
     // MARK: - Semantic Colors
     
     // Primary
-    public static let primaryDefault = UIColor(resource: .green500)
-    public static let primaryStrong = UIColor(resource: .green700)
-    public static let primarySubtle = UIColor(resource: .green50)
+    public static let primaryDefault = UIColor(resource: .grey900)
+    public static let primaryStrong = UIColor(resource: .common100)
+    public static let primarySubtle = UIColor(resource: .grey600)
     
     // Label
     public static let labelDefault = UIColor(resource: .grey900)
@@ -328,9 +328,9 @@ extension Color {
     // MARK: - Semantic Colors
     
     // Primary
-    public static let primaryDefault = Color(.green500)
-    public static let primaryStrong = Color(.green700)
-    public static let primarySubtle = Color(.green50)
+    public static let primaryDefault = Color(.grey900)
+    public static let primaryStrong = Color(.common100)
+    public static let primarySubtle = Color(.grey600)
     
     // Label
     public static let labelDefault = Color(.grey900)

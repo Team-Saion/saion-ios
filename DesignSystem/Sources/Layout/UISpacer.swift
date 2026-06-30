@@ -1,13 +1,13 @@
 //
 //  UISpacer.swift
-//  Saion
+//  DesignSystem
 //
 //  Created by 신정욱 on 6/22/26.
 //
 
 import UIKit
 
-final class UISpacer: UIView {
+public final class UISpacer: UIView {
     
     // MARK: Properties
     
@@ -15,18 +15,18 @@ final class UISpacer: UIView {
     
     // MARK: Life Cycle
     
-    init(_ spacing: CGFloat? = nil) {
+    public init(_ spacing: CGFloat? = nil) {
         self.spacing = spacing
         super.init(frame: .zero)
     }
     
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: Intrinsic Content Size
     
-    override var intrinsicContentSize: CGSize {
+    public override var intrinsicContentSize: CGSize {
         if let spacing {
             return CGSize(width: spacing, height: spacing)
         } else {

@@ -2,13 +2,13 @@
 //  NSDirectionalEdgeInsets+.swift
 //  DesignSystem
 //
-//  Created by 신정욱 on 6/17/26.
+//  Created by 신정욱 on 6/22/26.
 //
 
 import UIKit
 
 extension NSDirectionalEdgeInsets {
-    static func + (
+    public static func + (
         lhs: NSDirectionalEdgeInsets,
         rhs: NSDirectionalEdgeInsets
     ) -> NSDirectionalEdgeInsets {
@@ -20,7 +20,7 @@ extension NSDirectionalEdgeInsets {
         )
     }
     
-    init(
+    public init(
         top: CGFloat = .zero,
         leading: CGFloat = .zero,
         bottom: CGFloat = .zero,
@@ -35,7 +35,7 @@ extension NSDirectionalEdgeInsets {
         )
     }
     
-    init(
+    public init(
         horizontal: CGFloat = .zero,
         vertical: CGFloat = .zero
     ) {
@@ -47,7 +47,7 @@ extension NSDirectionalEdgeInsets {
         )
     }
     
-    init(edges: CGFloat) {
+    public init(edges: CGFloat) {
         self.init(
             top: edges,
             leading: edges,
