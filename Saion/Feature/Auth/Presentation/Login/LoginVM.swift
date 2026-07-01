@@ -25,6 +25,7 @@ final class LoginVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
+        case presentTerms
     }
     
     // MARK: Properties
@@ -66,6 +67,8 @@ final class LoginVM {
             let idToken = try await kakaoAuthRepo.fetchKakaoIDToken()
             let (accessToken, refreshToken, role) =
             try await loginRepo.requestLoginWithKakao(idToken: idToken)
+            
+            effect.send(.presentTerms)
             
             AuthManager.shared.store.send(.userDidLogin(
                 accessToken: accessToken,

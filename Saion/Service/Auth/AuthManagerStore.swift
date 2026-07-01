@@ -34,11 +34,11 @@ final class AuthManagerStore {
     
     struct State {
         /// 앱 설치 후 최초 실행 여부 (키체인 초기화 용도)
-        @Storage("isFirstLaunch")
+//        @Storage("isFirstLaunch")
         fileprivate var isFirstLaunch: Bool = true
         /// 현재 인증 상태
         @SecureStorage("authState")
-        var authState: AuthState = .unknown
+        var authState: AuthState = .invalid
     }
     
     @CasePathable

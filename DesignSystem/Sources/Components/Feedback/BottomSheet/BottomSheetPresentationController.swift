@@ -53,7 +53,6 @@ final class BottomSheetPresentationController: UIPresentationController {
         presentedView?.backgroundColor = .backgroundDefault
         presentedView?.layer.cornerRadius = Radius.containerXlarge
         
-        presentedView?.layer.cornerRadius = Radius.containerXxlarge
         presentedView?.layer.shadowColor = Shadow.component.shadowColor
         presentedView?.layer.shadowOpacity = Shadow.component.shadowOpacity
         presentedView?.layer.shadowOffset = Shadow.component.shadowOffset

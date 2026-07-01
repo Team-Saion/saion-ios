@@ -10,17 +10,17 @@ import UIKit
 
 import SnapKit
 
-class NoticeAlertVC: AlertPresentationVC {
+open class NoticeAlertVC: AlertPresentationVC {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    public var cancellables = Set<AnyCancellable>()
     
     // MARK: Components
     
-    let contentsVStack = UIStackView(.vertical, spacing: 6, inset: .init(edges: 22))
+    public let contentsVStack = UIStackView(.vertical, spacing: 6, inset: .init(edges: 22))
     
-    let buttonsHStack = {
+    public let buttonsHStack = {
         let view = UIStackView()
         view.inset = .init(horizontal: 16) + .init(bottom: 16)
         view.distribution = .fillEqually
@@ -28,7 +28,7 @@ class NoticeAlertVC: AlertPresentationVC {
         return view
     }()
     
-    let titleLabel = {
+    public let titleLabel = {
         let style = TextStyle(
             typography: .title1Strong,
             decoration: .init(foregroundColor: .labelDefault)
@@ -39,7 +39,7 @@ class NoticeAlertVC: AlertPresentationVC {
         return label
     }()
     
-    let descriptionLabel = {
+    public let descriptionLabel = {
         let style = TextStyle(
             typography: .title3,
             decoration: .init(foregroundColor: .labelSubtle)
@@ -50,7 +50,7 @@ class NoticeAlertVC: AlertPresentationVC {
         return label
     }()
     
-    let acceptButton = {
+    public let acceptButton = {
         let appearance = SaionButton.Appearance(size: .large, variant: .neutral)
         let button = SaionButton(with: appearance)
         button.title = "확인"
@@ -59,7 +59,15 @@ class NoticeAlertVC: AlertPresentationVC {
     
     // MARK: Life Cycle
     
-    override func viewDidLoad() {
+    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    open override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
     }

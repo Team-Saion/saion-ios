@@ -18,8 +18,6 @@ enum AuthState: Equatable, Codable {
         case admin = "ADMIN"
     }
     
-    /// 인증 상태 검증 전
-    case unknown
     /// 유효
     case valid(
         accessToken: String,

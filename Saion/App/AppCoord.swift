@@ -30,9 +30,6 @@ final class AppCoord: Coordinator {
         AuthManager.shared.authStatePublisher
             .sink { [weak self] in
                 switch $0 {
-                case .unknown:
-                    break
-                    
                 case let .valid(_, _, role):
                     switch role {
                     case .member, .admin:
