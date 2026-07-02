@@ -15,6 +15,8 @@ final class LoginVM {
     // MARK: Types
     
     enum Action {
+        /// 화면 표시됨
+        case viewDidLoad
         /// 카카오 로그인 버튼 탭
         case kakaoLoginTapped
     }
@@ -30,9 +32,11 @@ final class LoginVM {
     
     // MARK: Properties
     
+    
     @Published private(set) var state = State()
     private let effect = PassthroughSubject<Effect, Never>()
     var effectPublisher: AnyPublisher<Effect, Never> { effect.eraseToAnyPublisher() }
+    private var cancellables = Set<AnyCancellable>()
     
     private let kakaoAuthRepo: KakaoAuthRepo
     private let loginRepo: LoginRepo
@@ -63,18 +67,22 @@ final class LoginVM {
     
     private func process(action: Action) async throws {
         switch action {
+        case .viewDidLoad:
+            print("AuthManager.shared.store.state.authState: \(AuthManager.shared.store.state.authState)")
+            guard AuthManager.shared.store.state.authState.is(\.onboarding) else { return }
+            effect.send(.presentTerms)
+            
         case .kakaoLoginTapped:
             let idToken = try await kakaoAuthRepo.fetchKakaoIDToken()
-            let (accessToken, refreshToken, role) =
+            let (accessToken, refreshToken) =
             try await loginRepo.requestLoginWithKakao(idToken: idToken)
-            
-            effect.send(.presentTerms)
             
             AuthManager.shared.store.send(.userDidLogin(
                 accessToken: accessToken,
-                refreshToken: refreshToken,
-                role: role
+                refreshToken: refreshToken
             ))
+            
+            effect.send(.presentTerms)
         }
     }
 }

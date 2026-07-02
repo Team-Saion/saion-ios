@@ -9,6 +9,8 @@ import UIKit
 
 import SnapKit
 
-final class ProfileInputVC: UIViewController {
+import Navigation
+
+final class ProfileInputVC: NavigationBarVC {
     
 }

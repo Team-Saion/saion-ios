@@ -97,6 +97,8 @@ final class LoginVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
+        vm.send(.viewDidLoad)
+        
         loginButton.tapPublisher
             .sink { [weak self] in self?.vm.send(.kakaoLoginTapped) }
             .store(in: &cancellables)
@@ -105,18 +107,11 @@ final class LoginVC: UIViewController {
             .compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
-        
-        vm.effectPublisher
-            .compactMap { $0[case: \.presentTerms] }
-            .compactMap { [weak self] in self?.presentTermsSheet() }
-            .switchToLatest()
-            .print("🍕")
-            .sink { _ in }
-            .store(in: &cancellables)
     }
     
     // MARK: Reactive Interface
     
+    /// 약관 동의 시트 노출
     private func presentTermsSheet() -> AnyPublisher<Void, Never> {
         Deferred { [weak self] in Future { promise in
             let sheet = TermsSheetVC()
@@ -131,8 +126,16 @@ final class LoginVC: UIViewController {
         } }
         .eraseToAnyPublisher()
     }
+    
+    /// 프로필 입력 화면으로 이동 퍼블리셔
+    var pushProfileInputPublisher: AnyPublisher<Void, Never> {
+        vm.effectPublisher
+            .compactMap { $0[case: \.presentTerms] }
+            .compactMap { [weak self] in self?.presentTermsSheet() }
+            .switchToLatest()
+            .eraseToAnyPublisher()
+    }
 }
-
 
 // MARK: - Preview
 

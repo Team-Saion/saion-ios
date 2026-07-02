@@ -7,9 +7,12 @@
 
 import Foundation
 
+import CasePaths
+
+@CasePathable
 enum AuthState: Equatable, Codable {
     
-    enum Role: String, Codable {
+    enum Role: String {
         /// 임시 회원 (온보딩 미완료)
         case pending = "PENDING"
         /// 정회원
@@ -18,12 +21,20 @@ enum AuthState: Equatable, Codable {
         case admin = "ADMIN"
     }
     
-    /// 유효
-    case valid(
-        accessToken: String,
-        refreshToken: String,
-        role: Role
-    )
-    /// 무효
-    case invalid
+    /// 로그인되지 않은 상태
+    case signedOut
+    /// 소셜 로그인 후 추가 정보 입력이 필요한 상태
+    case onboarding(accessToken: String, refreshToken: String)
+    /// 로그인 및 회원가입이 완료된 상태
+    case signedIn(accessToken: String, refreshToken: String)
+    
+    var accessToken: String? {
+        self[case: \.onboarding]?.accessToken
+        ?? self[case: \.signedIn]?.accessToken
+    }
+    
+    var refreshToken: String? {
+        self[case: \.onboarding]?.refreshToken
+        ?? self[case: \.signedIn]?.refreshToken
+    }
 }

@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 
+import CasePaths
 import SnapKit
 
 final class AppCoord: Coordinator {
@@ -28,21 +29,9 @@ final class AppCoord: Coordinator {
     func start() {
         // 주어진 인증 상태에 따라, 탭바/로그인 화면 분기처리
         AuthManager.shared.authStatePublisher
-            .sink { [weak self] in
-                switch $0 {
-                case let .valid(_, _, role):
-                    switch role {
-                    case .member, .admin:
-                        self?.startTabBar()
-                        
-                    case .pending:
-                        self?.startSignUp()
-                    }
-                    
-                case .invalid:
-                    self?.startLogin()
-                }
-            }
+            .map { $0.is(\.signedIn) }
+            .removeDuplicates() // 코디네이터 중복 시작 차단
+            .sink { [weak self] in $0 ? self?.startTabBar() : self?.startLogin() }
             .store(in: &cancellables)
     }
     
@@ -55,10 +44,6 @@ final class AppCoord: Coordinator {
 //        setRootWithAnimation(coord.navigation)
 //        store(child: coord)
 //        coord.start()
-    }
-    
-    private func startSignUp() {
-        print("🥗 startSignUp 실행(되어야 함..)")
     }
     
     private func startLogin() {

@@ -17,15 +17,8 @@ final class AuthManager {
     let store = AuthManagerStore()
     private var cancellables = Set<AnyCancellable>()
     
-    var accessToken: String? {
-        guard case let .valid(accessToken, _, _) = store.state.authState else { return nil }
-        return accessToken
-    }
-    
-    var refreshToken: String? {
-        guard case let .valid(_, refreshToken, _) = store.state.authState else { return nil }
-        return refreshToken
-    }
+    var accessToken: String? { store.state.authState.accessToken }
+    var refreshToken: String? { store.state.authState.refreshToken }
     
     // MARK: Singleton
     
@@ -50,5 +43,5 @@ final class AuthManager {
 // MARK: - AuthenticationCredential
 
 extension AuthManager: AuthenticationCredential {
-    var requiresRefresh: Bool { store.state.authState == .invalid }
+    var requiresRefresh: Bool { store.state.authState == .signedOut }
 }
