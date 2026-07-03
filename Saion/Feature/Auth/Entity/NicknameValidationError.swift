@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 닉네임 유효성 에러
 enum NicknameValidationError: LocalizedError, Equatable {
     case tooLong
     case emptyOrWhitespace

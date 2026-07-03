@@ -33,7 +33,7 @@ final class ProfileInputVC: BackButtonVC {
     private let profileImageView = ProfileImageView(size: .large)
     
     /// 닉네임 텍스트 필드
-    private let nicknameGuideLabel = {
+    private let guideLabel = {
         let style = TextStyle(
             typography: .title2,
             decoration: .init(foregroundColor: .labelDefault)
@@ -44,7 +44,7 @@ final class ProfileInputVC: BackButtonVC {
     }()
     
     /// 닉네임 입력 필드
-    private let nicknameTextField = {
+    private let textField = {
         let text = TextStyle(
             typography: .heading1,
             paragraph: .init(alignment: .center)
@@ -63,7 +63,7 @@ final class ProfileInputVC: BackButtonVC {
     }()
     
     /// 닉네임 텍스트 필드 캡션 레이블 (가이드 레이블)
-    private let nicknameCaptionLabel = {
+    private let captionLabel = {
         let style = TextStyle(
             typography: .title3,
             paragraph: .init(alignment: .center)
@@ -115,11 +115,11 @@ final class ProfileInputVC: BackButtonVC {
         topVStack.addArrangedSubview(UISpacer(24))
         topVStack.addArrangedSubview(profileImageView)
         topVStack.addArrangedSubview(UISpacer(40))
-        topVStack.addArrangedSubview(nicknameGuideLabel)
+        topVStack.addArrangedSubview(guideLabel)
         topVStack.addArrangedSubview(UISpacer(12))
-        topVStack.addArrangedSubview(nicknameTextField)
+        topVStack.addArrangedSubview(textField)
         
-        bottomVStack.addArrangedSubview(nicknameCaptionLabel)
+        bottomVStack.addArrangedSubview(captionLabel)
         bottomVStack.addArrangedSubview(UISpacer(20))
         bottomVStack.addArrangedSubview(submitButton)
         bottomVStack.addArrangedSubview(UISpacer(16))
@@ -136,38 +136,47 @@ final class ProfileInputVC: BackButtonVC {
     // MARK: Bindings
     
     private func setupBindings() {
-        nicknameTextField.textPublisher
-            .sink { [weak self] in self?.vm.send(.nicknameChanged($0)) }
+        // 텍스트 필드 텍스트 변경 이벤트 전달
+        textField.textPublisher
+            .sink { [weak self] in self?.vm.send(.textChanged($0)) }
             .store(in: &cancellables)
         
-        nicknameTextField.$currentState
+        // 텍스트 필드 포커스 상태 변경 이벤트 전달
+        textField.$currentState
             .sink { [weak self] in self?.vm.send(.textFieldStateChanged($0)) }
             .store(in: &cancellables)
         
+        // 제출 버튼 탭 이벤트 전달
         submitButton.tapPublisher
             .sink { [weak self] in self?.vm.send(.submitTapped) }
             .store(in: &cancellables)
         
+        // 프로필 이미지 뷰 상태 바인딩
         vm.$state.map(\.profileImageViewState)
             .sink { [weak self] in self?.profileImageView.configure(with: $0) }
             .store(in: &cancellables)
         
+        // 닉네임 플레이스홀더 바인딩
         vm.$state.map(\.nicknamePlaceholder)
-            .sink { [weak self] in self?.nicknameTextField.placeholder = $0 }
+            .sink { [weak self] in self?.textField.placeholder = $0 }
             .store(in: &cancellables)
         
+        // 초기 닉네임 텍스트 설정 (1회)
         vm.$state.map(\.nicknameText).prefix(1)
-            .sink { [weak self] in self?.nicknameTextField.text = $0 }
+            .sink { [weak self] in self?.textField.text = $0 }
             .store(in: &cancellables)
         
+        // 하단 캡션 레이블 텍스트 바인딩
         vm.$state.compactMap(\.captionText)
-            .sink { [weak self] in self?.nicknameCaptionLabel.text = $0 }
+            .sink { [weak self] in self?.captionLabel.text = $0 }
             .store(in: &cancellables)
         
+        // 닉네임 폼 UI 외형(색상 등) 바인딩
         vm.$state.compactMap(\.appearance)
             .sink { [weak self] in self?.updateUI(appearance: $0) }
             .store(in: &cancellables)
         
+        // 유효성에 따른 제출 버튼 활성화 바인딩
         vm.$state.map(\.isValidNickname)
             .removeDuplicates()
             .sink { [weak self] in self?.submitButton.isEnabled = $0 }
@@ -177,8 +186,8 @@ final class ProfileInputVC: BackButtonVC {
     // MARK: Reactive Interface
     
     private func updateUI(appearance: NicknameFormAppearance) {
-        nicknameTextField.defaultTextAttributes[.foregroundColor] = appearance.textColor
-        nicknameCaptionLabel.textAttributes[.foregroundColor] = appearance.captionColor
+        textField.defaultTextAttributes[.foregroundColor] = appearance.textColor
+        captionLabel.textAttributes[.foregroundColor] = appearance.captionColor
     }
 }
 
