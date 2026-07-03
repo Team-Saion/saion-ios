@@ -28,24 +28,6 @@ open class AttributedTextField: DefaultTextField {
         set { setAttributedPlaceholder(with: newValue) }
     }
     
-    // MARK: Life Cycle
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupDefaults()
-    }
-    
-    public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: Defaults
-    
-    private func setupDefaults() {
-        autocapitalizationType = .none  // 자동 대문자 비활성화
-        textContentType = .oneTimeCode  // 강력한 비번 생성 방지
-    }
-    
     // MARK: Private Helpers
     
     /// 문자열에 기본 플레이스홀더 속성을 적용해 attributedText 갱신

@@ -23,11 +23,20 @@ open class DefaultTextField: UITextField {
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        setupDefaults()
         setupBindings()
     }
     
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Defaults
+    
+    private func setupDefaults() {
+        autocapitalizationType = .none  // 자동 대문자 비활성화
+        textContentType = .oneTimeCode  // 강력한 비번 생성 방지
+        tintColor = .labelDefault
     }
     
     // MARK: Bindings

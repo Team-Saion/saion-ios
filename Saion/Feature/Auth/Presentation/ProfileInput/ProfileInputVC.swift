@@ -58,7 +58,6 @@ final class ProfileInputVC: BackButtonVC {
         field.inset = .init(horizontal: 20, vertical: 4)
         field.defaultTextAttributes = text.toDictionary()
         field.placeholderAttributes = placeholder.toDictionary()
-        field.tintColor = .labelDefault
         return field
     }()
     
@@ -136,8 +135,8 @@ final class ProfileInputVC: BackButtonVC {
     // MARK: Bindings
     
     private func setupBindings() {
-        // 텍스트 필드 텍스트 변경 이벤트 전달
-        textField.textPublisher
+        // 텍스트 필드 텍스트 변경 이벤트 전달 (구독 시 방출되는 초기 값 무시)
+        textField.textPublisher.dropFirst()
             .sink { [weak self] in self?.vm.send(.textChanged($0)) }
             .store(in: &cancellables)
         
