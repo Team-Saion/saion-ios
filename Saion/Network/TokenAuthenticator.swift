@@ -43,7 +43,7 @@ final class TokenAuthenticator: Authenticator {
         completion: @escaping (Result<Credential, any Error>) -> Void
     ) {
         APISession.plain.request(
-            Bundle.main.baseUrl + "/api/v1/auth/refresh",
+            Bundle.main.baseURL + "/api/v1/auth/refresh",
             method: .post,
             parameters: RefreshTokenReqDTO(from: credential.refreshToken),
             encoder: JSONParameterEncoder.default

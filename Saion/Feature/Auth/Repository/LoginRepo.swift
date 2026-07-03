@@ -23,7 +23,7 @@ final class DefaultLoginRepo: LoginRepo {
         try await withCheckedThrowingContinuation { continuation in
             
             APISession.plain.request(
-                Bundle.main.baseUrl + "/api/v1/auth/kakao",
+                Bundle.main.baseURL + "/api/v1/auth/kakao",
                 method: .post,
                 parameters: KakaoLoginReqDTO(idToken: idToken),
                 encoder: JSONParameterEncoder.default

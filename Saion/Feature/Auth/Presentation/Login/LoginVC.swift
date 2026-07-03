@@ -104,9 +104,18 @@ final class LoginVC: UIViewController {
             .store(in: &cancellables)
         
         vm.effectPublisher
+            .compactMap { $0[case: \.presentTerms] }
+            .compactMap { [weak self] in self?.presentTermsSheet() }
+            .switchToLatest()
+            .sink { [weak self] in self?.vm.send(.submitTapped) }
+            .store(in: &cancellables)
+        
+        vm.effectPublisher
             .compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
+        
+
     }
     
     // MARK: Reactive Interface
@@ -128,11 +137,9 @@ final class LoginVC: UIViewController {
     }
     
     /// 프로필 입력 화면으로 이동 퍼블리셔
-    var pushProfileInputPublisher: AnyPublisher<Void, Never> {
+    var pushProfileInputPublisher: AnyPublisher<OnboardingInfo, Never> {
         vm.effectPublisher
-            .compactMap { $0[case: \.presentTerms] }
-            .compactMap { [weak self] in self?.presentTermsSheet() }
-            .switchToLatest()
+            .compactMap { $0[case: \.pushProfileInput] }
             .eraseToAnyPublisher()
     }
 }

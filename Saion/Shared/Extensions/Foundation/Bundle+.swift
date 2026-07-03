@@ -14,7 +14,7 @@ extension Bundle {
     }
     
     /// API 서버 기본 URL
-    var baseUrl: String {
+    var baseURL: String {
         guard let baseUrl = appEnvironment["BASE_URL"] as? String else {
             preconditionFailure("AppEnvironment에 BASE_URL이 누락되었어.")
         }

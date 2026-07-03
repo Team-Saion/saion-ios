@@ -19,15 +19,20 @@ final class LoginVM {
         case viewDidLoad
         /// 카카오 로그인 버튼 탭
         case kakaoLoginTapped
+        /// 확인 버튼 탭
+        case submitTapped
     }
     
-    struct State {}
+    struct State {
+        var isLoading = false
+    }
     
     @CasePathable
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
         case presentTerms
+        case pushProfileInput(OnboardingInfo)
     }
     
     // MARK: Properties
@@ -40,15 +45,18 @@ final class LoginVM {
     
     private let kakaoAuthRepo: KakaoAuthRepo
     private let loginRepo: LoginRepo
+    private let onboardingRepo: OnboardingRepo
     
     // MARK: Initializer
     
     init(
         kakaoAuthRepo: KakaoAuthRepo,
-        loginRepo: LoginRepo
+        loginRepo: LoginRepo,
+        onboardingRepo: OnboardingRepo
     ) {
         self.kakaoAuthRepo = kakaoAuthRepo
         self.loginRepo = loginRepo
+        self.onboardingRepo = onboardingRepo
     }
     
     // MARK: Send
@@ -68,7 +76,6 @@ final class LoginVM {
     private func process(action: Action) async throws {
         switch action {
         case .viewDidLoad:
-            print("AuthManager.shared.store.state.authState: \(AuthManager.shared.store.state.authState)")
             guard AuthManager.shared.store.state.authState.is(\.onboarding) else { return }
             effect.send(.presentTerms)
             
@@ -83,6 +90,15 @@ final class LoginVM {
             ))
             
             effect.send(.presentTerms)
+            
+        case .submitTapped:
+            guard !state.isLoading else { return }
+            
+            state.isLoading = true
+            defer { state.isLoading = false }
+            
+            let onboardingInfo = try await onboardingRepo.fetchOnboardingInfo()
+            effect.send(.pushProfileInput(onboardingInfo))
         }
     }
 }

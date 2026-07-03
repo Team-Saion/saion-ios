@@ -17,7 +17,15 @@ final class AuthDI {
     func makeLoginVM() -> LoginVM {
         LoginVM(
             kakaoAuthRepo: DefaultKakaoAuthRepo(),
-            loginRepo: DefaultLoginRepo()
+            loginRepo: DefaultLoginRepo(),
+            onboardingRepo: DefaultOnboardingRepo()
+        )
+    }
+    
+    func makeProfileInputVM(onboardingInfo: OnboardingInfo) -> ProfileInputVM {
+        ProfileInputVM(
+            onboardingInfo: onboardingInfo,
+            onboardingRepo: DefaultOnboardingRepo()
         )
     }
 }

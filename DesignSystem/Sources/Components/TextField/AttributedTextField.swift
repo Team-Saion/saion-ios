@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class AttributedTextField: UITextField {
+open class AttributedTextField: DefaultTextField {
     
     // MARK: Properties
     
