@@ -89,7 +89,10 @@ final class LoginVM {
                 refreshToken: refreshToken
             ))
             
-            effect.send(.presentTerms)
+            // 이미 정회원이면 바텀시트를 열지 않음
+            if decodeRole(from: accessToken) != .member {
+                effect.send(.presentTerms)
+            }
             
         case .submitTapped:
             guard !state.isLoading else { return }
@@ -100,6 +103,34 @@ final class LoginVM {
             let onboardingInfo = try await onboardingRepo.fetchOnboardingInfo()
             effect.send(.pushProfileInput(onboardingInfo))
         }
+    }
+    
+    // MARK: Private Helper
+    
+    /// JWT 페이로드에서 role 값을 디코딩하여 반환
+    private func decodeRole(from jwtToken: String) -> AuthState.Role? {
+        let segments = jwtToken.components(separatedBy: ".")
+        guard segments.count > 1 else { return nil }
+        
+        // Base64url 포맷을 Base64 표준 포맷으로 변환해
+        var base64 = segments[1]
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        
+        // 4의 배수가 되도록 패딩(=)을 추가해
+        let remainder = base64.count % 4
+        if remainder > 0 {
+            base64.append(String(repeating: "=", count: 4 - remainder))
+        }
+        
+        // Data를 JSON 객체로 변환하여 roles 배열의 첫 번째 요소를 추출
+        guard let data = Data(base64Encoded: base64),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let roleStr = (json["roles"] as? [String])?.first,
+              let role = AuthState.Role(rawValue: roleStr)
+        else { return nil }
+        
+        return role
     }
 }
 

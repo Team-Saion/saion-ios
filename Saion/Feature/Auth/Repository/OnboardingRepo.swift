@@ -10,6 +10,8 @@ import Foundation
 import Alamofire
 
 protocol OnboardingRepo {
+    /// 약관 동의 요청
+    func agreeToTerms() async throws
     /// 온보딩 프리필 데이터 조회
     func fetchOnboardingInfo() async throws -> OnboardingInfo
     /// 온보딩 완료 요청
@@ -19,6 +21,29 @@ protocol OnboardingRepo {
 }
 
 final class DefaultOnboardingRepo: OnboardingRepo {
+    func agreeToTerms() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/terms/agree",
+                method: .post,
+                parameters: TermsAgreementReqDTO(),
+                encoder: JSONParameterEncoder.default
+            )
+            .decodeResponse(decodeType: EmptyDTO.self) { _ in
+                continuation.resume(returning: ())
+                
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "약관 동의 처리 중 문제가 발생했어요.",
+                    errorCode: "OR-ATT-0"
+                ))
+            }
+            
+        }
+    }
+    
     func fetchOnboardingInfo() async throws -> OnboardingInfo {
         try await withCheckedThrowingContinuation { continuation in
             

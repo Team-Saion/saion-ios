@@ -125,7 +125,7 @@ final class LoginVC: UIViewController {
         Deferred { [weak self] in Future { promise in
             let sheet = TermsSheetVC()
             
-            sheet.submitPublisher
+            sheet.termsAgreementCompletedPublisher
                 .sink { [weak sheet] in
                     sheet?.dismiss(animated: true) { promise(.success(())) }
                 }

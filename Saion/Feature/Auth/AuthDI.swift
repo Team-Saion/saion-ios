@@ -22,6 +22,10 @@ final class AuthDI {
         )
     }
     
+    func makeTermsSheetVM() -> TermsSheetVM {
+        TermsSheetVM(onboardingRepo: DefaultOnboardingRepo())
+    }
+    
     func makeProfileInputVM(onboardingInfo: OnboardingInfo) -> ProfileInputVM {
         ProfileInputVM(
             onboardingInfo: onboardingInfo,

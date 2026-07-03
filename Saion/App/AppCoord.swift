@@ -36,10 +36,11 @@ final class AppCoord: Coordinator {
     }
     
     private func startTabBar() {
-        print("🥗 startTabBar 실행(되어야 함..)")
-//        // 전환 전에 기존 자식 코디네이터 정리
-//        children.removeAll()
-//        // 새 코디네이터의 네비게이션을 루트로 설정
+        // 전환 전에 기존 자식 코디네이터 정리
+        children.removeAll()
+        // 새 코디네이터의 네비게이션을 루트로 설정
+        let vc = HomeVC()
+        setRootWithAnimation(vc)
 //        let coord = TabBarCoord(navigation: .init())
 //        setRootWithAnimation(coord.navigation)
 //        store(child: coord)

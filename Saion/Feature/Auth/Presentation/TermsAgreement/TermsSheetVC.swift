@@ -6,8 +6,10 @@
 //
 
 import Combine
+import SafariServices
 import UIKit
 
+import CasePaths
 import CombineCocoa
 import SnapKit
 
@@ -19,6 +21,8 @@ final class TermsSheetVC: HandleBottomSheetVC {
     
     var cancellables = Set<AnyCancellable>()
     
+    private let vm = AuthDI.shared.makeTermsSheetVM()
+    
     // MARK: Components
     
     private let mainVStack = UIStackView(.vertical, inset: .init(edges: 20))
@@ -26,7 +30,6 @@ final class TermsSheetVC: HandleBottomSheetVC {
     private let checkListHStack1 = UIStackView()
     private let checkListHStack2 = UIStackView()
     private let closeVStack = UIStackView(.vertical, alignment: .center)
-//    private let checkListHStack3 = UIStackView()
     
     /// 만 14세 이상 필수 동의 버튼
     private let ageConfirmationButton =
@@ -39,10 +42,6 @@ final class TermsSheetVC: HandleBottomSheetVC {
     /// 개인정보 수집 및 이용 필수 동의 버튼
     private let privacyAgreementButton =
     CheckListButton(title: "개인정보수집 및 이용 동의", isOptional: false)
-    
-//    /// 마케팅 정보 수신 선택 동의 버튼
-//    private let marketingAgreementButton =
-//    CheckListButton(title: "마케팅 정보 수신 동의", isOptional: false)
     
     /// 서비스 이용약관 상세 확인 버튼
     private let termsDetailButton = {
@@ -59,14 +58,6 @@ final class TermsSheetVC: HandleBottomSheetVC {
         config.contentInsets = .zero
         return UIButton(configuration: config)
     }()
-    
-//    /// 마케팅 정보 수신 동의 상세 확인 버튼
-//    private let marketingDetailButton = {
-//        var config = UIButton.Configuration.plain()
-//        config.image = .authChevronRight
-//        config.contentInsets = .zero
-//        return UIButton(configuration: config)
-//    }()
     
     /// 약관 동의 및 다음 단계 진행 버튼
     private let submitButton = {
@@ -102,8 +93,6 @@ final class TermsSheetVC: HandleBottomSheetVC {
         mainVStack.addArrangedSubview(checkListHStack1)
         mainVStack.addArrangedSubview(UISpacer(4))
         mainVStack.addArrangedSubview(checkListHStack2)
-//        mainVStack.addArrangedSubview(UISpacer(4))
-//        mainVStack.addArrangedSubview(checkListHStack3)
         mainVStack.addArrangedSubview(UISpacer(20))
         mainVStack.addArrangedSubview(submitButton)
         mainVStack.addArrangedSubview(UISpacer(20))
@@ -122,57 +111,67 @@ final class TermsSheetVC: HandleBottomSheetVC {
         
         closeVStack.addArrangedSubview(closeButton)
         
-//        checkListHStack3.addArrangedSubview(marketingAgreementButton)
-//        checkListHStack3.addArrangedSubview(UISpacer())
-//        checkListHStack3.addArrangedSubview(marketingDetailButton)
-        
         mainVStack.snp.makeConstraints { $0.edges.equalTo(contentLayoutGuide) }
     }
     
     // MARK: Bindings
     
     private func setupBindings() {
-        /// 만 14세 이상 동의 여부
-        let ageConfirmed = ageConfirmationButton.tapPublisher
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.ageConfirmationButton.isSelected.toggle()
-            })
-            .compactMap { [weak self] in
-                self?.ageConfirmationButton.isSelected
-            }
+        // 만 14세 이상 동의 버튼 탭 이벤트의 뷰모델 전달
+        ageConfirmationButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.ageConfirmationTapped) }
+            .store(in: &cancellables)
         
-        /// 서비스 이용약관 동의 여부
-        let termsAgreed = termsAgreementButton.tapPublisher
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.termsAgreementButton.isSelected.toggle()
-            })
-            .compactMap { [weak self] in
-                self?.termsAgreementButton.isSelected
-            }
+        // 서비스 이용약관 동의 버튼 탭 이벤트의 뷰모델 전달
+        termsAgreementButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.termsAgreementTapped) }
+            .store(in: &cancellables)
         
-        /// 개인정보 수집 및 이용 동의 여부
-        let privacyAgreed = privacyAgreementButton.tapPublisher
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.privacyAgreementButton.isSelected.toggle()
-            })
-            .compactMap { [weak self] in
-                self?.privacyAgreementButton.isSelected
-            }
+        // 개인정보 수집 및 이용 동의 버튼 탭 이벤트의 뷰모델 전달
+        privacyAgreementButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.privacyAgreementTapped) }
+            .store(in: &cancellables)
         
-//        // 마케팅 정보 수신 동의 여부 스트림
-//        let marketingAgreed = marketingAgreementButton.tapPublisher
-//            .handleEvents(receiveOutput: { [weak self] in
-//                self?.marketingAgreementButton.isSelected.toggle()
-//            })
-//            .compactMap { [weak self] in
-//                self?.marketingAgreementButton.isSelected
-//            }
+        // 동의하고 다음 버튼 탭 이벤트의 뷰모델 전달
+        submitButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.submitTapped) }
+            .store(in: &cancellables)
         
-        // 모든 필수 약관 동의 여부에 따른 다음 버튼 활성화 처리
-        Publishers.CombineLatest3(ageConfirmed, termsAgreed, privacyAgreed)
-            .map { $0.0 && $0.1 && $0.2 }
-            .prepend(false) // 초기값: 버튼 비활성화
+        // 만 14세 이상 동의 상태의 버튼 선택 상태 반영
+        vm.$state.map(\.ageConfirmed)
+            .sink { [weak self] in self?.ageConfirmationButton.isSelected = $0 }
+            .store(in: &cancellables)
+        
+        // 서비스 이용약관 동의 상태의 버튼 선택 상태 반영
+        vm.$state.map(\.termsAgreed)
+            .sink { [weak self] in self?.termsAgreementButton.isSelected = $0 }
+            .store(in: &cancellables)
+        
+        // 개인정보 수집 및 이용 동의 상태의 버튼 선택 상태 반영
+        vm.$state.map(\.privacyAgreed)
+            .sink { [weak self] in self?.privacyAgreementButton.isSelected = $0 }
+            .store(in: &cancellables)
+        
+        // 모든 필수 항목 동의 여부에 따른 다음 버튼 활성화 상태 제어
+        vm.$state.map(\.allAgreed)
             .sink { [weak self] in self?.submitButton.isEnabled = $0 }
+            .store(in: &cancellables)
+        
+        // 뷰모델 에러 발생 이펙트 수신 시 에러 얼럿 표시
+        vm.effect.compactMap { $0[case: \.presentError] }
+            .sink { [weak self] in self?.presentErrorAlert(error: $0) }
+            .store(in: &cancellables)
+        
+        // 서비스 이용약관 상세 버튼 탭 시 해당 링크 웹페이지 사파리 표시
+        termsDetailButton.tapPublisher
+            .map { "https://sites.google.com/view/saio-terms-service-v1-0/홈?authuser=8" }
+            .sink { [weak self] in self?.openSafari(url: $0) }
+            .store(in: &cancellables)
+        
+        // 개인정보 수집 및 이용 상세 버튼 탭 시 해당 링크 웹페이지 사파리 표시
+        privacyDetailButton.tapPublisher
+            .map { "https://sites.google.com/view/saio-terms-personalinfo-v1-0/홈?authuser=8" }
+            .sink { [weak self] in self?.openSafari(url: $0) }
             .store(in: &cancellables)
         
         // 닫기 버튼 선택 시 바텀시트 닫기
@@ -183,9 +182,20 @@ final class TermsSheetVC: HandleBottomSheetVC {
     
     // MARK: Reactive Interface
     
+    /// 주어진 URL을 Safari 뷰 컨트롤러로 열기
+    private func openSafari(url: String) {
+        guard let url = URL(string: url) else { return }
+        let safariVC = SFSafariViewController(url: url)
+        safariVC.modalPresentationStyle = .overFullScreen
+        present(safariVC, animated: true)
+    }
+    
     /// 약관 동의 완료 퍼블리셔
-    var submitPublisher: AnyPublisher<Void, Never> {
-        submitButton.tapPublisher
+    /// 뷰모델의 약관 동의 완료 이펙트 수신 시 완료 이벤트 방출
+    var termsAgreementCompletedPublisher: AnyPublisher<Void, Never> {
+        vm.effect
+            .compactMap { $0[case: \.termsAgreementCompleted] }
+            .eraseToAnyPublisher()
     }
 }
 
