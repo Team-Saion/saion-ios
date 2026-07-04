@@ -41,6 +41,7 @@ final class AppCoord: Coordinator {
         // 새 코디네이터의 네비게이션을 루트로 설정
         let vc = HomeVC()
         setRootWithAnimation(vc)
+        
 //        let coord = TabBarCoord(navigation: .init())
 //        setRootWithAnimation(coord.navigation)
 //        store(child: coord)
