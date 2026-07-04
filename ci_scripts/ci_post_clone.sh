@@ -2,6 +2,9 @@
 
 set -eu
 
+defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
+
 REPO_ROOT="${CI_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 CONFIG_DIR="$REPO_ROOT/Saion/Resource"
 
