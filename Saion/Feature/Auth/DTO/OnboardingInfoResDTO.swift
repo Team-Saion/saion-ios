@@ -27,9 +27,15 @@ struct OnboardingInfoResDTO: Decodable {
     // MARK: Mapper
     
     func toDomain() -> OnboardingInfo {
+        /// http로 시작하는 URL이 들어올 경우, https로 강제 변환
+        let profileImageURL = socialProfileImageUrl?.replacingOccurrences(
+            of: "http://",
+            with: "https://"
+        )
+        
         return OnboardingInfo(
             nickname: socialNickname?.isEmpty == false ? socialNickname : nil,
-            profileImageURL: socialProfileImageUrl.flatMap { URL(string: $0) },
+            profileImageURL: profileImageURL.flatMap { URL(string: $0) },
             avatarColor: .hex(hexStr: avatarColor.hex)
         )
     }
