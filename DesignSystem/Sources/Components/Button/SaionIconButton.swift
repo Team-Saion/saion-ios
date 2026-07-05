@@ -100,9 +100,7 @@ public final class SaionIconButton: UIButton {
         )
         
         // 이미지 스타일 반영
-        configuration.image = image?
-            .resized(to: appearance.size.imageSize)
-            .withTintColor(.labelStrong)
+        configuration.image = image?.resized(to: appearance.size.imageSize)
         
         self.configuration = configuration
     }

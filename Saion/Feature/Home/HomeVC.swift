@@ -9,6 +9,8 @@ import UIKit
 
 import SnapKit
 
+import DesignSystem
+
 final class HomeVC: UIViewController {
     
     // MARK: Properties
@@ -16,13 +18,21 @@ final class HomeVC: UIViewController {
     
     // MARK: Components
     
-    let label = {
-        let label = UILabel()
-        label.text = "홈 화면 입니다."
-        label.font = .preferredFont(forTextStyle: .headline)
-        return label
+    private let backgroundLayer = {
+        let layer = CAGradientLayer()
+        layer.colors = [
+            UIColor.yellow50.cgColor,
+            UIColor.backgroundMuted.cgColor
+        ]
+        layer.locations = [0.0, 0.5962]
+        layer.startPoint = CGPoint(x: 0.5, y: 0.0)
+        layer.endPoint = CGPoint(x: 0.5, y: 1.0)
+        return layer
     }()
     
+    private let mainVStack = UIStackView(.vertical)
+    
+    private let navigationBar = HomeNavigationBar()
     
     // MARK: Life Cycle
     
@@ -32,17 +42,25 @@ final class HomeVC: UIViewController {
         setupLayout()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        backgroundLayer.frame = view.bounds
+    }
+    
     // MARK: Defaults
     
-    private func setupDefaults() {
-        view.backgroundColor = .white
-    }
+    private func setupDefaults() {}
     
     // MARK: Layout
     
     private func setupLayout() {
-        view.addSubview(label)
-        label.snp.makeConstraints { $0.center.equalToSuperview() }
+        view.layer.addSublayer(backgroundLayer)
+        view.addSubview(mainVStack)
+        
+        mainVStack.addArrangedSubview(navigationBar)
+        mainVStack.addArrangedSubview(UISpacer())
+        
+        mainVStack.snp.makeConstraints { $0.edges.equalTo(view.safeAreaLayoutGuide) }
     }
     
     // MARK: Bindings

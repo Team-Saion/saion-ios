@@ -18,7 +18,7 @@ class BackButtonVC: NavigationBarVC {
     let backBarButton = {
         let appearance = SaionIconButton.Appearance(size: .large)
         let button = SaionIconButton(with: appearance)
-        button.image = .chevronLeftLarge
+        button.image = .chevronLeftLarge.withTintColor(.grey800)
         return button
     }()
     
