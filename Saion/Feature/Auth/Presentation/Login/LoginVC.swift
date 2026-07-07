@@ -114,8 +114,6 @@ final class LoginVC: UIViewController {
             .compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
-        
-
     }
     
     // MARK: Reactive Interface
