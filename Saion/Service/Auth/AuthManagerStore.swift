@@ -61,7 +61,7 @@ final class AuthManagerStore {
     
     // MARK: Process
     
-    @MainActor private func process(action: Action) async throws {
+    private func process(action: Action) async throws {
         switch action {
         case .appDidLaunch:
             // 앱을 재설치 한 경우, 키체인에 잔류하고 있는 토큰 초기화

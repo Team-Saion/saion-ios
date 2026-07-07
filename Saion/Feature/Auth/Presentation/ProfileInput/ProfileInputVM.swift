@@ -123,7 +123,7 @@ final class ProfileInputVM {
     
     // MARK: Process
     
-    @MainActor private func process(action: Action) async throws {
+    private func process(action: Action) async throws {
         switch action {
         case .textFieldStateChanged(let textFieldState):
             state.nicknameTextFieldState = textFieldState
