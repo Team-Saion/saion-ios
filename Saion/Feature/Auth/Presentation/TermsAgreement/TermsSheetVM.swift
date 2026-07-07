@@ -73,7 +73,7 @@ final class TermsSheetVM {
     
     // MARK: Process
     
-    private func process(action: Action) async throws {
+    @MainActor private func process(action: Action) async throws {
         switch action {
         case .ageConfirmationTapped:
             state.ageConfirmed.toggle()

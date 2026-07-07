@@ -73,7 +73,7 @@ final class LoginVM {
     
     // MARK: Process
     
-    private func process(action: Action) async throws {
+    @MainActor private func process(action: Action) async throws {
         switch action {
         case .viewDidLoad:
             guard AuthManager.shared.store.state.authState.is(\.onboarding) else { return }
