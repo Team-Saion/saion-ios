@@ -30,9 +30,20 @@ final class HomeVC: UIViewController {
         return layer
     }()
     
-    private let mainVStack = UIStackView(.vertical)
-    
     private let navigationBar = HomeNavigationBar()
+    
+    private let scrollView = {
+        let view = ResponsiveScrollView()
+        view.contentInset = .init(bottom: TabBar.height)
+        view.scrollIndicatorInsets = .init(bottom: TabBar.height)
+        return view
+    }()
+    
+    private let contentVStack = UIStackView(.vertical, inset: .init(horizontal: 20))
+    
+    private let headerView = HomeHeaderView()
+    
+    private let dashboardView = HomeDashboardView()
     
     // MARK: Life Cycle
     
@@ -55,12 +66,23 @@ final class HomeVC: UIViewController {
     
     private func setupLayout() {
         view.layer.addSublayer(backgroundLayer)
-        view.addSubview(mainVStack)
+        view.addSubview(navigationBar)
+        view.addSubview(scrollView)
         
-        mainVStack.addArrangedSubview(navigationBar)
-        mainVStack.addArrangedSubview(UISpacer())
+        scrollView.addSubview(contentVStack)
+        contentVStack.addArrangedSubview(headerView)
+        contentVStack.addArrangedSubview(UISpacer(12))
+        contentVStack.addArrangedSubview(dashboardView)
         
-        mainVStack.snp.makeConstraints { $0.edges.equalTo(view.safeAreaLayoutGuide) }
+        navigationBar.snp.makeConstraints {
+            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(scrollView.snp.top)
+        }
+        scrollView.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        contentVStack.snp.makeConstraints { $0.edges.width.equalToSuperview() }
     }
     
     // MARK: Bindings
