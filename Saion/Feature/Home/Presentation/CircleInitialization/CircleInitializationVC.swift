@@ -8,7 +8,6 @@
 import Combine
 import UIKit
 
-import CasePaths
 import CombineCocoa
 import SnapKit
 
@@ -20,7 +19,7 @@ final class CircleInitializationVC: NavigationBarVC {
     // MARK: Properties
     
     private var cancellables = Set<AnyCancellable>()
-    private let vm: ProfileInputVM
+    private let vm: CircleInitializationVM
     
     // MARK: Components
     
@@ -42,19 +41,8 @@ final class CircleInitializationVC: NavigationBarVC {
     
     /// 서클 이름 입력 필드
     private let textField = {
-        let text = TextStyle(
-            typography: .heading1,
-            paragraph: .init(alignment: .center)
-        )
-        let placeholder = TextStyle(
-            typography: .heading1,
-            decoration: .init(foregroundColor: .labelMuted),
-            paragraph: .init(alignment: .center)
-        )
-        let field = InsetAttributedTextField()
-        field.inset = .init(horizontal: 20, vertical: 4)
-        field.defaultTextAttributes = text.toDictionary()
-        field.attributedPlaceholder = placeholder.toNSAttrStr("써클 이름")
+        let field = SaionPlainTextField()
+        field.placeholder = "써클 이름"
         return field
     }()
     
@@ -62,6 +50,7 @@ final class CircleInitializationVC: NavigationBarVC {
     private let captionLabel = {
         let style = TextStyle(
             typography: .title3,
+            decoration: .init(foregroundColor: .labelSubtle),
             paragraph: .init(alignment: .center)
         )
         let label = AttributedLabel()
@@ -79,7 +68,7 @@ final class CircleInitializationVC: NavigationBarVC {
     
     // MARK: Life Cycle
     
-    init(vm: ProfileInputVM) {
+    init(vm: CircleInitializationVM) {
         self.vm = vm
         super.init(nibName: nil, bundle: nil)
     }
@@ -92,7 +81,7 @@ final class CircleInitializationVC: NavigationBarVC {
         super.viewDidLoad()
         setupDefaults()
         setupLayout()
-//        setupBindings()
+        setupBindings()
     }
     
     // MARK: Defaults
@@ -128,58 +117,47 @@ final class CircleInitializationVC: NavigationBarVC {
     
     // MARK: Bindings
     
-//    private func setupBindings() {
-//        // 텍스트 필드 텍스트 변경 이벤트 전달 (구독 시 방출되는 초기 값 무시)
-//        textField.textPublisher.dropFirst()
-//            .sink { [weak self] in self?.vm.send(.textChanged($0)) }
-//            .store(in: &cancellables)
-//        
-//        // 텍스트 필드 포커스 상태 변경 이벤트 전달
-//        textField.$currentState
-//            .sink { [weak self] in self?.vm.send(.textFieldStateChanged($0)) }
-//            .store(in: &cancellables)
-//        
-//        // 제출 버튼 탭 이벤트 전달
-//        submitButton.tapPublisher
-//            .sink { [weak self] in self?.vm.send(.submitTapped) }
-//            .store(in: &cancellables)
-//        
-//        // 프로필 이미지 뷰 상태 바인딩
-//        vm.$state.map(\.profileImageViewState)
-//            .sink { [weak self] in self?.profileImageView.configure(with: $0) }
-//            .store(in: &cancellables)
-//        
-//        // 닉네임 플레이스홀더 바인딩
-//        vm.$state.map(\.nicknamePlaceholder)
-//            .sink { [weak self] in self?.textField.placeholder = $0 }
-//            .store(in: &cancellables)
-//        
-//        // 초기 닉네임 텍스트 설정 (1회)
-//        vm.$state.map(\.nicknameText).prefix(1)
-//            .sink { [weak self] in self?.textField.text = $0 }
-//            .store(in: &cancellables)
-//        
-//        // 하단 캡션 레이블 텍스트 바인딩
-//        vm.$state.compactMap(\.captionText)
-//            .sink { [weak self] in self?.captionLabel.text = $0 }
-//            .store(in: &cancellables)
-//        
-//        // 닉네임 폼 UI 외형(색상 등) 바인딩
-//        vm.$state.compactMap(\.appearance)
-//            .sink { [weak self] in self?.updateUI(appearance: $0) }
-//            .store(in: &cancellables)
-//        
-//        // 유효성에 따른 제출 버튼 활성화 바인딩
-//        vm.$state.map(\.isValidNickname)
-//            .removeDuplicates()
-//            .sink { [weak self] in self?.submitButton.isEnabled = $0 }
-//            .store(in: &cancellables)
-//    }
+    private func setupBindings() {
+        // 텍스트 필드 텍스트 변경 이벤트 전달 (구독 시 방출되는 초기 값 무시)
+        textField.textPublisher.dropFirst()
+            .sink { [weak self] in self?.vm.send(.textChanged($0)) }
+            .store(in: &cancellables)
+        
+        // 제출 버튼 탭 이벤트 전달
+        submitButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.submitTapped) }
+            .store(in: &cancellables)
+        
+        // 하단 캡션 레이블 텍스트 바인딩
+        vm.$state.map(\.captionText)
+            .sink { [weak self] in self?.captionLabel.text = $0 }
+            .store(in: &cancellables)
+        
+        // 서클 이름 유효성 에러 상태 바인딩
+        vm.$state.map(\.hasValidationError)
+            .removeDuplicates()
+            .sink { [weak self] in self?.textField.hasError = $0 }
+            .store(in: &cancellables)
+        
+        // 텍스트 필드 상태에 따른 캡션 UI 바인딩
+        textField.$currentState
+            .sink { [weak self] in self?.updateCaptionUI(textFieldState: $0) }
+            .store(in: &cancellables)
+        
+        // 유효성에 따른 제출 버튼 활성화 바인딩
+        vm.$state.map(\.isValidCircleName)
+            .removeDuplicates()
+            .sink { [weak self] in self?.submitButton.isEnabled = $0 }
+            .store(in: &cancellables)
+    }
     
     // MARK: Reactive Interface
     
-    private func updateUI(appearance: NicknameFormAppearance) {
-        textField.defaultTextAttributes[.foregroundColor] = appearance.textColor
-        captionLabel.textAttributes[.foregroundColor] = appearance.captionColor
+    private func updateCaptionUI(textFieldState: TextFieldState) {
+        let captionColor: UIColor = switch textFieldState {
+        case .error:    .statusNegativeDefault
+        default:        .labelSubtle
+        }
+        captionLabel.textAttributes[.foregroundColor] = captionColor
     }
 }

@@ -44,27 +44,13 @@ final class ProfileInputVC: BackButtonVC {
     }()
     
     /// 닉네임 입력 필드
-    private let textField = {
-        let text = TextStyle(
-            typography: .heading1,
-            paragraph: .init(alignment: .center)
-        )
-        let placeholder = TextStyle(
-            typography: .heading1,
-            decoration: .init(foregroundColor: .labelMuted),
-            paragraph: .init(alignment: .center)
-        )
-        let field = InsetAttributedTextField()
-        field.inset = .init(horizontal: 20, vertical: 4)
-        field.defaultTextAttributes = text.toDictionary()
-        field.placeholderAttributes = placeholder.toDictionary()
-        return field
-    }()
+    private let textField = SaionPlainTextField()
     
     /// 닉네임 텍스트 필드 캡션 레이블 (가이드 레이블)
     private let captionLabel = {
         let style = TextStyle(
             typography: .title3,
+            decoration: .init(foregroundColor: .labelSubtle),
             paragraph: .init(alignment: .center)
         )
         let label = AttributedLabel()
@@ -140,11 +126,6 @@ final class ProfileInputVC: BackButtonVC {
             .sink { [weak self] in self?.vm.send(.textChanged($0)) }
             .store(in: &cancellables)
         
-        // 텍스트 필드 포커스 상태 변경 이벤트 전달
-        textField.$currentState
-            .sink { [weak self] in self?.vm.send(.textFieldStateChanged($0)) }
-            .store(in: &cancellables)
-        
         // 제출 버튼 탭 이벤트 전달
         submitButton.tapPublisher
             .sink { [weak self] in self?.vm.send(.submitTapped) }
@@ -170,9 +151,15 @@ final class ProfileInputVC: BackButtonVC {
             .sink { [weak self] in self?.captionLabel.text = $0 }
             .store(in: &cancellables)
         
-        // 닉네임 폼 UI 외형(색상 등) 바인딩
-        vm.$state.compactMap(\.appearance)
-            .sink { [weak self] in self?.updateUI(appearance: $0) }
+        // 닉네임 유효성 에러 상태 바인딩
+        vm.$state.map(\.hasValidationError)
+            .removeDuplicates()
+            .sink { [weak self] in self?.textField.hasError = $0 }
+            .store(in: &cancellables)
+        
+        // 텍스트 필드 상태에 따른 캡션 UI 바인딩
+        textField.$currentState
+            .sink { [weak self] in self?.updateCaptionUI(textFieldState: $0) }
             .store(in: &cancellables)
         
         // 유효성에 따른 제출 버튼 활성화 바인딩
@@ -184,9 +171,12 @@ final class ProfileInputVC: BackButtonVC {
     
     // MARK: Reactive Interface
     
-    private func updateUI(appearance: NicknameFormAppearance) {
-        textField.defaultTextAttributes[.foregroundColor] = appearance.textColor
-        captionLabel.textAttributes[.foregroundColor] = appearance.captionColor
+    private func updateCaptionUI(textFieldState: TextFieldState) {
+        let captionColor: UIColor = switch textFieldState {
+        case .error:    .statusNegativeDefault
+        default:        .labelSubtle
+        }
+        captionLabel.textAttributes[.foregroundColor] = captionColor
     }
 }
 
@@ -200,4 +190,3 @@ final class ProfileInputVC: BackButtonVC {
     ))
     return ProfileInputVC(vm: vm)
 }
-

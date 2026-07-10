@@ -9,5 +9,6 @@ public enum TextFieldState {
     case normal
     case focused
     case filled
+    case error
     case disabled
 }

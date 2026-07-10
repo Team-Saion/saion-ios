@@ -142,12 +142,10 @@ private final class BottomSheetDemoContentVC: BottomSheetPresentationVC {
         return label
     }()
     
-    private let textForm = {
-        let form = SaionBoxTextForm()
-        form.titleLabel.text = "메모"
-        form.textField.placeholder = "키보드 대응도 확인해봐"
-        form.captionLabel.text = "키보드가 올라오면 시트 하단이 keyboardLayoutGuide를 따라가."
-        return form
+    private let textField = {
+        let field = SaionBoxTextField()
+        field.placeholder = "키보드 대응도 확인해봐"
+        return field
     }()
     
     private lazy var closeButton = {
@@ -181,11 +179,11 @@ private final class BottomSheetDemoContentVC: BottomSheetPresentationVC {
         stackView.addArrangedSubview(handleContainerView)
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(descriptionLabel)
-        stackView.addArrangedSubview(textForm)
+        stackView.addArrangedSubview(textField)
         stackView.addArrangedSubview(closeButton)
         
         stackView.setCustomSpacing(20, after: descriptionLabel)
-        stackView.setCustomSpacing(24, after: textForm)
+        stackView.setCustomSpacing(24, after: textField)
         
         handleView.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()

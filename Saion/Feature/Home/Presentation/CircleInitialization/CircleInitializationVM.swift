@@ -10,15 +10,11 @@ import Foundation
 
 import CasePaths
 
-import DesignSystem
-
 final class CircleInitializationVM {
     
     // MARK: Types
     
     enum Action {
-        /// 텍스트 필드 상태 변경됨
-        case textFieldStateChanged(TextFieldState)
         /// 텍스트 입력됨
         case textChanged(String?)
         /// 시작하기 버튼 탭
@@ -26,19 +22,17 @@ final class CircleInitializationVM {
     }
     
     struct State {
-        /// 텍스트 필드 상태
-        var textFieldState: TextFieldState?
         /// 서클 이름 텍스트
         var circleNameText: String?
         
-        /// 유효성 에러 (닉네임 데이터만 보고 판단)
+        /// 유효성 에러 (서클 이름 데이터만 보고 판단)
         fileprivate var validationError: CircleValidationError? {
             guard let circleNameText else { return nil }
             
             // 1순위: 20자 초과 → "20자 이내로 입력해주세요."
             if circleNameText.count > 20 { return .tooLong }
             
-            // 2순위: 공백만 있음 → "닉네임을 입력해주세요."
+            // 2순위: 공백만 있음 → "써클 이름을 입력해주세요."
             let trimmed = circleNameText.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty { return .emptyOrWhitespace }
             
@@ -52,23 +46,16 @@ final class CircleInitializationVM {
             ?? "\(circleNameText?.count ?? 0)/20"
         }
         
-        /// 실제 UI에 반영할 상태 (에러 여부와 현재 상호작용 상태를 조합)
-        var appearance: CircleNameFormAppearance {
-            // 1순위: 에러가 있으면 에러 상태
-            if validationError != nil { return .error }
-            // 2순위: DesignSystem의 상호작용 상태 그대로 매핑
-            return switch textFieldState {
-            case .focused:  .focused
-            case .filled:   .filled
-            default:        .normal
-            }
+        /// 유효성 에러 여부
+        var hasValidationError: Bool {
+            validationError != nil
         }
         
         /// 서클 이름 유효 여부 (버튼 비활성화 목적)
-        var isValidNickname: Bool {
+        var isValidCircleName: Bool {
             guard let circleNameText else { return false }
             // 2자 미만일 때는 유효하지 않음
-            return circleNameText.count >= 2 && validationError == nil
+            return circleNameText.count >= 2 && !hasValidationError
         }
         
         var isLoading: Bool = false
@@ -101,14 +88,11 @@ final class CircleInitializationVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .textFieldStateChanged(let textFieldState):
-            state.textFieldState = textFieldState
-            
         case .textChanged(let text):
             state.circleNameText = text?.isEmpty == false ? text : nil
             
         case .submitTapped:
-            guard !state.isLoading, let nicknameText = state.circleNameText else { return }
+            guard !state.isLoading, state.circleNameText != nil else { return }
             
             state.isLoading = true
             defer { state.isLoading = false }

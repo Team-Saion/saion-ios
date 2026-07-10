@@ -19,6 +19,9 @@ open class DefaultTextField: UITextField {
     /// 현재 텍스트 필드 상태
     @Published public private(set) var currentState: TextFieldState = .normal
     
+    /// 에러 여부
+    @Published public var hasError: Bool = false
+    
     // MARK: Life Cycle
     
     public override init(frame: CGRect) {
@@ -43,10 +46,11 @@ open class DefaultTextField: UITextField {
     
     private func setupBindings() {
         /// 텍스트 필드의 포커스(편집 시작 및 종료) 상태
-        let isFocused = Publishers.Merge(
-            controlEventPublisher(for: .editingDidBegin).map { true },
-            controlEventPublisher(for: .editingDidEnd).map { false }
-        )
+        let isFocused = Publishers
+            .Merge(
+                controlEventPublisher(for: .editingDidBegin).map { true },
+                controlEventPublisher(for: .editingDidEnd).map { false }
+            )
             .prepend(isEditing)
             .removeDuplicates()
         
@@ -62,9 +66,10 @@ open class DefaultTextField: UITextField {
             .removeDuplicates()
         
         /// 여러 상태를 조합하여 현재 상태 생성
-        Publishers.CombineLatest3(isEnabled, isFocused, isFilled)
-            .map { isEnabled, isFocused, isFilled -> TextFieldState in
+        Publishers.CombineLatest4(isEnabled, $hasError, isFocused, isFilled)
+            .map { isEnabled, hasError, isFocused, isFilled -> TextFieldState in
                 if !isEnabled { return .disabled }
+                if hasError { return .error }
                 if isFocused { return .focused }
                 if isFilled { return .filled }
                 return .normal

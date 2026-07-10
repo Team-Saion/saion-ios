@@ -10,15 +10,11 @@ import Foundation
 
 import CasePaths
 
-import DesignSystem
-
 final class ProfileInputVM {
     
     // MARK: Types
     
     enum Action {
-        /// 닉네임 텍스트 필드 상태 변경됨
-        case textFieldStateChanged(TextFieldState)
         /// 닉네임 텍스트 입력됨
         case textChanged(String?)
         /// 시작하기 버튼 탭
@@ -28,8 +24,6 @@ final class ProfileInputVM {
     struct State {
         /// 프로필 뷰 상태
         let profileImageViewState: ProfileImageViewState
-        /// 닉네임 텍스트 필드 상태
-        var nicknameTextFieldState: TextFieldState?
         /// 닉네임 플레이스 홀더
         let nicknamePlaceholder: String?
         /// 닉네임
@@ -60,23 +54,14 @@ final class ProfileInputVM {
             validationError?.errorDescription ?? "2~10자, 한글, 영문, 숫자만"
         }
         
-        /// 실제 UI에 반영할 상태 (에러 여부와 현재 상호작용 상태를 조합)
-        var appearance: NicknameFormAppearance {
-            // 1순위: 에러가 있으면 에러 상태
-            if validationError != nil { return .error }
-            // 2순위: DesignSystem의 상호작용 상태 그대로 매핑
-            return switch nicknameTextFieldState {
-            case .focused:  .focused
-            case .filled:   .filled
-            default:        .normal
-            }
-        }
+        /// 유효성 에러 여부
+        var hasValidationError: Bool { validationError != nil }
         
         /// 닉네임 유효 여부 (버튼 비활성화 목적)
         var isValidNickname: Bool {
             guard let nicknameText else { return false }
             // 2자 미만일 때는 유효하지 않음
-            return nicknameText.count >= 2 && validationError == nil
+            return nicknameText.count >= 2 && !hasValidationError
         }
         
         var isLoading: Bool = false
@@ -125,9 +110,6 @@ final class ProfileInputVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .textFieldStateChanged(let textFieldState):
-            state.nicknameTextFieldState = textFieldState
-            
         case .textChanged(let text):
             state.nicknameText = text?.isEmpty == false ? text : nil
             
