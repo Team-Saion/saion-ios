@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 
+import CasePaths
 import CombineCocoa
 import SnapKit
 
@@ -18,10 +19,17 @@ final class CircleInitializationVC: NavigationBarVC {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
-    private let vm: CircleInitializationVM
+    var cancellables = Set<AnyCancellable>()
+    private let vm = HomeDI.shared.makeCircleInitializationVM()
     
     // MARK: Components
+    
+    private let closeBarButton = {
+        let appearance = SaionIconButton.Appearance(size: .large)
+        let button = SaionIconButton(with: appearance)
+        button.image = .xBold.withTintColor(.grey800)
+        return button
+    }()
     
     private let topVStack =
     UIStackView(.vertical, alignment: .center, inset: .init(horizontal: 20))
@@ -68,15 +76,6 @@ final class CircleInitializationVC: NavigationBarVC {
     
     // MARK: Life Cycle
     
-    init(vm: CircleInitializationVM) {
-        self.vm = vm
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    @MainActor required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupDefaults()
@@ -88,11 +87,15 @@ final class CircleInitializationVC: NavigationBarVC {
     
     private func setupDefaults() {
         view.backgroundColor = .white
+        defaultNavBar.titleLabel.text = "써클 만들기"
     }
     
     // MARK: Layout
     
     private func setupLayout() {
+        defaultNavBar.itemsHStack.addArrangedSubview(closeBarButton)
+        defaultNavBar.itemsHStack.addArrangedSubview(UISpacer())
+        
         view.addSubview(topVStack)
         view.addSubview(bottomVStack)
         
@@ -128,8 +131,8 @@ final class CircleInitializationVC: NavigationBarVC {
             .sink { [weak self] in self?.vm.send(.submitTapped) }
             .store(in: &cancellables)
         
-        // 하단 캡션 레이블 텍스트 바인딩
-        vm.$state.map(\.captionText)
+        // 하단 캡션 레이블 텍스트 바인딩 (구독 시 방출되는 초기 값 무시)
+        vm.$state.map(\.captionText).dropFirst()
             .sink { [weak self] in self?.captionLabel.text = $0 }
             .store(in: &cancellables)
         
@@ -139,16 +142,38 @@ final class CircleInitializationVC: NavigationBarVC {
             .sink { [weak self] in self?.textField.hasError = $0 }
             .store(in: &cancellables)
         
-        // 텍스트 필드 상태에 따른 캡션 UI 바인딩
-        textField.$currentState
-            .sink { [weak self] in self?.updateCaptionUI(textFieldState: $0) }
-            .store(in: &cancellables)
-        
         // 유효성에 따른 제출 버튼 활성화 바인딩
         vm.$state.map(\.isValidCircleName)
             .removeDuplicates()
             .sink { [weak self] in self?.submitButton.isEnabled = $0 }
             .store(in: &cancellables)
+        
+        // 텍스트 필드 상태에 따른 캡션 UI 바인딩
+        textField.$currentState
+            .sink { [weak self] in self?.updateCaptionUI(textFieldState: $0) }
+            .store(in: &cancellables)
+        
+        // 닫기 버튼 누르면 화면 닫기
+        closeBarButton.tapPublisher
+            .sink { [weak self] in self?.dismiss(animated: true) }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: Overrides
+    
+    override func dismiss(
+        animated flag: Bool,
+        completion: (() -> Void)? = nil
+    ) {
+        // dismiss 중 키보드 레이아웃을 따라가지 않도록 하단 스택의 현재 위치 고정
+        view.layoutIfNeeded()
+        let bottomOffset = bottomVStack.frame.maxY - view.bounds.maxY
+        bottomVStack.snp.remakeConstraints {
+            $0.horizontalEdges.equalTo(contentLayoutGuide)
+            $0.bottom.equalToSuperview().offset(bottomOffset)
+        }
+        view.layoutIfNeeded()
+        super.dismiss(animated: flag, completion: completion)
     }
     
     // MARK: Reactive Interface
@@ -160,4 +185,15 @@ final class CircleInitializationVC: NavigationBarVC {
         }
         captionLabel.textAttributes[.foregroundColor] = captionColor
     }
+    
+    /// 서클 생성 완료 퍼블리셔
+    var circleCreatedPublisher: AnyPublisher<Void, Never> {
+        vm.effect
+            .compactMap { $0[case: \.circleCreated] }
+            .eraseToAnyPublisher()
+    }
 }
+
+// MARK: - Preview
+
+#Preview { CircleInitializationVC() }

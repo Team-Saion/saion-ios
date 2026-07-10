@@ -16,7 +16,7 @@ final class HomeVC: UIViewController {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm = HomeDI.shared.makeHomeVM()
     
     /// 현재 표시 중인 콘텐츠 뷰컨트롤러
@@ -44,10 +44,10 @@ final class HomeVC: UIViewController {
     private let contentView = UIView()
     
     /// 서클 참여 전 콘텐츠 뷰컨트롤러
-    private let entryVC = CircleEntryVC()
+    let entryVC = CircleEntryVC()
     
     /// 서클 참여 후 콘텐츠 뷰컨트롤러
-    private let overviewVC = CircleOverviewVC()
+    let overviewVC = CircleOverviewVC()
     
     // MARK: Life Cycle
     
@@ -131,6 +131,8 @@ final class HomeVC: UIViewController {
         currentContentVC = nextVC
     }
     
+    /// 화면 새로 고침
+    func refresh() { vm.send(.refreshTriggered) }
 }
 
 // MARK: - View State

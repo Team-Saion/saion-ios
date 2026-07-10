@@ -15,8 +15,10 @@ final class HomeVM {
     // MARK: Types
     
     enum Action {
-        /// 초기화
+        /// 화면 초기 로드 완료
         case viewDidLoad
+        /// 새로고침 이벤트가 발생함
+        case refreshTriggered
     }
     
     struct State {
@@ -63,7 +65,7 @@ final class HomeVM {
     private func process(action: Action) async throws {
         switch action {
             
-        case .viewDidLoad:
+        case .viewDidLoad, .refreshTriggered:
             state.isLoading = true
             defer { state.isLoading = false }
             

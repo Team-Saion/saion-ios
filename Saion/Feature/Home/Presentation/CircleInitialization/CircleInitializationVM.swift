@@ -42,14 +42,11 @@ final class CircleInitializationVM {
         /// 하단 캡션 텍스트
         var captionText: String {
             // 에러가 있다면 에러 메시지 우선 노출
-            validationError?.errorDescription
-            ?? "\(circleNameText?.count ?? 0)/20"
+            validationError?.errorDescription ?? "\(circleNameText?.count ?? 0)/20"
         }
         
         /// 유효성 에러 여부
-        var hasValidationError: Bool {
-            validationError != nil
-        }
+        var hasValidationError: Bool { validationError != nil }
         
         /// 서클 이름 유효 여부 (버튼 비활성화 목적)
         var isValidCircleName: Bool {
@@ -65,12 +62,22 @@ final class CircleInitializationVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
+        /// 서클 생성 완료 이벤트
+        case circleCreated
     }
     
     // MARK: Properties
     
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
+    
+    private let circleRepo: CircleRepo
+    
+    // MARK: Initializer
+    
+    init(circleRepo: CircleRepo) {
+        self.circleRepo = circleRepo
+    }
     
     // MARK: Send
     
@@ -97,7 +104,8 @@ final class CircleInitializationVM {
             state.isLoading = true
             defer { state.isLoading = false }
             
-            // TODO: 여기에 서클 생성 래포 필요할지도
+            _ = try await circleRepo.createCircle(name: state.circleNameText)
+            effect.send(.circleCreated)
         }
     }
 }

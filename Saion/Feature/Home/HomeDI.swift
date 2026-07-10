@@ -17,4 +17,8 @@ final class HomeDI {
     func makeHomeVM() -> HomeVM {
         HomeVM(circleRepo: DefaultCircleRepo())
     }
+    
+    func makeCircleInitializationVM() -> CircleInitializationVM {
+        CircleInitializationVM(circleRepo: DefaultCircleRepo())
+    }
 }
