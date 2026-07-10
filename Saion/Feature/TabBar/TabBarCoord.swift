@@ -19,20 +19,22 @@ final class TabBarCoord: Coordinator {
     /// 탭바 화면 초기화
     func start() {
         /// 홈 코디네이터
-        let homeVC = NavigationController(rootViewController: HomeVC())
-        homeVC.tabBarItem = UITabBarItem(
+        let homeCoord = HomeCoord(navigation: .init())
+        homeCoord.navigation.tabBarItem = UITabBarItem(
             title: "홈",
             image: .house,
             tag: 0
         )
+        store(child: homeCoord)
+        homeCoord.start()
         
         let vc = TabBarVC()
         vc.setViewControllers(
-            [homeVC],
+            [homeCoord.navigation],
             animated: false
         )
         
-        // 주어진 인덱스로 탭
+        // 주어진 인덱스로 탭 전환
         vc.defaultTabBar.selectedIndexPublisher
             .prepend(0) // 초기 탭 인덱스
             .sink { [weak vc] in vc?.selectedIndex = $0 }

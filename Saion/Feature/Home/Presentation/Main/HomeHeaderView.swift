@@ -17,44 +17,26 @@ final class HomeHeaderView: UIView {
     
     private let gradientLineView = GradientView()
     
-    private let titleHStack = {
-        let makeHearImageView = {
-            let view = UIImageView()
-            view.contentMode = .scaleAspectFit
-            view.image = .heartFill.withTintColor(.labelStrong)
-            
-            view.snp.makeConstraints { $0.size.equalTo(14) }
-            return view
-        }
-        
-        let view = UIStackView()
-        view.inset = .init(horizontal: 11)
-        view.alignment = .center
-        view.spacing = 4
-        
-        view.layer.borderColor = UIColor.lineSubtle.cgColor
-        view.layer.borderWidth = 1
-        view.backgroundColor = .common0
-        
-        view.layer.cornerRadius = 16
-        view.clipsToBounds = true
-        
-        view.addArrangedSubview(makeHearImageView())
-        view.addArrangedSubview(makeHearImageView())
-        
-        view.snp.makeConstraints { $0.height.equalTo(32) }
-        return view
-    }()
-    
     let titleLabel = {
         let style = TextStyle(
             typography: .label2,
             decoration: .init(foregroundColor: .labelStrong)
         )
-        let label = AttributedLabel()
+        let label = InsetAttributedLabel()
         label.textAttributes = style.toDictionary()
+        label.inset = .init(horizontal: 11)
+        
+        label.layer.borderColor = UIColor.lineSubtle.cgColor
+        label.layer.borderWidth = 1
+        
+        label.layer.cornerRadius = 16
+        label.clipsToBounds = true
+        label.backgroundColor = .common0
+        
         // FIXME: 임시로 붙임
         label.text = "정욱네"
+        
+        label.snp.makeConstraints { $0.height.equalTo(32) }
         return label
     }()
     
@@ -73,12 +55,10 @@ final class HomeHeaderView: UIView {
     
     private func setupLayout() {
         addSubview(gradientLineView)
-        addSubview(titleHStack)
-        
-        titleHStack.insertArrangedSubview(titleLabel, at: 1)
+        addSubview(titleLabel)
         
         gradientLineView.snp.makeConstraints { $0.horizontalEdges.centerY.equalToSuperview() }
-        titleHStack.snp.makeConstraints { $0.verticalEdges.centerX.equalToSuperview() }
+        titleLabel.snp.makeConstraints { $0.verticalEdges.centerX.equalToSuperview() }
     }
 }
 
