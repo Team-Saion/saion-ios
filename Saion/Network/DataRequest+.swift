@@ -22,11 +22,17 @@ extension DataRequest {
         ) { response in
             switch response.result {
             case .success(let commomRes):
-                completion(commomRes.data)
+                if commomRes.success {
+                    completion(commomRes.data)
+                } else {
+                    errorHandler?(commomRes.toAPIError())
+                }
                 
             case .failure(_):
                 let apiError = response.data.map {
-                    (try? JSONDecoder().decode(APIError.self, from: $0))
+                    (try? JSONDecoder()
+                        .decode(APIResDTO<ResponseDTO>.self, from: $0)
+                        .toAPIError())
                     ?? APIError(message: "에러 메시지 디코딩에 실패했습니다.")
                 } ?? APIError(message: "응답 데이터가 없습니다.")
                 
