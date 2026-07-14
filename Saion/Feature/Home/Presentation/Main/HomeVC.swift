@@ -87,6 +87,12 @@ final class HomeVC: UIViewController {
             .compactMap(\.content)
             .sink { [weak self] in self?.setContentVC($0) }
             .store(in: &cancellables)
+        
+        vm.$state
+            .map(\.isLoading)
+            .removeDuplicates()
+            .sink { [weak self] in self?.setLoadingIndicatorVisible($0) }
+            .store(in: &cancellables)
     }
     
     // MARK: Reactive Interface
