@@ -33,9 +33,6 @@ final class HomeHeaderView: UIView {
         label.clipsToBounds = true
         label.backgroundColor = .common0
         
-        // FIXME: 임시로 붙임
-        label.text = "정욱네"
-        
         label.snp.makeConstraints { $0.height.equalTo(32) }
         return label
     }()
@@ -57,8 +54,13 @@ final class HomeHeaderView: UIView {
         addSubview(gradientLineView)
         addSubview(titleLabel)
         
-        gradientLineView.snp.makeConstraints { $0.horizontalEdges.centerY.equalToSuperview() }
-        titleLabel.snp.makeConstraints { $0.verticalEdges.centerX.equalToSuperview() }
+        gradientLineView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.centerY.equalToSuperview()
+        }
+        titleLabel.snp.makeConstraints {
+            $0.verticalEdges.centerX.equalToSuperview()
+        }
     }
 }
 

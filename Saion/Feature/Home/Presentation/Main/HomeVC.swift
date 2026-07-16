@@ -141,13 +141,6 @@ final class HomeVC: UIViewController {
     func refresh() { vm.send(.refreshTriggered) }
 }
 
-// MARK: - View State
-
-enum HomeContent {
-    case entry
-    case overview
-}
-
 // MARK: - Preview
 
 #Preview { HomeVC() }

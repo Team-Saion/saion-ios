@@ -16,9 +16,9 @@ struct CircleHomeResDTO: Decodable {
     /// 초대 가능 여부
     let canInvite: Bool
     /// 대표 일정 정보
-    let mainSchedule: Schedule?
+    let mainSchedule: ScheduleSummariesResDTO.Schedule?
     /// 일정 요약 목록
-    let schedules: [Schedule]
+    let schedules: [ScheduleSummariesResDTO.Schedule]
     /// 전체 일정 개수
     let totalScheduleCount: Int
     
@@ -41,11 +41,48 @@ struct CircleHomeResDTO: Decodable {
         /// 아바타 색상
         let avatarColor: String
         /// 내 계정 여부
-        let isMe: Bool
+        let me: Bool
         /// 구성원 역할
         let role: String
     }
-    
-    /// 일정 요약 정보 (추후 필드 추가 예정)
-    struct Schedule: Decodable {}
+}
+
+// MARK: Mapper
+
+extension CircleHomeResDTO {
+    func toDomain() -> CircleHomeInfo? {
+        let mainSchedule: ScheduleSummary?
+        if let mainScheduleDTO = self.mainSchedule {
+            guard let mappedSchedule = mainScheduleDTO.toDomain() else { return nil }
+            mainSchedule = mappedSchedule
+        } else {
+            mainSchedule = nil
+        }
+        
+        let schedules = self.schedules.compactMap { $0.toDomain() }
+        guard schedules.count == self.schedules.count else { return nil }
+        
+        // FIXME: 프로필 사진 주소 할당 필요
+        return CircleHomeInfo(
+            circle: CircleSummary(
+                circleID: circle.circleId,
+                name: circle.name,
+                ownerID: circle.ownerId
+            ),
+            members: members.map {
+                MemberSummary(
+                    memberID: $0.memberId,
+                    nickname: $0.nickname,
+                    avatarColor: $0.avatarColor,
+                    isMe: $0.me,
+                    role: $0.role,
+                    profileImageURL: nil
+                )
+            },
+            canInvite: canInvite,
+            mainSchedule: mainSchedule,
+            schedules: schedules,
+            totalScheduleCount: totalScheduleCount
+        )
+    }
 }

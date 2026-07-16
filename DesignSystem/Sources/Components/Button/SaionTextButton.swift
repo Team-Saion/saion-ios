@@ -53,7 +53,7 @@ public final class SaionTextButton: UIButton {
         config.imagePadding = 2
         
         config.background.backgroundColor = .clear
-        config.contentInsets = .init(vertical: 2) + .init(leading: 6, trailing: 4)
+        config.contentInsets = .init(horizontal: 6, vertical: 2)
         config.background.cornerRadius = Radius.componentSmall
         config.cornerStyle = .fixed
         

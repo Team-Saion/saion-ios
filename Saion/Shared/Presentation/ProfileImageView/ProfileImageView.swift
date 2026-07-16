@@ -136,7 +136,7 @@ final class ProfileImageView: UIImageView {
 
 // MARK: - View State
 
-enum ProfileImageViewState {
+enum ProfileImageViewState: Hashable {
     /// 프로필 사진이 있음
     case image(profileImageURL: URL)
     /// 프로필 사진이 없는 경우 폴백 UI 노출

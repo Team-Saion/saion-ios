@@ -34,7 +34,7 @@ extension SaionTextButton {
         }
         
         public struct Variant: Sendable {
-            public let foregroundColor: ByState<UIColor>
+            public var foregroundColor: ByState<UIColor>
             public let overlayColor: ByState<UIColor>
             public let image: UIImage?
             
@@ -50,9 +50,9 @@ extension SaionTextButton {
         }
         
         public struct ByState<T: Sendable>: Sendable {
-            public let normal: T
-            public let highlighted: T
-            public let disabled: T
+            public var normal: T
+            public var highlighted: T
+            public var disabled: T
             
             public init(
                 normal: T,

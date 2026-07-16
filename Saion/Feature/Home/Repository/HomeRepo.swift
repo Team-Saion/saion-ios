@@ -10,5 +10,36 @@ import Foundation
 import Alamofire
 
 protocol HomeRepo {
-    // TODO: 홈 화면 명세 바뀔 거 같음 일단 대기
+    /// 서클 홈 화면에 사용할 데이터 조회
+    func fetchCircleHomeInfo(id: String) async throws -> CircleHomeInfo
+}
+
+final class DefaultHomeRepo: HomeRepo {
+    func fetchCircleHomeInfo(id: String) async throws -> CircleHomeInfo {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/homes/\(id)",
+                method: .get
+            )
+            .decodeResponse(decodeType: CircleHomeResDTO.self) { dto in
+                if let circleHomeInfo = dto?.toDomain() {
+                    continuation.resume(returning: circleHomeInfo)
+                } else {
+                    continuation.resume(throwing: SaionError(
+                        userMessage: "서클 홈 정보 조회 중 문제가 발생했어요.",
+                        errorCode: "HR-FCHI-0"
+                    ))
+                }
+                
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "서클 홈 정보 조회 중 문제가 발생했어요.",
+                    errorCode: "HR-FCHI-1"
+                ))
+            }
+            
+        }
+    }
 }
