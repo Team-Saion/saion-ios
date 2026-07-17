@@ -10,6 +10,7 @@ import UIKit
 
 import CombineCocoa
 
+import DesignSystem
 import Navigation
 
 final class TabBarCoord: Coordinator {
@@ -47,7 +48,14 @@ final class TabBarCoord: Coordinator {
         // 주어진 인덱스로 탭 전환
         vc.defaultTabBar.selectedIndexPublisher
             .prepend(0) // 초기 탭 인덱스
-            .sink { [weak vc] in vc?.selectedIndex = $0 }
+            .sink { [weak vc] index in
+                // 가입한 서클이 없으면 일정 탭 진입을 차단
+                if index == 1, CurrentCircleStore.shared.currentCircleID == nil {
+                    ToastCenter.shared.present(message: "서클에 가입하면 일정을 확인할 수 있어요.")
+                    return
+                }
+                vc?.selectedIndex = index
+            }
             .store(in: &cancellables)
         
         // 화면 전환

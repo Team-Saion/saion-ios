@@ -24,6 +24,7 @@ final class ScheduleListVC: UIViewController {
     
     // MARK: Components
     
+    /// 일정 목록과 일정 추가 진입점을 표시하는 컬렉션 뷰
     let collectionView = SchedulesCollectionView()
     
     // MARK: Life Cycle
@@ -53,8 +54,10 @@ final class ScheduleListVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
+        // 바인딩 구성이 끝난 뒤 최초 일정 목록 조회를 요청
         vm.send(.viewDidLoad)
         
+        // 셀 노출 인덱스를 VM에 전달해 다음 페이지 선조회 여부 판단
         collectionView.willDisplayCellPublisher.map { $0.indexPath.item }
             .sink { [weak self] in self?.vm.send(.cellWillDisplay(index: $0)) }
             .store(in: &cancellables)
