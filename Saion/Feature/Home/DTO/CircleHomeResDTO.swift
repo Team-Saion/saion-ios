@@ -39,11 +39,21 @@ struct CircleHomeResDTO: Decodable {
         /// 닉네임
         let nickname: String
         /// 아바타 색상
-        let avatarColor: String
+        let avatarColor: AvatarColor
+        /// 프로필 이미지 URL
+        let profileImageUrl: String?
         /// 내 계정 여부
         let me: Bool
         /// 구성원 역할
         let role: String
+    }
+    
+    /// 멤버 아바타 기본 색상
+    struct AvatarColor: Decodable {
+        /// 아바타 색상 코드
+        let code: String
+        /// 아바타 색상 hex값
+        let hex: String
     }
 }
 
@@ -62,7 +72,6 @@ extension CircleHomeResDTO {
         let schedules = self.schedules.compactMap { $0.toDomain() }
         guard schedules.count == self.schedules.count else { return nil }
         
-        // FIXME: 프로필 사진 주소 할당 필요
         return CircleHomeInfo(
             circle: CircleSummary(
                 circleID: circle.circleId,
@@ -73,10 +82,10 @@ extension CircleHomeResDTO {
                 MemberSummary(
                     memberID: $0.memberId,
                     nickname: $0.nickname,
-                    avatarColor: $0.avatarColor,
+                    avatarColor: $0.avatarColor.hex,
                     isMe: $0.me,
                     role: $0.role,
-                    profileImageURL: nil
+                    profileImageURL: $0.profileImageUrl.flatMap { URL(string: $0) }
                 )
             },
             canInvite: canInvite,
