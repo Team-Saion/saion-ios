@@ -17,6 +17,10 @@ final class CircleOverviewVM {
     enum Action {
         /// 화면 초기 로드 완료
         case viewDidLoad
+        /// 새로고침 이벤트가 발생함
+        case refreshTriggered
+        /// 일정 생성 챕
+        case createScheduleTapped
     }
     
     struct State {
@@ -51,6 +55,8 @@ final class CircleOverviewVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
+        /// 새 일정 생성
+        case createSchedule(circleID: String)
     }
     
     // MARK: Properties
@@ -87,11 +93,24 @@ final class CircleOverviewVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .viewDidLoad:
-            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = try await circleRepo.fetchJoinedCircles().first!.circleID
+        case .viewDidLoad, .refreshTriggered:
+            guard !state.isLoading else { return }
+            defer { state.isLoading = false }
+            state.isLoading = true
+            
+            let circleID = if let currentCircleID = state.circleHomeInfo?.circle.circleID {
+                currentCircleID
+            } else {
+                // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+                try await circleRepo.fetchJoinedCircles().first!.circleID
+            }
+            
             let circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
             state.circleHomeInfo = circleHomeInfo
+            
+        case .createScheduleTapped:
+            guard let circleID = state.circleHomeInfo?.circle.circleID else { return }
+            effect.send(.createSchedule(circleID: circleID))
         }
     }
 }

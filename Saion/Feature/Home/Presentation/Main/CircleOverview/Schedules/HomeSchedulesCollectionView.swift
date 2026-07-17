@@ -8,6 +8,9 @@
 import Combine
 import UIKit
 
+import CasePaths
+import CombineCocoa
+
 final class HomeSchedulesCollectionView: UICollectionView {
     
     // MARK: Enum
@@ -126,10 +129,35 @@ final class HomeSchedulesCollectionView: UICollectionView {
         snapshot.appendItems(items, toSection: .main)
         diffableDataSource.apply(snapshot, animatingDifferences: true)
     }
+    
+    // MARK: Reactive Interface
+    
+    /// 일정 셀 선택 시 일정 ID를 방출하는 퍼블리셔
+    var scheduleTapPublisher: AnyPublisher<String, Never> {
+        didSelectItemPublisher
+            .compactMap { [weak self] indexPath in
+                self?.diffableDataSource
+                    .itemIdentifier(for: indexPath)?[case: \.schedule]?
+                    .scheduleID
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    /// 일정 추가 셀 선택 퍼블리셔
+    var addScheduleTapPublisher: AnyPublisher<Void, Never> {
+        didSelectItemPublisher
+            .filter { [weak self] indexPath in
+                guard let self else { return false }
+                return cellForItem(at: indexPath) is AddScheduleCell
+            }
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
 }
 
 // MARK: - Presentation Model
 
+@CasePathable
 enum HomeSchedulesCollectionViewItem: Hashable {
     case schedule(ScheduleCellItem)
     case add
