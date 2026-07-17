@@ -16,9 +16,9 @@ struct CircleHomeResDTO: Decodable {
     /// 초대 가능 여부
     let canInvite: Bool
     /// 대표 일정 정보
-    let mainSchedule: ScheduleSummariesResDTO.Schedule?
+    let mainSchedule: ScheduleSummaryResDTO?
     /// 일정 요약 목록
-    let schedules: [ScheduleSummariesResDTO.Schedule]
+    let schedules: [ScheduleSummaryResDTO]
     /// 전체 일정 개수
     let totalScheduleCount: Int
     

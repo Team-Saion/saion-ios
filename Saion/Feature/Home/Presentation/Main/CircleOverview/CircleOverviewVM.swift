@@ -19,7 +19,7 @@ final class CircleOverviewVM {
         case viewDidLoad
         /// 새로고침 이벤트가 발생함
         case refreshTriggered
-        /// 일정 생성 챕
+        /// 일정 생성 탭
         case createScheduleTapped
     }
     
@@ -105,6 +105,10 @@ final class CircleOverviewVM {
                 try await circleRepo.fetchJoinedCircles().first!.circleID
             }
             
+            // 타 기능에도 현재 서클의 변경을 전달
+            CurrentCircleStore.shared.currentCircleID = circleID
+            
+            /// 서클 홈 정보 조회
             let circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
             state.circleHomeInfo = circleHomeInfo
             

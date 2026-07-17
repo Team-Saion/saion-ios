@@ -24,7 +24,6 @@ final class HomeVM {
     struct State {
         /// 현재 콘텐츠 뷰컨
         var content: HomeContent?
-        
         /// 네트워킹 상태
         var isLoading = false
     }

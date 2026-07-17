@@ -20,4 +20,8 @@ final class ScheduleDI {
             scheduleRepo: DefaultScheduleRepo()
         )
     }
+    
+    func makeScheduleListVM() -> ScheduleListVM {
+        ScheduleListVM(scheduleRepo: DefaultScheduleRepo())
+    }
 }

@@ -28,9 +28,19 @@ final class TabBarCoord: Coordinator {
         store(child: homeCoord)
         homeCoord.start()
         
+        /// 일정 코디네이터
+        let scheduleCoord = ScheduleCoord(navigation: .init())
+        scheduleCoord.navigation.tabBarItem = UITabBarItem(
+            title: "일정",
+            image: .calendarHeart,
+            tag: 1
+        )
+        store(child: scheduleCoord)
+        scheduleCoord.start()
+        
         let vc = TabBarVC()
         vc.setViewControllers(
-            [homeCoord.navigation],
+            [homeCoord.navigation, scheduleCoord.navigation],
             animated: false
         )
         
