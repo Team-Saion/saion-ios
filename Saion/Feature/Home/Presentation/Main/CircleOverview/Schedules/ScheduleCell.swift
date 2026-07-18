@@ -59,10 +59,14 @@ final class ScheduleCell: UICollectionViewCell {
         )
         let label = InsetAttributedLabel()
         label.textAttributes = style.toDictionary()
-        label.inset = .init(horizontal: 6, vertical: 3)
-        label.backgroundColor = .grey100
-        label.layer.cornerRadius = Radius.componentFull
+        label.inset = .init(horizontal: 6)
+        
+        label.layer.cornerRadius = 23 / 2
         label.clipsToBounds = true
+        
+        label.backgroundColor = .grey100
+        
+        label.snp.makeConstraints { $0.height.equalTo(23) }
         return label
     }()
     

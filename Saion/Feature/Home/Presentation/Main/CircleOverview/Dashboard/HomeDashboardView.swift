@@ -195,11 +195,13 @@ private final class ScheduleView: UIStackView {
             decoration: .init(foregroundColor: .red600)
         )
         let label = InsetAttributedLabel()
-        label.inset = .init(horizontal: 8, vertical: 4)
+        label.inset = .init(horizontal: 8)
         label.textAttributes = style.toDictionary()
-        label.layer.cornerRadius = Radius.componentFull
+        label.layer.cornerRadius = 14
         label.clipsToBounds = true
         label.backgroundColor = .red50
+        
+        label.snp.makeConstraints { $0.height.equalTo(28) }
         return label
     }()
     
@@ -307,7 +309,7 @@ private final class ScheduleProgressBar: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = bounds.height / 2
-
+        
         progressFillView.frame = CGRect(
             x: 0,
             y: 0,
@@ -351,7 +353,7 @@ private final class ScheduleProgressFillView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = bounds.height / 2
