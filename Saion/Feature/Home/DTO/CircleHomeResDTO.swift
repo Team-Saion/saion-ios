@@ -43,7 +43,7 @@ struct CircleHomeResDTO: Decodable {
         /// 프로필 이미지 URL
         let profileImageUrl: String?
         /// 내 계정 여부
-        let me: Bool
+        let isMe: Bool
         /// 구성원 역할
         let role: String
     }
@@ -83,7 +83,7 @@ extension CircleHomeResDTO {
                     memberID: $0.memberId,
                     nickname: $0.nickname,
                     avatarColor: $0.avatarColor.hex,
-                    isMe: $0.me,
+                    isMe: $0.isMe,
                     role: $0.role,
                     profileImageURL: $0.profileImageUrl.flatMap { URL(string: $0) }
                 )

@@ -271,7 +271,7 @@ private final class ScheduleView: UIStackView {
         
         addSubview(dDayLabel)
         
-        dDayLabel.snp.makeConstraints { $0.top.trailing.equalToSuperview().inset(20) }
+        dDayLabel.snp.makeConstraints { $0.top.trailing.equalToSuperview() }
     }
 }
 
@@ -306,6 +306,8 @@ private final class ScheduleProgressBar: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        layer.cornerRadius = bounds.height / 2
+
         progressFillView.frame = CGRect(
             x: 0,
             y: 0,
@@ -318,7 +320,6 @@ private final class ScheduleProgressBar: UIView {
     
     private func setupDefaults() {
         backgroundColor = .grey100
-        layer.cornerRadius = 4
         clipsToBounds = true
     }
     
@@ -350,9 +351,13 @@ private final class ScheduleProgressFillView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = bounds.height / 2
+    }
     
     private func setupDefaults() {
-        layer.cornerRadius = 4
         clipsToBounds = true
         gradientLayer.colors = [
             UIColor.orange500.cgColor,
