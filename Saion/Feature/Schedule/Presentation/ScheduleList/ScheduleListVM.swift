@@ -23,6 +23,8 @@ final class ScheduleListVM {
         case cellWillDisplay(index: Int)
         /// 새 일정 생성 화면 진입 요청
         case createScheduleTapped
+        /// 일정 상세 화면 진입 요청
+        case scheduleTapped(scheduleID: String)
     }
     
     struct State {
@@ -48,6 +50,8 @@ final class ScheduleListVM {
         case presentError(LocalizedError)
         /// 새 일정 생성
         case createSchedule(circleID: String)
+        /// 일정 상세 화면 진입
+        case showScheduleDetail(circleID: String, scheduleID: String)
     }
     
     // MARK: Properties
@@ -140,6 +144,13 @@ final class ScheduleListVM {
             // 화면 전환은 VC가 처리할 수 있도록 현재 서클 ID를 Effect로 전달한다.
             guard let circleID = state.circleID else { return }
             effect.send(.createSchedule(circleID: circleID))
+
+        case .scheduleTapped(let scheduleID):
+            guard let circleID = state.circleID else { return }
+            effect.send(.showScheduleDetail(
+                circleID: circleID,
+                scheduleID: scheduleID
+            ))
         }
     }
 }

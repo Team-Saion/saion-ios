@@ -50,16 +50,24 @@ open class NoticeAlertVC: AlertPresentationVC {
         return label
     }()
     
-    public let acceptButton = {
-        let appearance = SaionButton.Appearance(size: .large, variant: .neutral)
-        let button = SaionButton(with: appearance)
-        button.title = "확인"
-        return button
-    }()
+    public let acceptButton: SaionButton
     
     // MARK: Life Cycle
     
-    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    public init(
+        acceptVariant: SaionButton.Appearance.Variant
+    ) {
+        acceptButton = SaionButton(with: .init(size: .large, variant: acceptVariant))
+        acceptButton.title = "확인"
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    public override init(
+        nibName nibNameOrNil: String?,
+        bundle nibBundleOrNil: Bundle?
+    ) {
+        acceptButton = SaionButton(with: .init(size: .large, variant: .neutral))
+        acceptButton.title = "확인"
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     

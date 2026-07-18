@@ -24,4 +24,16 @@ final class ScheduleDI {
     func makeScheduleListVM() -> ScheduleListVM {
         ScheduleListVM(scheduleRepo: DefaultScheduleRepo())
     }
+
+    func makeScheduleDetailVM(
+        circleID: String,
+        scheduleID: String
+    ) -> ScheduleDetailVM {
+        ScheduleDetailVM(
+            circleID: circleID,
+            scheduleID: scheduleID,
+            scheduleRepo: DefaultScheduleRepo(),
+            memberRepo: DefaultMemberRepo()
+        )
+    }
 }

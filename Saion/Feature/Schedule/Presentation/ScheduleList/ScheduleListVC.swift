@@ -66,6 +66,11 @@ final class ScheduleListVC: UIViewController {
         collectionView.addScheduleTapPublisher
             .sink { [weak self] in self?.vm.send(.createScheduleTapped) }
             .store(in: &cancellables)
+
+        // 일정 선택 이벤트 전달
+        collectionView.scheduleTapPublisher
+            .sink { [weak self] in self?.vm.send(.scheduleTapped(scheduleID: $0)) }
+            .store(in: &cancellables)
         
         // 일정 아이템으로 컬렉션뷰 스냅샷 갱신
         vm.$state
@@ -93,5 +98,10 @@ final class ScheduleListVC: UIViewController {
     /// 일정 추가 퍼블리셔
     var createSchedulePublisher: AnyPublisher<String, Never> {
         vm.effect.compactMap { $0[case: \.createSchedule] }.eraseToAnyPublisher()
+    }
+
+    /// 일정 상세 화면 전환 퍼블리셔
+    var scheduleDetailPublisher: AnyPublisher<(circleID: String, scheduleID: String), Never> {
+        vm.effect.compactMap { $0[case: \.showScheduleDetail] }.eraseToAnyPublisher()
     }
 }

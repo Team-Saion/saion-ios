@@ -22,6 +22,18 @@ protocol ScheduleRepo {
         circleID: String,
         cursor: String?
     ) async throws -> Pagenation<ScheduleSummary>
+    
+    /// 일정 상세 조회
+    func fetchScheduleDetail(
+        circleID: String,
+        scheduleID: String
+    ) async throws -> Schedule
+
+    /// 일정 삭제
+    func deleteSchedule(
+        circleID: String,
+        scheduleID: String
+    ) async throws
 }
 
 final class DefaultScheduleRepo: ScheduleRepo {
@@ -90,6 +102,61 @@ final class DefaultScheduleRepo: ScheduleRepo {
                 ))
             }
             
+        }
+    }
+    
+    func fetchScheduleDetail(
+        circleID: String,
+        scheduleID: String
+    ) async throws -> Schedule {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)",
+                method: .get
+            )
+            .decodeResponse(decodeType: ScheduleResDTO.self) { dto in
+                if let domain = dto?.toDomain() {
+                    continuation.resume(returning: domain)
+                } else {
+                    continuation.resume(throwing: SaionError(
+                        userMessage: "일정 상세 조회 중 문제가 발생했어요.",
+                        errorCode: "SR-FSD-0"
+                    ))
+                }
+                
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "일정 상세 조회 중 문제가 발생했어요.",
+                    errorCode: "SR-FSD-1"
+                ))
+            }
+            
+        }
+    }
+
+    func deleteSchedule(
+        circleID: String,
+        scheduleID: String
+    ) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)",
+                method: .delete
+            )
+            .decodeResponse(decodeType: EmptyDTO.self) { _ in
+                continuation.resume(returning: ())
+
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "일정 삭제 중 문제가 발생했어요.",
+                    errorCode: "SR-DS-0"
+                ))
+            }
+
         }
     }
 }

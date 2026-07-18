@@ -53,7 +53,7 @@ struct ScheduleResDTO: Decodable {
     /// - example: 2024-07-01T10:00:00
     let createdAt: String
     /// 오늘 기준 startDate까지 남은 일수. 진행 중이거나 시작일이 이미 지난 경우 null.
-    let dday: Int?
+    let dDay: Int?
 
     /// 확인하기 종류별 카운트
     struct Confirmation: Decodable {
@@ -105,8 +105,16 @@ extension ScheduleResDTO {
             let endAt = formatter.date(from: "\(endDate) \(endTime ?? "23:59")")
         else { return nil }
 
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        guard let createdAt = formatter.date(from: createdAt) else { return nil }
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        isoFormatter.formatOptions = [
+            .withFullDate,
+            .withTime,
+            .withDashSeparatorInDate,
+            .withColonSeparatorInTime,
+            .withFractionalSeconds
+        ]
+        guard let createdAt = isoFormatter.date(from: createdAt) else { return nil }
 
         return Schedule(
             scheduleID: scheduleId,
@@ -122,7 +130,7 @@ extension ScheduleResDTO {
             myConfirmation: myConfirmation?.toDomain(),
             creatorID: createdBy,
             createdAt: createdAt,
-            dDay: dday
+            dDay: dDay
         )
     }
 }
