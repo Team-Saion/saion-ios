@@ -28,4 +28,12 @@ final class HomeDI {
     func makeCircleInitializationVM() -> CircleInitializationVM {
         CircleInitializationVM(circleRepo: DefaultCircleRepo())
     }
+    
+    func makeMemberListVM(circleID: String) -> MemberListVM {
+        MemberListVM(
+            circleID: circleID,
+            homeRepo: DefaultHomeRepo(),
+            memberRepo: DefaultMemberRepo()
+        )
+    }
 }

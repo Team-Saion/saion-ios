@@ -72,7 +72,7 @@ struct MemberCellItem: Hashable {
     /// 구성원 ID
     let memberID: String
     /// 화면에 표시할 구성원 이름
-    let name: String
+    var name: String
     /// 프로필 이미지의 표시 상태
     let profileImageViewState: ProfileImageViewState
 }
@@ -98,8 +98,8 @@ extension MemberCellItem {
             )
         }
         
-        memberID = member.memberID
-        name = member.nickname
+        self.memberID = member.memberID
+        self.name = member.nickname
         self.profileImageViewState = profileImageViewState
     }
 }

@@ -33,6 +33,11 @@ final class HomeCoord: Coordinator {
             .sink { [weak vc] in vc?.overviewVC.refresh() }
             .store(in: &vc.cancellables)
         
+        // 전체 구성원 목록 화면으로 이동
+        vc.overviewVC.showAllMembersTapPublisher
+            .sink { [weak self] in self?.pushMemberListVC(circleID: $0) }
+            .store(in: &vc.cancellables)
+        
         // 화면 전환
         navigation.pushViewController(vc, animated: false)
     }
@@ -76,5 +81,19 @@ final class HomeCoord: Coordinator {
             self?.navigation.present(vc, animated: true)
         } }
         .eraseToAnyPublisher()
+    }
+    
+    /// 전체 구성원 목록 화면으로 이동
+    func pushMemberListVC(circleID: String) {
+        let vm = HomeDI.shared.makeMemberListVM(circleID: circleID)
+        let vc = MemberListVC(vm: vm)
+        vc.hidesDefaultTabBarWhenPushed = true
+        
+        // 뒤로가기 탭하면 화면 닫기
+        vc.backBarButton.tapPublisher
+            .sink { [weak self] in self?.navigation.popViewController(animated: true) }
+            .store(in: &vc.cancellables)
+        
+        navigation.pushViewController(vc, animated: true)
     }
 }

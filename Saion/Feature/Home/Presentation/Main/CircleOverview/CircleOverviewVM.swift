@@ -21,6 +21,8 @@ final class CircleOverviewVM {
         case refreshTriggered
         /// 일정 생성 탭
         case createScheduleTapped
+        /// 전체 구성원 보기 탭
+        case showAllMembersTapped
     }
     
     struct State {
@@ -57,6 +59,8 @@ final class CircleOverviewVM {
         case presentError(LocalizedError)
         /// 새 일정 생성
         case createSchedule(circleID: String)
+        /// 전체 구성원 화면 이동
+        case showAllMembers(circleID: String)
     }
     
     // MARK: Properties
@@ -115,6 +119,10 @@ final class CircleOverviewVM {
         case .createScheduleTapped:
             guard let circleID = state.circleHomeInfo?.circle.circleID else { return }
             effect.send(.createSchedule(circleID: circleID))
+            
+        case .showAllMembersTapped:
+            guard let circleID = state.circleHomeInfo?.circle.circleID else { return }
+            effect.send(.showAllMembers(circleID: circleID))
         }
     }
 }

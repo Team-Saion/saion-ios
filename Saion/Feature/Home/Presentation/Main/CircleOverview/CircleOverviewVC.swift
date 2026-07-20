@@ -112,6 +112,11 @@ final class CircleOverviewVC: UIViewController {
         .sink { [weak self] in self?.vm.send(.createScheduleTapped) }
         .store(in: &cancellables)
         
+        // 전체 구성원 보기 이벤트 전달
+        membersView.showAllButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.showAllMembersTapped) }
+            .store(in: &cancellables)
+        
         // 서클 이름을 헤더에 반영
         vm.$state.compactMap(\.circleTitle).removeDuplicates()
             .sink { [weak self] in self?.headerView.titleLabel.text = $0 }
@@ -151,6 +156,11 @@ final class CircleOverviewVC: UIViewController {
     // 일정 추가 퍼블리셔
     var createSchedulePublisher: AnyPublisher<String, Never> {
         vm.effect.compactMap { $0[case: \.createSchedule] }.eraseToAnyPublisher()
+    }
+    
+    // 전체 구성원 보기 탭 퍼블리셔
+    var showAllMembersTapPublisher: AnyPublisher<String, Never> {
+        vm.effect.compactMap { $0[case: \.showAllMembers] }.eraseToAnyPublisher()
     }
 }
 
