@@ -39,9 +39,23 @@ final class TabBarCoord: Coordinator {
         store(child: scheduleCoord)
         scheduleCoord.start()
         
+        /// 마이페이지 코디네이터
+        let myPageCoord = MyPageCoord(navigation: .init())
+        myPageCoord.navigation.tabBarItem = UITabBarItem(
+            title: "마이",
+            image: .user,
+            tag: 2
+        )
+        store(child: myPageCoord)
+        myPageCoord.start()
+        
         let vc = TabBarVC()
         vc.setViewControllers(
-            [homeCoord.navigation, scheduleCoord.navigation],
+            [
+                homeCoord.navigation,
+                scheduleCoord.navigation,
+                myPageCoord.navigation
+            ],
             animated: false
         )
         

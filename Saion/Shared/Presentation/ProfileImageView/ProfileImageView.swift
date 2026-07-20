@@ -63,6 +63,8 @@ final class ProfileImageView: UIImageView {
         
         layer.cornerRadius = sizeMetrics.size.width / 2
         clipsToBounds = true
+        
+        backgroundColor = .backgroundDefault
     }
     
     // MARK: Layout
@@ -150,6 +152,23 @@ enum ProfileImageViewState: Hashable {
             self = .fallback(
                 name: String(domain.nickname?.prefix(2) ?? ""),
                 avatarColor: domain.avatarColor
+            )
+        }
+    }
+
+    init(from domain: MyProfile) {
+        if let profileImageURL = domain.profileImageURL {
+            self = .image(profileImageURL: profileImageURL)
+        } else {
+            let hexString = domain.avatarColor.hex.trimmingCharacters(
+                in: CharacterSet(charactersIn: "#")
+            )
+            let avatarColor = Int(hexString, radix: 16)
+                .map { UIColor.hex($0) } ?? .black
+
+            self = .fallback(
+                name: String(domain.nickname.prefix(2)),
+                avatarColor: avatarColor
             )
         }
     }
