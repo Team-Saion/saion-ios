@@ -81,13 +81,16 @@ final class HomeVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
+        // 화면 진입을 전달해 홈 콘텐츠를 최초 조회
         vm.send(.viewDidLoad)
         
+        // 조회된 홈 상태에 맞는 자식 뷰컨트롤러로 전환
         vm.$state
             .compactMap(\.content)
             .sink { [weak self] in self?.setContentVC($0) }
             .store(in: &cancellables)
         
+        // 로딩 상태가 변경될 때만 인디케이터 표시 여부 갱신
         vm.$state
             .map(\.isLoading)
             .removeDuplicates()

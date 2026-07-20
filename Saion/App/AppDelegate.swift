@@ -19,6 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AuthManager.shared.store.send(.appDidLaunch)
         // Kakao SDK 초기화(소셜 로그인)
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoNativeAppKey)
+        // 스플래시 이미지 표시
+        Thread.sleep(forTimeInterval: 0.72)
         return true
     }
 }
