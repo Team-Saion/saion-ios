@@ -37,7 +37,7 @@ final class HomeVM {
     // MARK: Properties
     
     @Published private(set) var state = State()
-    private let effect = PassthroughSubject<Effect, Never>()
+    let effect = PassthroughSubject<Effect, Never>()
     
     // MARK: Send
     

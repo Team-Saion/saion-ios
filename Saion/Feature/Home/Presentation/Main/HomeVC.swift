@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 
+import CasePaths
 import SnapKit
 
 import DesignSystem
@@ -17,7 +18,7 @@ final class HomeVC: UIViewController {
     // MARK: Properties
     
     var cancellables = Set<AnyCancellable>()
-    private let vm = HomeDI.shared.makeHomeVM()
+    private let vm = HomeVM()
     
     /// 현재 표시 중인 콘텐츠 뷰컨트롤러
     private var currentContentVC: UIViewController?
@@ -85,16 +86,18 @@ final class HomeVC: UIViewController {
         vm.send(.viewDidLoad)
         
         // 조회된 홈 상태에 맞는 자식 뷰컨트롤러로 전환
-        vm.$state
-            .compactMap(\.content)
+        vm.$state.compactMap(\.content).removeDuplicates()
             .sink { [weak self] in self?.setContentVC($0) }
             .store(in: &cancellables)
         
-        // 로딩 상태가 변경될 때만 인디케이터 표시 여부 갱신
-        vm.$state
-            .map(\.isLoading)
-            .removeDuplicates()
+        // 로딩 상태에 따라 로딩 인디케이터 노출 여부 갱신
+        vm.$state.map(\.isLoading).removeDuplicates()
             .sink { [weak self] in self?.setLoadingIndicatorVisible($0) }
+            .store(in: &cancellables)
+        
+        // 상태 전이 중 발생한 에러를 알림으로 표시
+        vm.effect.compactMap { $0[case: \.presentError] }
+            .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
     }
     

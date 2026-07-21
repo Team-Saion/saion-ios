@@ -133,6 +133,11 @@ final class CircleOverviewVC: UIViewController {
         vm.effect.compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
+        
+        // 전체 일정 보기 탭하면 일정 탭으로 이동
+        schedulesView.showAllButton.tapPublisher
+            .sink { [weak self] in self?.tabBarController?.selectedIndex = 1 }
+            .store(in: &cancellables)
     }
     
     // MARK: Reactive Interface
@@ -140,7 +145,7 @@ final class CircleOverviewVC: UIViewController {
     /// 화면 새로 고침
     func refresh() { vm.send(.refreshTriggered) }
     
-    // 일정 추가 퍼블리셔
+    /// 일정 추가 퍼블리셔
     var createSchedulePublisher: AnyPublisher<Void, Never> {
         Publishers.Merge(
             schedulesView.collectionView.addScheduleTapPublisher,
@@ -149,7 +154,7 @@ final class CircleOverviewVC: UIViewController {
         .eraseToAnyPublisher()
     }
     
-    // 전체 구성원 보기 탭 퍼블리셔
+    /// 전체 구성원 보기 탭 퍼블리셔
     var showAllMembersTapPublisher: AnyPublisher<Void, Never> {
         membersView.showAllButton.tapPublisher
     }

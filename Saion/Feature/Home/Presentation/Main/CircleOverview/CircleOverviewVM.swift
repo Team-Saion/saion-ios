@@ -64,9 +64,7 @@ final class CircleOverviewVM {
     
     // MARK: Initializer
     
-    init(
-        homeRepo: HomeRepo
-    ) {
+    init(homeRepo: HomeRepo) {
         self.homeRepo = homeRepo
     }
     
