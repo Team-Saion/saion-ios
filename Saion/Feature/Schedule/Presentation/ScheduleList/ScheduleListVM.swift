@@ -30,7 +30,7 @@ final class ScheduleListVM {
     struct State {
         /// 일정 조회 기준이 되는 현재 활동 서클 식별자
         fileprivate var circleID: String? {
-            CurrentCircleStore.shared.currentCircleID
+            UserSessionStore.shared.currentCircle?.circleID
         }
         /// 페이지네이션 정보와 원본 일정 목록
         fileprivate var schedulesPage: Pagenation<ScheduleSummary>?
@@ -49,9 +49,9 @@ final class ScheduleListVM {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
         /// 새 일정 생성
-        case createSchedule(circleID: String)
+        case createSchedule
         /// 일정 상세 화면 진입
-        case showScheduleDetail(circleID: String, scheduleID: String)
+        case showScheduleDetail(scheduleID: String)
     }
     
     // MARK: Properties
@@ -73,7 +73,9 @@ final class ScheduleListVM {
     
     private func setupBindings() {
         // 현재 활동중인 서클 변경시, 새로고침
-        CurrentCircleStore.shared.$currentCircleID.removeDuplicates()
+        UserSessionStore.shared.$currentCircle
+            .map { $0?.circleID }
+            .removeDuplicates()
             .sink { [weak self] _ in self?.send(.refreshTriggered) }
             .store(in: &cancellables)
     }
@@ -96,8 +98,8 @@ final class ScheduleListVM {
         switch action {
         case .viewDidLoad:
             // 화면 진입 시 현재 서클의 일정 첫 페이지를 조회한다.
-            guard let circleID = state.circleID else { return }
             state.viewDidLoad = true
+            guard let circleID = state.circleID else { return }
             
             state.schedulesPage = try await scheduleRepo.fetchSchedules(
                 circleID: circleID,
@@ -141,16 +143,10 @@ final class ScheduleListVM {
             state.schedulesPage?.hasNext = nextPage.hasNext
             
         case .createScheduleTapped:
-            // 화면 전환은 VC가 처리할 수 있도록 현재 서클 ID를 Effect로 전달한다.
-            guard let circleID = state.circleID else { return }
-            effect.send(.createSchedule(circleID: circleID))
+            effect.send(.createSchedule)
 
         case .scheduleTapped(let scheduleID):
-            guard let circleID = state.circleID else { return }
-            effect.send(.showScheduleDetail(
-                circleID: circleID,
-                scheduleID: scheduleID
-            ))
+            effect.send(.showScheduleDetail(scheduleID: scheduleID))
         }
     }
 }

@@ -19,10 +19,6 @@ final class CircleOverviewVM {
         case viewDidLoad
         /// 새로고침 이벤트가 발생함
         case refreshTriggered
-        /// 일정 생성 탭
-        case createScheduleTapped
-        /// 전체 구성원 보기 탭
-        case showAllMembersTapped
     }
     
     struct State {
@@ -57,10 +53,6 @@ final class CircleOverviewVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
-        /// 새 일정 생성
-        case createSchedule(circleID: String)
-        /// 전체 구성원 화면 이동
-        case showAllMembers(circleID: String)
     }
     
     // MARK: Properties
@@ -68,16 +60,13 @@ final class CircleOverviewVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let circleRepo: CircleRepo
     private let homeRepo: HomeRepo
     
     // MARK: Initializer
     
     init(
-        circleRepo: CircleRepo,
         homeRepo: HomeRepo
     ) {
-        self.circleRepo = circleRepo
         self.homeRepo = homeRepo
     }
     
@@ -102,27 +91,10 @@ final class CircleOverviewVM {
             defer { state.isLoading = false }
             state.isLoading = true
             
-            let circleID = if let currentCircleID = state.circleHomeInfo?.circle.circleID {
-                currentCircleID
-            } else {
-                // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-                try await circleRepo.fetchJoinedCircles().first!.circleID
-            }
-            
-            // 타 기능에도 현재 서클의 변경을 전달
-            CurrentCircleStore.shared.currentCircleID = circleID
-            
+            /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
             /// 서클 홈 정보 조회
-            let circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
-            state.circleHomeInfo = circleHomeInfo
-            
-        case .createScheduleTapped:
-            guard let circleID = state.circleHomeInfo?.circle.circleID else { return }
-            effect.send(.createSchedule(circleID: circleID))
-            
-        case .showAllMembersTapped:
-            guard let circleID = state.circleHomeInfo?.circle.circleID else { return }
-            effect.send(.showAllMembers(circleID: circleID))
+            state.circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
         }
     }
 }

@@ -21,16 +21,14 @@ final class ScheduleCoord: Coordinator {
         
         // 일정 생성 화면으로 이동하고, 생성 완료 시 목록 갱신
         vc.createSchedulePublisher
-            .compactMap { [weak self] in self?.presentCreateScheduleVC(circleID: $0) }
+            .compactMap { [weak self] in self?.presentCreateScheduleVC() }
             .switchToLatest()
             .sink { [weak vc] in vc?.refresh() }
             .store(in: &cancellables)
         
         // 일정 상세 화면으로 이동하고, 삭제 완료 시 목록 갱신
         vc.scheduleDetailPublisher
-            .compactMap { [weak self] in
-                self?.pushScheduleDetailVC(circleID: $0.circleID, scheduleID: $0.scheduleID)
-            }
+            .compactMap { [weak self] in self?.pushScheduleDetailVC(scheduleID: $0) }
             .switchToLatest()
             .sink { [weak vc] in vc?.refresh() }
             .store(in: &cancellables)
@@ -40,9 +38,9 @@ final class ScheduleCoord: Coordinator {
     }
     
     /// 일정 생성 화면으로 이동
-    private func presentCreateScheduleVC(circleID: String) -> AnyPublisher<Void, Never> {
+    private func presentCreateScheduleVC() -> AnyPublisher<Void, Never> {
         Deferred { [weak self] in Future { promise in
-            let vm = ScheduleDI.shared.makeCreateScheduleVM(circleID: circleID)
+            let vm = ScheduleDI.shared.makeCreateScheduleVM()
             let vc = CreateScheduleVC(vm: vm)
             vc.modalPresentationStyle = .fullScreen
             
@@ -61,15 +59,9 @@ final class ScheduleCoord: Coordinator {
     }
     
     /// 일정 상세 화면으로 이동
-    private func pushScheduleDetailVC(
-        circleID: String,
-        scheduleID: String
-    ) -> AnyPublisher<Void, Never> {
+    private func pushScheduleDetailVC(scheduleID: String) -> AnyPublisher<Void, Never> {
         Deferred { [weak self] in Future { promise in
-            let vm = ScheduleDI.shared.makeScheduleDetailVM(
-                circleID: circleID,
-                scheduleID: scheduleID
-            )
+            let vm = ScheduleDI.shared.makeScheduleDetailVM(scheduleID: scheduleID)
             let vc = ScheduleDetailVC(vm: vm)
             vc.hidesDefaultTabBarWhenPushed = true
             

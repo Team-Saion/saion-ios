@@ -39,14 +39,6 @@ final class HomeVM {
     @Published private(set) var state = State()
     private let effect = PassthroughSubject<Effect, Never>()
     
-    private let circleRepo: CircleRepo
-    
-    // MARK: Initializer
-    
-    init(circleRepo: CircleRepo) {
-        self.circleRepo = circleRepo
-    }
-    
     // MARK: Send
     
     func send(_ action: Action) {
@@ -63,14 +55,21 @@ final class HomeVM {
     
     private func process(action: Action) async throws {
         switch action {
-            
-        case .viewDidLoad, .refreshTriggered:
-            state.isLoading = true
+        case .viewDidLoad:
+            guard !state.isLoading else { return }
             defer { state.isLoading = false }
+            state.isLoading = true
             
-            let joinedCircles = try await circleRepo.fetchJoinedCircles()
-            state.content = joinedCircles.isEmpty ? .entry : .overview
+            try await UserSessionStore.shared.startSession()
+            state.content = UserSessionStore.shared.joinedCircles.isEmpty ? .entry : .overview
+
+        case .refreshTriggered:
+            guard !state.isLoading else { return }
+            defer { state.isLoading = false }
+            state.isLoading = true
+
+            try await UserSessionStore.shared.refreshJoinedCircles()
+            state.content = UserSessionStore.shared.joinedCircles.isEmpty ? .entry : .overview
         }
     }
 }
-

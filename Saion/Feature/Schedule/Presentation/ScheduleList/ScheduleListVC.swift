@@ -96,12 +96,12 @@ final class ScheduleListVC: UIViewController {
     func refresh() { vm.send(.refreshTriggered) }
     
     /// 일정 추가 퍼블리셔
-    var createSchedulePublisher: AnyPublisher<String, Never> {
+    var createSchedulePublisher: AnyPublisher<Void, Never> {
         vm.effect.compactMap { $0[case: \.createSchedule] }.eraseToAnyPublisher()
     }
 
     /// 일정 상세 화면 전환 퍼블리셔
-    var scheduleDetailPublisher: AnyPublisher<(circleID: String, scheduleID: String), Never> {
+    var scheduleDetailPublisher: AnyPublisher<String, Never> {
         vm.effect.compactMap { $0[case: \.showScheduleDetail] }.eraseToAnyPublisher()
     }
 }

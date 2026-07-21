@@ -31,7 +31,14 @@ final class AppCoord: Coordinator {
         AuthManager.shared.authStatePublisher
             .map { $0.is(\.signedIn) }
             .removeDuplicates() // 코디네이터 중복 시작 차단
-            .sink { [weak self] in $0 ? self?.startTabBar() : self?.startLogin() }
+            .sink { [weak self] isSignedIn in
+                if isSignedIn {
+                    self?.startTabBar()
+                } else {
+                    UserSessionStore.shared.endSession()
+                    self?.startLogin()
+                }
+            }
             .store(in: &cancellables)
     }
     

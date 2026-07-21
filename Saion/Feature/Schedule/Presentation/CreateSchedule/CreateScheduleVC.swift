@@ -382,6 +382,6 @@ private final class NeedConfirmToggleView: UIStackView {
 // MARK: - Preview
 
 #Preview {
-    let vm = ScheduleDI.shared.makeCreateScheduleVM(circleID: "preview-circle-id")
+    let vm = ScheduleDI.shared.makeCreateScheduleVM()
     return CreateScheduleVC(vm: vm)
 }

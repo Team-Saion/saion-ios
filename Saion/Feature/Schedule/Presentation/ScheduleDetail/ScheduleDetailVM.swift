@@ -56,21 +56,17 @@ final class ScheduleDetailVM {
     
     /// 일정 상세 조회와 삭제를 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
-    /// 현재 사용자의 일정 삭제 권한을 확인하는 저장소
-    private let memberRepo: MemberRepo
     
     // MARK: Initializer
     
     init(
-        circleID: String,
         scheduleID: String,
-        scheduleRepo: ScheduleRepo,
-        memberRepo: MemberRepo
+        scheduleRepo: ScheduleRepo
     ) {
-        self.circleID = circleID
+        /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+        self.circleID = UserSessionStore.shared.currentCircle!.circleID
         self.scheduleID = scheduleID
         self.scheduleRepo = scheduleRepo
-        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -94,7 +90,8 @@ final class ScheduleDetailVM {
             defer { state.isLoading = false }
             state.isLoading = true
 
-            let myProfile = try await memberRepo.fetchMyProfile()
+            /// 세션 시작 시 내 프로필이 조회됐음을 보장하므로 강제 언래핑
+            let myProfile = UserSessionStore.shared.myProfile!
             let schedule = try await scheduleRepo.fetchScheduleDetail(
                 circleID: circleID,
                 scheduleID: scheduleID

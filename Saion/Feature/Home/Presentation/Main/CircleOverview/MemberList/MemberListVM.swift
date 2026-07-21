@@ -15,7 +15,7 @@ final class MemberListVM {
     // MARK: Types
     
     enum Action {
-        /// 화면 진입 후 구성원 목록 및 내 프로필 조회
+        /// 화면 진입 후 구성원 목록 조회
         case viewDidLoad
     }
     
@@ -47,20 +47,12 @@ final class MemberListVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let circleID: String
     private let homeRepo: HomeRepo
-    private let memberRepo: MemberRepo
     
     // MARK: Initializer
     
-    init(
-        circleID: String,
-        homeRepo: HomeRepo,
-        memberRepo: MemberRepo
-    ) {
-        self.circleID = circleID
+    init(homeRepo: HomeRepo) {
         self.homeRepo = homeRepo
-        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -84,7 +76,10 @@ final class MemberListVM {
             defer { state.isLoading = false }
             state.isLoading = true
             
-            state.myID = try await memberRepo.fetchMyProfile().memberID
+            /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
+            /// 세션 시작 시 내 프로필이 조회됐음을 보장하므로 강제 언래핑
+            state.myID = UserSessionStore.shared.myProfile!.memberID
             state.memberSummaries = try await homeRepo.fetchMembers(circleID: circleID)
         }
     }

@@ -128,9 +128,6 @@ final class MyPageVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
-        // 바인딩 구성이 끝난 뒤 내 프로필 조회 요청
-        vm.send(.viewDidLoad)
-        
         // 로그아웃 확인 얼럿에서 승인한 경우 VM에 로그아웃 이벤트 전달
         logoutRow.tapPublisher
             .compactMap { [weak self] in self?.presentLogoutConfirmAlert() }

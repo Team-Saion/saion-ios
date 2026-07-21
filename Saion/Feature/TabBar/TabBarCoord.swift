@@ -64,7 +64,7 @@ final class TabBarCoord: Coordinator {
             .prepend(0) // 초기 탭 인덱스
             .sink { [weak vc] index in
                 // 가입한 서클이 없으면 일정 탭 진입을 차단
-                if index == 1, CurrentCircleStore.shared.currentCircleID == nil {
+                if index == 1, UserSessionStore.shared.currentCircle == nil {
                     ToastCenter.shared.present(message: "서클에 가입하면 일정을 확인할 수 있어요.")
                     return
                 }

@@ -55,16 +55,11 @@ final class CreateScheduleVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let circleID: String
     private let scheduleRepo: ScheduleRepo
     
     // MARK: Initializer
     
-    init(
-        circleID: String,
-        scheduleRepo: ScheduleRepo
-    ) {
-        self.circleID = circleID
+    init(scheduleRepo: ScheduleRepo) {
         self.scheduleRepo = scheduleRepo
     }
     
@@ -106,6 +101,8 @@ final class CreateScheduleVM {
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
+            /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
             // 일정 생성 요청 후 외부로 이벤트 전달, 반환값은 사용하지 않음
             _ = try await scheduleRepo.createSchedule(from: state.draft, circleID)
             effect.send(.scheduleCreated)

@@ -104,19 +104,6 @@ final class CircleOverviewVC: UIViewController {
     private func setupBindings() {
         vm.send(.viewDidLoad)
         
-        // 일정 추가 이벤트 전달
-        Publishers.Merge(
-            schedulesView.collectionView.addScheduleTapPublisher,
-            addScheduleButton.tapPublisher
-        )
-        .sink { [weak self] in self?.vm.send(.createScheduleTapped) }
-        .store(in: &cancellables)
-        
-        // 전체 구성원 보기 이벤트 전달
-        membersView.showAllButton.tapPublisher
-            .sink { [weak self] in self?.vm.send(.showAllMembersTapped) }
-            .store(in: &cancellables)
-        
         // 서클 이름을 헤더에 반영
         vm.$state.compactMap(\.circleTitle).removeDuplicates()
             .sink { [weak self] in self?.headerView.titleLabel.text = $0 }
@@ -154,13 +141,17 @@ final class CircleOverviewVC: UIViewController {
     func refresh() { vm.send(.refreshTriggered) }
     
     // 일정 추가 퍼블리셔
-    var createSchedulePublisher: AnyPublisher<String, Never> {
-        vm.effect.compactMap { $0[case: \.createSchedule] }.eraseToAnyPublisher()
+    var createSchedulePublisher: AnyPublisher<Void, Never> {
+        Publishers.Merge(
+            schedulesView.collectionView.addScheduleTapPublisher,
+            addScheduleButton.tapPublisher
+        )
+        .eraseToAnyPublisher()
     }
     
     // 전체 구성원 보기 탭 퍼블리셔
-    var showAllMembersTapPublisher: AnyPublisher<String, Never> {
-        vm.effect.compactMap { $0[case: \.showAllMembers] }.eraseToAnyPublisher()
+    var showAllMembersTapPublisher: AnyPublisher<Void, Never> {
+        membersView.showAllButton.tapPublisher
     }
 }
 

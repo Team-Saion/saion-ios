@@ -28,14 +28,14 @@ final class HomeCoord: Coordinator {
         
         // 일정 생성 화면으로 이동, 생성 완료 시 화면 갱신
         vc.overviewVC.createSchedulePublisher
-            .compactMap { [weak self] in self?.presentCreateScheduleVC(circleID: $0) }
+            .compactMap { [weak self] in self?.presentCreateScheduleVC() }
             .switchToLatest()
             .sink { [weak vc] in vc?.overviewVC.refresh() }
             .store(in: &vc.cancellables)
         
         // 전체 구성원 목록 화면으로 이동
         vc.overviewVC.showAllMembersTapPublisher
-            .sink { [weak self] in self?.pushMemberListVC(circleID: $0) }
+            .sink { [weak self] in self?.pushMemberListVC() }
             .store(in: &vc.cancellables)
         
         // 화면 전환
@@ -63,9 +63,9 @@ final class HomeCoord: Coordinator {
     }
     
     /// 일정 생성 화면으로 이동
-    func presentCreateScheduleVC(circleID: String) -> AnyPublisher<Void, Never> {
+    func presentCreateScheduleVC() -> AnyPublisher<Void, Never> {
         Deferred { [weak self] in Future { promise in
-            let vm = ScheduleDI.shared.makeCreateScheduleVM(circleID: circleID)
+            let vm = ScheduleDI.shared.makeCreateScheduleVM()
             let vc = CreateScheduleVC(vm: vm)
             vc.modalPresentationStyle = .fullScreen
             
@@ -84,8 +84,8 @@ final class HomeCoord: Coordinator {
     }
     
     /// 전체 구성원 목록 화면으로 이동
-    func pushMemberListVC(circleID: String) {
-        let vm = HomeDI.shared.makeMemberListVM(circleID: circleID)
+    func pushMemberListVC() {
+        let vm = HomeDI.shared.makeMemberListVM()
         let vc = MemberListVC(vm: vm)
         vc.hidesDefaultTabBarWhenPushed = true
         
