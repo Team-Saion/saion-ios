@@ -19,6 +19,8 @@ final class ScheduleDetailVM {
         case viewDidLoad
         /// 삭제 확인 후 일정 삭제 요청
         case deleteButtonTapped
+        /// 확인 토클 버튼 탭
+        case confirmToggled
     }
     
     struct State {
@@ -49,11 +51,8 @@ final class ScheduleDetailVM {
     /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
-    /// 상세 조회와 삭제에 사용할 서클 식별자
-    private let circleID: String
     /// 상세 조회와 삭제에 사용할 일정 식별자
     private let scheduleID: String
-    
     /// 일정 상세 조회와 삭제를 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
     
@@ -63,8 +62,6 @@ final class ScheduleDetailVM {
         scheduleID: String,
         scheduleRepo: ScheduleRepo
     ) {
-        /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-        self.circleID = UserSessionStore.shared.currentCircle!.circleID
         self.scheduleID = scheduleID
         self.scheduleRepo = scheduleRepo
     }
@@ -91,13 +88,16 @@ final class ScheduleDetailVM {
             state.isLoading = true
 
             /// 세션 시작 시 내 프로필이 조회됐음을 보장하므로 강제 언래핑
-            let myProfile = UserSessionStore.shared.myProfile!
+            let memberID = UserSessionStore.shared.myProfile!.memberID
+            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
+
             let schedule = try await scheduleRepo.fetchScheduleDetail(
                 circleID: circleID,
                 scheduleID: scheduleID
             )
 
-            state.deleteButtonHidden = !(myProfile.memberID == schedule.creatorID)
+            state.deleteButtonHidden = !(memberID == schedule.creatorID)
             state.schedule = schedule
 
         case .deleteButtonTapped:
@@ -105,11 +105,45 @@ final class ScheduleDetailVM {
             defer { state.isLoading = false }
             state.isLoading = true
 
+            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
+
             try await scheduleRepo.deleteSchedule(
                 circleID: circleID,
                 scheduleID: scheduleID
             )
             effect.send(.scheduleDeleted)
+            
+        case .confirmToggled:
+            guard !state.isLoading else { return }
+            defer { state.isLoading = false }
+            state.isLoading = true
+            
+            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
+            
+            guard var confirmation = state.schedule?.confirmations.first,
+                  let confirmationID = confirmation.confirmationID
+            else { return }
+            
+            if confirmation.isSelected  {
+                try await scheduleRepo.setUnconfirmed(
+                    circleID: circleID,
+                    scheduleID: scheduleID,
+                    confirmationID: confirmationID
+                )
+                confirmation.isSelected = false
+                confirmation.count -= 1
+                
+            } else {
+                try await scheduleRepo.setConfirmed(
+                    circleID: circleID,
+                    scheduleID: scheduleID
+                )
+                confirmation.isSelected = true
+                confirmation.count += 1
+            }
+            
         }
     }
 }

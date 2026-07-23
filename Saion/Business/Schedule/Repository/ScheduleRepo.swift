@@ -34,6 +34,19 @@ protocol ScheduleRepo {
         circleID: String,
         scheduleID: String
     ) async throws
+
+    /// 일정 확인 등록
+    func setConfirmed(
+        circleID: String,
+        scheduleID: String
+    ) async throws
+
+    /// 일정 확인 취소
+    func setUnconfirmed(
+        circleID: String,
+        scheduleID: String,
+        confirmationID: Int
+    ) async throws
 }
 
 final class DefaultScheduleRepo: ScheduleRepo {
@@ -154,6 +167,57 @@ final class DefaultScheduleRepo: ScheduleRepo {
                     with: error,
                     userMessage: "일정 삭제 중 문제가 발생했어요.",
                     errorCode: "SR-DS-0"
+                ))
+            }
+
+        }
+    }
+
+    func setConfirmed(
+        circleID: String,
+        scheduleID: String
+    ) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)/confirmations",
+                method: .post,
+                parameters: RegisterConfirmationReqDTO(confirmationType: .confirmed),
+                encoder: JSONParameterEncoder.default
+            )
+            .decodeResponse(decodeType: RegisterConfirmationResDTO.self) { _ in
+                continuation.resume(returning: ())
+
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "일정 확인 중 문제가 발생했어요.",
+                    errorCode: "SR-SC-0"
+                ))
+            }
+
+        }
+    }
+
+    func setUnconfirmed(
+        circleID: String,
+        scheduleID: String,
+        confirmationID: Int
+    ) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)/confirmations/\(confirmationID)",
+                method: .delete
+            )
+            .decodeResponse(decodeType: EmptyDTO.self) { _ in
+                continuation.resume(returning: ())
+
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "일정 확인 취소 중 문제가 발생했어요.",
+                    errorCode: "SR-SU-0"
                 ))
             }
 

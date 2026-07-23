@@ -54,7 +54,7 @@ struct ScheduleResDTO: Decodable {
     let createdAt: String
     /// 오늘 기준 startDate까지 남은 일수. 진행 중이거나 시작일이 이미 지난 경우 null.
     let dDay: Int?
-
+    
     /// 확인하기 종류별 카운트
     struct Confirmation: Decodable {
         /// 확인하기 종류
@@ -64,7 +64,7 @@ struct ScheduleResDTO: Decodable {
         /// - example: 5
         let count: Int
     }
-
+    
     /// 내 확인하기 정보
     struct MyConfirmation: Decodable {
         /// 확인하기 ID
@@ -74,7 +74,7 @@ struct ScheduleResDTO: Decodable {
         /// - example: CONFIRMED
         let confirmationType: ConfirmationType
     }
-
+    
     /// 일정 상태
     enum Status: String, Decodable {
         /// 시작일시 이전
@@ -84,7 +84,7 @@ struct ScheduleResDTO: Decodable {
         /// 종료일시 초과
         case completed = "COMPLETED"
     }
-
+    
     /// 확인하기 종류
     enum ConfirmationType: String, Decodable {
         /// 확인했어요
@@ -104,7 +104,7 @@ extension ScheduleResDTO {
             let startAt = formatter.date(from: "\(startDate) \(startTime ?? "00:00")"),
             let endAt = formatter.date(from: "\(endDate) \(endTime ?? "23:59")")
         else { return nil }
-
+        
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         isoFormatter.formatOptions = [
@@ -115,7 +115,7 @@ extension ScheduleResDTO {
             .withFractionalSeconds
         ]
         guard let createdAt = isoFormatter.date(from: createdAt) else { return nil }
-
+        
         return Schedule(
             scheduleID: scheduleId,
             title: title,
@@ -126,8 +126,7 @@ extension ScheduleResDTO {
             status: status.toDomain(),
             progressRate: progressRate,
             memo: memo,
-            confirmations: confirmations.map { $0.toDomain() },
-            myConfirmation: myConfirmation?.toDomain(),
+            confirmations: confirmations.map { $0.toDomain(myConfirmation: myConfirmation) },
             creatorID: createdBy,
             createdAt: createdAt,
             dDay: dDay
@@ -136,19 +135,18 @@ extension ScheduleResDTO {
 }
 
 private extension ScheduleResDTO.Confirmation {
-    func toDomain() -> Schedule.Confirmation {
-        Schedule.Confirmation(
+    func toDomain(
+        myConfirmation: ScheduleResDTO.MyConfirmation?
+    ) -> Schedule.Confirmation {
+        var myConfirmation = myConfirmation.flatMap {
+            $0.confirmationType == type ? $0 : nil
+        }
+        
+        return Schedule.Confirmation(
+            confirmationID: myConfirmation.map { Int($0.confirmationId) },
             type: type.toDomain(),
-            count: count
-        )
-    }
-}
-
-private extension ScheduleResDTO.MyConfirmation {
-    func toDomain() -> Schedule.MyConfirmation {
-        Schedule.MyConfirmation(
-            confirmationID: Int(confirmationId),
-            confirmationType: confirmationType.toDomain()
+            count: count,
+            isSelected: myConfirmation != nil
         )
     }
 }

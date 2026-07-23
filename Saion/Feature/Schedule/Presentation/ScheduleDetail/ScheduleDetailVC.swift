@@ -93,6 +93,8 @@ final class ScheduleDetailVC: BackButtonVC {
         return view
     }()
     
+    private let confirmToggleButton = ConfirmToggleButton()
+    
     /// 일정 메모를 읽기 전용으로 표시하는 텍스트 뷰
     private let memoTextView = MemoTextView()
     
@@ -106,12 +108,12 @@ final class ScheduleDetailVC: BackButtonVC {
     }()
     
     // MARK: Life Cycle
-
+    
     init(vm: ScheduleDetailVM) {
         self.vm = vm
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -144,6 +146,8 @@ final class ScheduleDetailVC: BackButtonVC {
         mainVStack.addArrangedSubview(progressView)
         mainVStack.addArrangedSubview(UISpacer(24))
         mainVStack.addArrangedSubview(memoTextView)
+        mainVStack.addArrangedSubview(UISpacer(24))
+        mainVStack.addArrangedSubview(confirmToggleButton)
         
         mainVStack.snp.makeConstraints { $0.top.horizontalEdges.equalTo(contentLayoutGuide) }
         progressView.snp.makeConstraints { $0.horizontalEdges.equalToSuperview().inset(20) }
@@ -156,29 +160,33 @@ final class ScheduleDetailVC: BackButtonVC {
     private func setupBindings() {
         // 바인딩 구성이 끝난 뒤 일정 상세 조회 요청
         vm.send(.viewDidLoad)
-
+        
+        confirmToggleButton.tapPublisher
+            .sink { [weak self] in self?.vm.send(.confirmToggled) }
+            .store(in: &cancellables)
+        
         // 삭제 확인 얼럿에서 승인한 경우 VM에 삭제 이벤트 전달
         deleteButton.tapPublisher
             .compactMap { [weak self] in self?.presentConfirmAlert() }
             .switchToLatest()
             .sink { [weak self] in self?.vm.send(.deleteButtonTapped) }
             .store(in: &cancellables)
-
+        
         // 일정 상세 화면 상태를 각 컴포넌트에 반영
         vm.$state.compactMap(\.vcState).removeDuplicates()
             .sink { [weak self] in self?.updateUI(with: $0) }
             .store(in: &cancellables)
-
+        
         // 일정 생성자 여부에 따라 삭제 버튼 노출 상태 갱신
         vm.$state.map(\.deleteButtonHidden).removeDuplicates()
             .sink { [weak self] in self?.deleteButton.isHidden = $0 }
             .store(in: &cancellables)
-
+        
         // 로딩 상태에 따라 로딩 인디케이터 노출 여부 갱신
         vm.$state.map(\.isLoading).removeDuplicates()
             .sink { [weak self] in self?.setLoadingIndicatorVisible($0) }
             .store(in: &cancellables)
-
+        
         // 상태 전이 중 발생한 에러를 알림으로 표시
         vm.effect.compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
@@ -194,6 +202,9 @@ final class ScheduleDetailVC: BackButtonVC {
         periodLabel.text = state.period
         progressView.setProgress(state.progress)
         memoTextView.text = state.memo
+        confirmToggleButton.title = state.confirmToggleTitle
+        confirmToggleButton.isHidden = state.confirmToggleHidden
+        confirmToggleButton.isSelected = state.confirmSelected
     }
     
     /// 사용자의 삭제 확인 결과를 한 번 방출하는 퍼블리셔
@@ -215,7 +226,7 @@ final class ScheduleDetailVC: BackButtonVC {
         } }
         .eraseToAnyPublisher()
     }
-
+    
     /// 일정 삭제 완료 퍼블리셔
     var scheduleDeletedPublisher: AnyPublisher<Void, Never> {
         vm.effect.compactMap { $0[case: \.scheduleDeleted] }.eraseToAnyPublisher()
@@ -276,6 +287,65 @@ private final class MemoTextView: UITextView {
     }
 }
 
+// MARK: - ConfirmToggleButton
+
+private final class ConfirmToggleButton: UIButton {
+    
+    // MARK: Properties
+    
+    var title: String? {
+        didSet { setNeedsUpdateConfiguration() }
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        CGSize(width: super.intrinsicContentSize.width, height: 38)
+    }
+    
+    // MARK: Life Cycle
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupDefaults()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Defaults
+    
+    private func setupDefaults() {
+        var config = UIButton.Configuration.plain()
+        config.background.cornerRadius = Radius.componentMedium
+        config.contentInsets = .init(horizontal: 12)
+        config.image = .scheduleCheck
+        config.imagePadding = 4
+        
+        configuration = config
+    }
+    
+    // MARK: Overrides
+    
+    override func updateConfiguration() {
+        guard var configuration else { return }
+        
+        let foregroundColor: UIColor = isSelected ? .labelInverse : .labelStrong
+        let backgroundColor: UIColor = isSelected ? .grey800 : .common0
+        let strokeColor: UIColor = isSelected ? .clear : .lineSubtle
+        
+        let style = TextStyle(
+            typography: .title3,
+            decoration: .init(foregroundColor: foregroundColor)
+        )
+        configuration.attributedTitle = title.map { style.toAttrStr($0) }
+        configuration.background.backgroundColor = backgroundColor
+        configuration.background.strokeColor = strokeColor
+        configuration.background.strokeWidth = 1
+        
+        self.configuration = configuration
+    }
+}
+
 // MARK: - Presentation Model
 
 struct ScheduleDetailVCState: Hashable {
@@ -291,6 +361,12 @@ struct ScheduleDetailVCState: Hashable {
     let progress: CGFloat
     /// 일정 메모
     let memo: String?
+    /// 확인 토글 노출 여부
+    let confirmToggleHidden: Bool
+    /// 나의 확인 여부
+    var confirmSelected: Bool
+    /// 확인 버튼 제목
+    let confirmToggleTitle: String
     
     /// 일정 상세 정보로 화면 상태 생성
     init(_ schedule: Schedule) {
@@ -315,15 +391,25 @@ struct ScheduleDetailVCState: Hashable {
             period = "\(startTimeText) ~ \(endTimeText)"
         }
         
+        let confirmToggleTitle = {
+            let confirmation = schedule.confirmations.first
+            let type = confirmation?.type.rawValue ?? "알 수 없음"
+            let count = confirmation.map { String($0.count) } ?? ""
+            return "\(type) \(count)"
+        }()
+        
         self.dDay = schedule.dDay.map { "\($0)일 전" } ?? "만료됨"
         self.title = schedule.title
         self.date = isSameDay ? startDateText : "\(startDateText) ~ \(endDateText)"
         self.period = period
         self.progress = CGFloat(schedule.progressRate) / 100
         self.memo = schedule.memo
+        self.confirmToggleHidden = !schedule.needConfirm
+        // TODO: 다중 선택 지원 시 nil 여부가 아닌 선택 내용을 기준으로 판단
+        self.confirmSelected = schedule.confirmations.first?.isSelected ?? false
+        self.confirmToggleTitle = confirmToggleTitle
     }
 }
-
 // MARK: - Preview
 
 #Preview {

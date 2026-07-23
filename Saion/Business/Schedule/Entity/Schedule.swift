@@ -27,33 +27,15 @@ struct Schedule: Hashable {
     let progressRate: Int
     /// 메모
     let memo: String?
-    /// 확인하기 종류별 카운트 목록
-    let confirmations: [Confirmation]
-    /// 내 확인하기 정보
-    let myConfirmation: MyConfirmation?
+    /// 확인하기 목록
+    var confirmations: [Confirmation]
     /// 일정 생성자 ID
     let creatorID: String
     /// 생성 일시
     let createdAt: Date
     /// 시작일까지 남은 일수
     let dDay: Int?
-
-    /// 확인하기 종류별 카운트
-    struct Confirmation: Hashable {
-        /// 확인하기 종류
-        let type: ConfirmationType
-        /// 해당 종류를 선택한 멤버 수
-        let count: Int
-    }
-
-    /// 내 확인하기 정보
-    struct MyConfirmation: Hashable {
-        /// 확인하기 ID
-        let confirmationID: Int
-        /// 확인하기 종류
-        let confirmationType: ConfirmationType
-    }
-
+    
     /// 일정 상태
     enum Status: Hashable {
         /// 시작 전
@@ -63,12 +45,24 @@ struct Schedule: Hashable {
         /// 완료
         case completed
     }
-
+    
+    /// 확인하기 종류별 카운트
+    struct Confirmation: Hashable {
+        /// 확인하기 ID
+        let confirmationID: Int?
+        /// 확인하기 종류
+        let type: ConfirmationType
+        /// 해당 종류를 선택한 멤버 수
+        var count: Int
+        /// 나의 선택 여부
+        var isSelected: Bool
+    }
+    
     /// 확인하기 종류
-    enum ConfirmationType: Hashable {
+    enum ConfirmationType: String, Hashable {
         /// 확인했어요
-        case confirmed
+        case confirmed = "확인했어요"
         /// 기타
-        case etc
+        case etc = "기타"
     }
 }
