@@ -88,11 +88,7 @@ final class MyPageVC: UIViewController {
     
     // MARK: Defaults
     
-    private func setupDefaults() {
-        view.backgroundColor = .backgroundMuted
-        // FIXME: 나중에 푸시알림 기능 추가되면 활성화 필요
-        rowVStack1.isHidden = true
-    }
+    private func setupDefaults() { view.backgroundColor = .backgroundMuted }
     
     // MARK: Layout
     
@@ -180,6 +176,8 @@ final class MyPageVC: UIViewController {
     
     /// 회원 탈퇴 탭 퍼블리셔
     var deleteAccountTapPublisher: AnyPublisher<Void, Never> { deleteAccountRow.tapPublisher }
+    /// 푸시알림 설정 탭 퍼블리셔
+    var notificationTapPublisher: AnyPublisher<Void, Never> { notificationRow.tapPublisher }
 }
 
 // MARK: - RowButton

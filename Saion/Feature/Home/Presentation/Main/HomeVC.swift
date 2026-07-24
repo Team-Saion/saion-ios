@@ -39,7 +39,7 @@ final class HomeVC: UIViewController {
     }()
     
     /// 홈 상단 내비게이션 바
-    private let navigationBar = HomeNavigationBar()
+    let navigationBar = HomeNavigationBar()
     
     /// 자식 뷰컨트롤러가 표시되는 영역
     private let contentView = UIView()

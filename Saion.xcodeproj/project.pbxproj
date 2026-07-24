@@ -16,6 +16,9 @@
 		511D79FC2FEECB680093272A /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 511D79FB2FEECB680093272A /* KakaoSDK */; };
 		51B3DE992FDB0D5200285A92 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE982FDB0D5200285A92 /* DesignSystem */; };
 		51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 51B3DE9B2FDB0E3E00285A92 /* SnapKit */; };
+		51CAEA4B30121FCE0087A990 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 51CAEA4A30121FCE0087A990 /* FirebaseCore */; };
+		51CAEA4D30121FCE0087A990 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 51CAEA4C30121FCE0087A990 /* FirebaseMessaging */; };
+		51CAEA4F30121FCE0087A990 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 51CAEA4E30121FCE0087A990 /* FirebaseInstallations */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,8 +57,11 @@
 				51040FAB2FE971E200439ACF /* CombineCocoa in Frameworks */,
 				51B3DE9C2FDB0E3E00285A92 /* SnapKit in Frameworks */,
 				5104126C2FE97A2300439ACF /* Navigation in Frameworks */,
+				51CAEA4B30121FCE0087A990 /* FirebaseCore in Frameworks */,
+				51CAEA4F30121FCE0087A990 /* FirebaseInstallations in Frameworks */,
 				5104125A2FE977A400439ACF /* Kingfisher in Frameworks */,
 				5104125D2FE9783800439ACF /* CasePaths in Frameworks */,
+				51CAEA4D30121FCE0087A990 /* FirebaseMessaging in Frameworks */,
 				511D79FC2FEECB680093272A /* KakaoSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -108,6 +114,9 @@
 				5104126B2FE97A2300439ACF /* Navigation */,
 				5104126E2FE97A3600439ACF /* Navigation */,
 				511D79FB2FEECB680093272A /* KakaoSDK */,
+				51CAEA4A30121FCE0087A990 /* FirebaseCore */,
+				51CAEA4E30121FCE0087A990 /* FirebaseInstallations */,
+				51CAEA4C30121FCE0087A990 /* FirebaseMessaging */,
 			);
 			productName = Saion;
 			productReference = 512430B62FCC4957004D7929 /* Saion.app */;
@@ -146,6 +155,7 @@
 				5104125B2FE9783800439ACF /* XCRemoteSwiftPackageReference "swift-case-paths" */,
 				5104126D2FE97A3600439ACF /* XCLocalSwiftPackageReference "Navigation" */,
 				511D79FA2FEECB680093272A /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				51CAEA4930121FCE0087A990 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 512430B72FCC4957004D7929 /* Products */;
@@ -183,6 +193,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Saion/Resource/Saion.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4ZYD8FJ88F;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -197,7 +208,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5.1;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saion.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -219,6 +230,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Saion/Resource/Saion.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4ZYD8FJ88F;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -233,7 +245,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5.1;
+				MARKETING_VERSION = 0.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.saion.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -460,6 +472,14 @@
 				minimumVersion = 6.0.0;
 			};
 		};
+		51CAEA4930121FCE0087A990 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.16.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -505,6 +525,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 51B3DE9A2FDB0E3E00285A92 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		51CAEA4A30121FCE0087A990 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 51CAEA4930121FCE0087A990 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		51CAEA4C30121FCE0087A990 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 51CAEA4930121FCE0087A990 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		51CAEA4E30121FCE0087A990 /* FirebaseInstallations */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 51CAEA4930121FCE0087A990 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseInstallations;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -21,4 +21,8 @@ final class MyPageDI {
     func makeDeleteAccountReasonVM() -> DeleteAccountReasonVM {
         DeleteAccountReasonVM(memberRepo: DefaultMemberRepo())
     }
+    
+    func makePushNotificationSettingsVM() -> PushNotificationSettingsVM {
+        PushNotificationSettingsVM(settingsRepo: DefaultSettingsRepo())
+    }
 }

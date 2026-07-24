@@ -38,6 +38,11 @@ final class HomeCoord: Coordinator {
             .sink { [weak self] in self?.pushMemberListVC() }
             .store(in: &vc.cancellables)
         
+        // 알림 목록 화면으로 이동
+        vc.navigationBar.notificationButton.tapPublisher
+            .sink { [weak self] in self?.pushInboxVC() }
+            .store(in: &vc.cancellables)
+        
         // 화면 전환
         navigation.pushViewController(vc, animated: false)
     }
@@ -87,6 +92,19 @@ final class HomeCoord: Coordinator {
     func pushMemberListVC() {
         let vm = HomeDI.shared.makeMemberListVM()
         let vc = MemberListVC(vm: vm)
+        vc.hidesDefaultTabBarWhenPushed = true
+        
+        // 뒤로가기 탭하면 화면 닫기
+        vc.backBarButton.tapPublisher
+            .sink { [weak self] in self?.navigation.popViewController(animated: true) }
+            .store(in: &vc.cancellables)
+        
+        navigation.pushViewController(vc, animated: true)
+    }
+    
+    /// 알림 목록 화면으로 이동
+    func pushInboxVC() {
+        let vc = InboxVC()
         vc.hidesDefaultTabBarWhenPushed = true
         
         // 뒤로가기 탭하면 화면 닫기
