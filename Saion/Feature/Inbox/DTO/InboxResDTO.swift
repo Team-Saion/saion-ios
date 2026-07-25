@@ -61,6 +61,7 @@ struct InboxResDTO: Decodable {
         case scheduleReminderDDayTimed = "SCHEDULE_REMINDER_DDAY_TIMED"
         case scheduleConfirmedByFamily = "SCHEDULE_CONFIRMED_BY_FAMILY"
         case scheduleConfirmationRequested = "SCHEDULE_CONFIRMATION_REQUESTED"
+        case scheduleFamilyNotificationRequested = "SCHEDULE_FAMILY_NOTIFICATION_REQUESTED"
     }
     
     /// 이동 화면 유형
@@ -82,16 +83,19 @@ extension InboxResDTO {
         let standardFormatter = ISO8601DateFormatter()
         standardFormatter.formatOptions = [.withInternetDateTime]
         
+        let timeZoneOffset = "+09:00"
         var mappedItems = [InboxItem]()
         for item in items {
-            guard let occurredAt = fractionalFormatter.date(from: item.occurredAt)
-                    ?? standardFormatter.date(from: item.occurredAt)
+            let occurredAtValue = item.occurredAt + timeZoneOffset
+            guard let occurredAt = fractionalFormatter.date(from: occurredAtValue)
+                    ?? standardFormatter.date(from: occurredAtValue)
             else { return nil }
             
             let readAt: Date?
             if let readAtValue = item.readAt {
-                guard let parsedReadAt = fractionalFormatter.date(from: readAtValue)
-                        ?? standardFormatter.date(from: readAtValue)
+                let offsetReadAtValue = readAtValue + timeZoneOffset
+                guard let parsedReadAt = fractionalFormatter.date(from: offsetReadAtValue)
+                        ?? standardFormatter.date(from: offsetReadAtValue)
                 else { return nil }
                 readAt = parsedReadAt
             } else {
@@ -109,6 +113,7 @@ extension InboxResDTO {
             case .scheduleReminderDDayTimed: type = .scheduleReminderDDayTimed
             case .scheduleConfirmedByFamily: type = .scheduleConfirmedByFamily
             case .scheduleConfirmationRequested: type = .scheduleConfirmationRequested
+            case .scheduleFamilyNotificationRequested: type = .scheduleFamilyNotificationRequested
             }
             
             let routeType: InboxItem.RouteType

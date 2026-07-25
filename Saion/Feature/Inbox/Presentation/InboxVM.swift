@@ -26,13 +26,18 @@ final class InboxVM {
         fileprivate var inboxItemsPage: Pagenation<InboxItem>?
         /// 알림 컬렉션뷰에 표시할 아이템 목록
         var inboxItems: [InboxCellItem] {
-            let dateFormatter = DateFormatter.seoul
-            dateFormatter.dateFormat = "M월 d일"
+            let relativeDateFormatter = RelativeDateTimeFormatter()
+            relativeDateFormatter.locale = Locale(identifier: "ko_KR")
+            relativeDateFormatter.unitsStyle = .full
+            relativeDateFormatter.dateTimeStyle = .named
             
             return inboxItemsPage?.elemets.map {
                 InboxCellItem(
                     title: $0.title,
-                    date: dateFormatter.string(from: $0.occurredAt),
+                    date: relativeDateFormatter.localizedString(
+                        for: $0.occurredAt,
+                        relativeTo: .now
+                    ),
                     caption: $0.body
                 )
             } ?? []

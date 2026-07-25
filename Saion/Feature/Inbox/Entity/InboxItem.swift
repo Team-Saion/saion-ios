@@ -45,6 +45,7 @@ struct InboxItem: Hashable {
         case scheduleReminderDDayTimed
         case scheduleConfirmedByFamily
         case scheduleConfirmationRequested
+        case scheduleFamilyNotificationRequested
     }
 
     /// 이동 화면 유형
