@@ -37,9 +37,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let toastWindow = ToastOverlayWindow(windowScene: windowScene)
         self.toastWindow = toastWindow
         
+        print("🥐")
+        
         // 루트 뷰 컨트롤러는 AppCoord 내부에서 설정
         appCoord = AppCoord(window: mainWindow)
         appCoord?.start()
+        
+        // 들어온 URL 정보가 있는지 확인
+        guard let url = connectionOptions.urlContexts.first?.url else { return }
+        
+        if url.host == "kakaolink",
+           let components = URLComponents(
+            url: url,
+            resolvingAgainstBaseURL: false
+           ),
+           let token = components.queryItems?
+            .first(where: { $0.name == "token" })?
+            .value,
+           !token.isEmpty {
+            DeepLinksCenter.shared.pending = .routeJoinCircle(invitationCode: token)
+        }
     }
     
     /// 딥링크나 유니버설 링크를 처리하는 메서드
@@ -53,6 +70,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // 카카오톡 앱을 통한 인증 후 돌아왔을 때, SDK에 전달해 로그인을 완료
         if AuthApi.isKakaoTalkLoginUrl(url) {
             _ = AuthController.handleOpenUrl(url: url)
+        }
+        
+        if url.host == "kakaolink",
+           let components = URLComponents(
+            url: url,
+            resolvingAgainstBaseURL: false
+           ),
+           let token = components.queryItems?
+            .first(where: { $0.name == "token" })?
+            .value,
+           !token.isEmpty {
+            DeepLinksCenter.shared.pending = .routeJoinCircle(invitationCode: token)
         }
     }
 }

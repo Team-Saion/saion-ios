@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 
+import CasePaths
 import CombineCocoa
 
 import DesignSystem
@@ -72,7 +73,34 @@ final class TabBarCoord: Coordinator {
             }
             .store(in: &cancellables)
         
+        // 탭바가 나타난 시점부터 대기 중이거나 새로 들어오는 딥링크 처리
+        vc.viewDidAppearPublisher
+            .prefix(1)
+            .flatMap { DeepLinksCenter.shared.$pending }
+            .compactMap { $0?[case: \.routeJoinCircle] }
+            .sink { [weak self] invitationCode in
+                guard let self else { return }
+                DeepLinksCenter.shared.pending = nil
+                self.presentJoinCircle(invitationCode: invitationCode)
+            }
+            .store(in: &cancellables)
+        
         // 화면 전환
         navigation.pushViewController(vc, animated: false)
+    }
+            
+    /// 서클 참여 흐름 시작
+    private func presentJoinCircle(invitationCode: String) {
+        let coord = JoinCircleCoord(navigation: .init())
+        coord.navigation.modalPresentationStyle = .fullScreen
+        
+        // 참여 흐름 종료 시 자식 코디네이터 해제
+        coord.didFinishPublisher
+            .sink { [weak self, weak coord] in self?.free(child: coord) }
+            .store(in: &coord.cancellables)
+        
+        store(child: coord)
+        coord.start(invitationCode: invitationCode)
+        navigation.present(coord.navigation, animated: true)
     }
 }

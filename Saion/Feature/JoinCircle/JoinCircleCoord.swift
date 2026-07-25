@@ -22,7 +22,7 @@ final class JoinCircleCoord: Coordinator {
 
     // MARK: Start
 
-    func start() {
+    func start(invitationCode: String? = nil) {
         let vc = InputInvitationCodeVC()
 
         // 닫기 버튼 탭하면 참여 흐름 종료
@@ -36,11 +36,21 @@ final class JoinCircleCoord: Coordinator {
             .store(in: &cancellables)
 
         navigation.pushViewController(vc, animated: false)
+
+        if let invitationCode {
+            pushJoinConfirmationVC(
+                invitationCode: invitationCode,
+                animated: false
+            )
+        }
     }
 
     // MARK: Private Methods
 
-    private func pushJoinConfirmationVC(invitationCode: String) {
+    private func pushJoinConfirmationVC(
+        invitationCode: String,
+        animated: Bool = true
+    ) {
         let vm = JoinCircleDI.shared.makeJoinConfirmationVM(invitationCode: invitationCode)
         let vc = JoinConfirmationVC(vm: vm)
 
@@ -60,7 +70,7 @@ final class JoinCircleCoord: Coordinator {
             }
             .store(in: &cancellables)
 
-        navigation.pushViewController(vc, animated: true)
+        navigation.pushViewController(vc, animated: animated)
     }
 
     private func close() {
