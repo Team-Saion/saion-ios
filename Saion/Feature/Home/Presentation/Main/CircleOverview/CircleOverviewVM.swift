@@ -19,6 +19,8 @@ final class CircleOverviewVM {
         case viewDidLoad
         /// 새로고침 이벤트가 발생함
         case refreshTriggered
+        
+        case inviteTapped
     }
     
     struct State {
@@ -53,6 +55,8 @@ final class CircleOverviewVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
+        
+        case openInviteURL(URL)
     }
     
     // MARK: Properties
@@ -61,11 +65,18 @@ final class CircleOverviewVM {
     let effect = PassthroughSubject<Effect, Never>()
     
     private let homeRepo: HomeRepo
+    private let invitationRepo: InvitationRepo
+    
+    private let inviteWithKakaoUC = InviteWithKakaoUC()
     
     // MARK: Initializer
     
-    init(homeRepo: HomeRepo) {
+    init(
+        homeRepo: HomeRepo,
+        invitationRepo: InvitationRepo
+    ) {
         self.homeRepo = homeRepo
+        self.invitationRepo = invitationRepo
     }
     
     // MARK: Send
@@ -93,6 +104,12 @@ final class CircleOverviewVM {
             let circleID = UserSessionStore.shared.currentCircle!.circleID
             /// 서클 홈 정보 조회
             state.circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
+            
+        case .inviteTapped:
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
+            let invitation =  try await invitationRepo.issueInvitation(cirlceID: circleID)
+            let url = try await inviteWithKakaoUC.execute(invitation: invitation)
+            effect.send(.openInviteURL(url))
         }
     }
 }

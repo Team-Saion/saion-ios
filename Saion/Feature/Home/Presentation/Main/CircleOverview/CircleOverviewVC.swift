@@ -104,6 +104,13 @@ final class CircleOverviewVC: UIViewController {
     private func setupBindings() {
         vm.send(.viewDidLoad)
         
+        Publishers.Merge(
+            membersView.collectionView.inviteMemberTapPublisher,
+            dashboardView.inviteTapPublisher
+        )
+        .sink { [weak self] in self?.vm.send(.inviteTapped) }
+        .store(in: &cancellables)
+            
         // 서클 이름을 헤더에 반영
         vm.$state.compactMap(\.circleTitle).removeDuplicates()
             .sink { [weak self] in self?.headerView.titleLabel.text = $0 }
@@ -132,6 +139,10 @@ final class CircleOverviewVC: UIViewController {
         // 상태 전이 중 발생한 에러를 알림으로 표시
         vm.effect.compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
+            .store(in: &cancellables)
+        
+        vm.effect.compactMap { $0[case: \.openInviteURL] }
+            .sink { UIApplication.shared.open($0) }
             .store(in: &cancellables)
         
         // 전체 일정 보기 탭하면 일정 탭으로 이동

@@ -5,8 +5,10 @@
 //  Created by 신정욱 on 7/8/26.
 //
 
+import Combine
 import UIKit
 
+import CombineCocoa
 import SnapKit
 
 import DesignSystem
@@ -93,6 +95,13 @@ final class HomeDashboardView: UIStackView {
             shceduleView.progressView.setProgress(progress)
             shceduleView.isHidden = false
         }
+    }
+    
+    // MARK: Reactive Interface
+    
+    /// 구성원 초대 버튼 탭 퍼블리셔
+    var inviteTapPublisher: AnyPublisher<Void, Never> {
+        idleView.sendInviteButton.tapPublisher
     }
 }
 

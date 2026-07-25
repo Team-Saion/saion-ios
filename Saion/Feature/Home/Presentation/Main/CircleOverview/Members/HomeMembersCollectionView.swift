@@ -8,6 +8,8 @@
 import Combine
 import UIKit
 
+import CombineCocoa
+
 import DesignSystem
 
 final class HomeMembersCollectionView: UICollectionView {
@@ -134,6 +136,19 @@ final class HomeMembersCollectionView: UICollectionView {
         snapshot.appendSections([.main])
         snapshot.appendItems(items, toSection: .main)
         diffableDataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    // MARK: Reactive Interface
+    
+    /// 구성원 추가 셀 선택 퍼블리셔
+    var inviteMemberTapPublisher: AnyPublisher<Void, Never> {
+        didSelectItemPublisher
+            .filter { [weak self] indexPath in
+                guard let self else { return false }
+                return cellForItem(at: indexPath) is InviteMemberCell
+            }
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 }
 
