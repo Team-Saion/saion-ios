@@ -25,7 +25,7 @@ final class InviteWithKakaoUC {
             "inviteToken": invitation.token,
             "circleName": currnetCircle.name,
             "expiresAt": expiresAt,
-            "inviteCode": invitation.invitationID
+            "inviteCode": invitation.token
         ]
         
         guard ShareApi.isKakaoTalkSharingAvailable() else {
