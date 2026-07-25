@@ -1,7 +1,7 @@
 //
 //  InboxResDTO.swift
 //  Saion
-//
+//  살려줘 너무 피곤하다. 진짜
 //  Created by 신정욱 on 7/24/26.
 //
 

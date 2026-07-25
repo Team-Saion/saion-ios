@@ -72,6 +72,7 @@ final class InboxCell: UICollectionViewCell {
         mainVStack.addArrangedSubview(captionLabel)
         
         titleHStack.addArrangedSubview(titleLabel)
+        titleHStack.addArrangedSubview(UISpacer())
         titleHStack.addArrangedSubview(dateLabel)
         
         mainVStack.snp.makeConstraints { $0.edges.equalToSuperview() }
@@ -89,6 +90,7 @@ final class InboxCell: UICollectionViewCell {
 // MARK: - Presentation Model
 
 struct InboxCellItem: Hashable {
+    let id: Int
     let title: String
     let date: String
     let caption: String

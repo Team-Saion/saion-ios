@@ -33,6 +33,7 @@ final class InboxVM {
             
             return inboxItemsPage?.elemets.map {
                 InboxCellItem(
+                    id: $0.id,
                     title: $0.title,
                     date: relativeDateFormatter.localizedString(
                         for: $0.occurredAt,
