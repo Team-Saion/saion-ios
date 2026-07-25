@@ -53,7 +53,7 @@ final class DefaultInvitationRepo: InvitationRepo {
     func fetchInvitationDetail(token: String) async throws -> InvitationDetail {
         try await withCheckedThrowingContinuation { continuation in
             
-            APISession.plain.request(
+            APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/invitations/\(token)",
                 method: .get
             )

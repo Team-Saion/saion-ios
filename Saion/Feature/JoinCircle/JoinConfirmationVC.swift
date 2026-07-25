@@ -36,6 +36,7 @@ final class JoinConfirmationVC: BackButtonVC {
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
+        label.numberOfLines = .zero
         return label
     }()
 

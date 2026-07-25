@@ -25,6 +25,7 @@ final class InviteWithKakaoUC {
             "inviteToken": invitation.token,
             "circleName": currnetCircle.name,
             "expiresAt": expiresAt,
+            // TODO: 이거 뭐할 때 쓰는 거지?
             "inviteCode": invitation.token
         ]
         
