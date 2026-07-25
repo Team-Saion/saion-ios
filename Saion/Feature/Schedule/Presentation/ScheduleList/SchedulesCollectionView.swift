@@ -106,7 +106,7 @@ final class SchedulesCollectionView: UICollectionView {
     // MARK: Configure
     
     func setSnapshot(items: [ScheduleCellItem]) {
-        let items = items.map(Item.schedule) + [.add]
+        let items = [.add] + items.map(Item.schedule)
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
