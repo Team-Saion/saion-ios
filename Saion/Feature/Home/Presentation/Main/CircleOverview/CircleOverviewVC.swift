@@ -110,6 +110,12 @@ final class CircleOverviewVC: UIViewController {
         )
         .sink { [weak self] in self?.vm.send(.inviteTapped) }
         .store(in: &cancellables)
+
+        dashboardView.shareTapPublisher
+            .compactMap { [weak self] in self?.presentShareConfirmAlert() }
+            .switchToLatest()
+            .sink { [weak self] in self?.vm.send(.shareTapped) }
+            .store(in: &cancellables)
             
         // 서클 이름을 헤더에 반영
         vm.$state.compactMap(\.circleTitle).removeDuplicates()
@@ -152,6 +158,28 @@ final class CircleOverviewVC: UIViewController {
     }
     
     // MARK: Reactive Interface
+    
+    /// 일정 공유 확인 얼럿 노출
+    private func presentShareConfirmAlert() -> AnyPublisher<Void, Never> {
+        Deferred { [weak self] in Future { promise in
+            let alert = ConfirmAlertVC(acceptVariant: .primary)
+            alert.titleLabel.text = "모두에게 이 일정을 전할까요?"
+            alert.acceptButton.title = "전하기"
+            
+            alert.cancelButton.tapPublisher
+                .sink { [weak alert] in alert?.dismiss(animated: true) }
+                .store(in: &alert.cancellables)
+            
+            alert.acceptButton.tapPublisher
+                .sink { [weak alert] in alert?.dismiss(animated: true) {
+                    promise(.success(())) }
+                }
+                .store(in: &alert.cancellables)
+            
+            self?.present(alert, animated: true)
+        } }
+        .eraseToAnyPublisher()
+    }
     
     /// 화면 새로 고침
     func refresh() { vm.send(.refreshTriggered) }

@@ -37,8 +37,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let toastWindow = ToastOverlayWindow(windowScene: windowScene)
         self.toastWindow = toastWindow
         
-        print("🥐")
-        
         // 루트 뷰 컨트롤러는 AppCoord 내부에서 설정
         appCoord = AppCoord(window: mainWindow)
         appCoord?.start()

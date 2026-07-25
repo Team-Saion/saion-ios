@@ -21,6 +21,8 @@ final class CircleOverviewVM {
         case refreshTriggered
         
         case inviteTapped
+        /// 가족에게 전하기 버튼 탭
+        case shareTapped
     }
     
     struct State {
@@ -66,6 +68,7 @@ final class CircleOverviewVM {
     
     private let homeRepo: HomeRepo
     private let invitationRepo: InvitationRepo
+    private let scheduleRepo: ScheduleRepo
     
     private let inviteWithKakaoUC = InviteWithKakaoUC()
     
@@ -73,10 +76,12 @@ final class CircleOverviewVM {
     
     init(
         homeRepo: HomeRepo,
-        invitationRepo: InvitationRepo
+        invitationRepo: InvitationRepo,
+        scheduleRepo: ScheduleRepo
     ) {
         self.homeRepo = homeRepo
         self.invitationRepo = invitationRepo
+        self.scheduleRepo = scheduleRepo
     }
     
     // MARK: Send
@@ -110,6 +115,19 @@ final class CircleOverviewVM {
             let invitation =  try await invitationRepo.issueInvitation(cirlceID: circleID)
             let url = try await inviteWithKakaoUC.execute(invitation: invitation)
             effect.send(.openInviteURL(url))
+
+        case .shareTapped:
+            guard !state.isLoading,
+                  let scheduleID = state.circleHomeInfo?.mainSchedule?.scheduleID
+            else { return }
+            defer { state.isLoading = false }
+            state.isLoading = true
+
+            let circleID = UserSessionStore.shared.currentCircle!.circleID
+            try await scheduleRepo.requestFamilyNotification(
+                circleID: circleID,
+                scheduleID: scheduleID
+            )
         }
     }
 }

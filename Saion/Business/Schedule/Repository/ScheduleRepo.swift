@@ -47,6 +47,12 @@ protocol ScheduleRepo {
         scheduleID: String,
         confirmationID: Int
     ) async throws
+
+    /// 일정 내용을 가족에게 전달
+    func requestFamilyNotification(
+        circleID: String,
+        scheduleID: String
+    ) async throws
 }
 
 final class DefaultScheduleRepo: ScheduleRepo {
@@ -218,6 +224,30 @@ final class DefaultScheduleRepo: ScheduleRepo {
                     with: error,
                     userMessage: "일정 확인 취소 중 문제가 발생했어요.",
                     errorCode: "SR-SU-0"
+                ))
+            }
+
+        }
+    }
+
+    func requestFamilyNotification(
+        circleID: String,
+        scheduleID: String
+    ) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)/family-notifications",
+                method: .post
+            )
+            .decodeResponse(decodeType: EmptyDTO.self) { _ in
+                continuation.resume(returning: ())
+
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "가족에게 일정 전달 중 문제가 발생했어요.",
+                    errorCode: "SR-RFN-0"
                 ))
             }
 

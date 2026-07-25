@@ -103,6 +103,11 @@ final class HomeDashboardView: UIStackView {
     var inviteTapPublisher: AnyPublisher<Void, Never> {
         idleView.sendInviteButton.tapPublisher
     }
+
+    /// 가족에게 전하기 버튼 탭 퍼블리셔
+    var shareTapPublisher: AnyPublisher<Void, Never> {
+        shceduleView.shareButton.tapPublisher
+    }
 }
 
 // MARK: - IdleView
@@ -221,7 +226,7 @@ private final class ScheduleView: UIStackView {
     let shareButton = {
         let appearance = SaionButton.Appearance(size: .large, variant: .primary)
         let button = SaionButton(with: appearance)
-        button.title = "가족에게 전하기"
+        button.title = "모두에게 전하기"
         return button
     }()
     
@@ -253,6 +258,7 @@ private final class ScheduleView: UIStackView {
         addArrangedSubview(UISpacer(16))
         addArrangedSubview(progressView)
         addArrangedSubview(UISpacer(16))
+        // TODO: 멤버가 나 밖에 없으면 공유 버튼 숨겨야 함
         addArrangedSubview(shareButton)
         
         addSubview(dDayLabel)

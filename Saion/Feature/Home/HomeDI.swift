@@ -17,7 +17,8 @@ final class HomeDI {
     func makeCircleOverviewVM() -> CircleOverviewVM {
         CircleOverviewVM(
             homeRepo: DefaultHomeRepo(),
-            invitationRepo: DefaultInvitationRepo()
+            invitationRepo: DefaultInvitationRepo(),
+            scheduleRepo: DefaultScheduleRepo()
         )
     }
     
