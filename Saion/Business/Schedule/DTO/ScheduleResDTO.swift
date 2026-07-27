@@ -105,16 +105,13 @@ extension ScheduleResDTO {
             let endAt = formatter.date(from: "\(endDate) \(endTime ?? "23:59")")
         else { return nil }
         
-        let isoFormatter = ISO8601DateFormatter()
-        isoFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-        isoFormatter.formatOptions = [
-            .withFullDate,
-            .withTime,
-            .withDashSeparatorInDate,
-            .withColonSeparatorInTime,
-            .withFractionalSeconds
-        ]
+        let isoFormatter = ISO8601DateFormatter.seoul
         guard let createdAt = isoFormatter.date(from: createdAt) else { return nil }
+        let mappedStatus: Schedule.Status = switch status {
+        case .upcoming: .upcoming
+        case .inProgress: .inProgress
+        case .completed: .completed
+        }
         
         return Schedule(
             scheduleID: scheduleId,
@@ -123,49 +120,28 @@ extension ScheduleResDTO {
             endAt: endAt,
             isAllDay: isAllDay,
             needConfirm: needConfirm,
-            status: status.toDomain(),
+            status: mappedStatus,
             progressRate: progressRate,
             memo: memo,
-            confirmations: confirmations.map { $0.toDomain(myConfirmation: myConfirmation) },
+            confirmations: confirmations.map { confirmation in
+                let myConfirmation = myConfirmation.flatMap {
+                    $0.confirmationType == confirmation.type ? $0 : nil
+                }
+                let type: Schedule.ConfirmationType = switch confirmation.type {
+                case .confirmed: .confirmed
+                case .etc: .etc
+                }
+
+                return Schedule.Confirmation(
+                    confirmationID: myConfirmation.map { Int($0.confirmationId) },
+                    type: type,
+                    count: confirmation.count,
+                    isSelected: myConfirmation != nil
+                )
+            },
             creatorID: createdBy,
             createdAt: createdAt,
             dDay: dDay
         )
-    }
-}
-
-private extension ScheduleResDTO.Confirmation {
-    func toDomain(
-        myConfirmation: ScheduleResDTO.MyConfirmation?
-    ) -> Schedule.Confirmation {
-        var myConfirmation = myConfirmation.flatMap {
-            $0.confirmationType == type ? $0 : nil
-        }
-        
-        return Schedule.Confirmation(
-            confirmationID: myConfirmation.map { Int($0.confirmationId) },
-            type: type.toDomain(),
-            count: count,
-            isSelected: myConfirmation != nil
-        )
-    }
-}
-
-private extension ScheduleResDTO.Status {
-    func toDomain() -> Schedule.Status {
-        switch self {
-        case .upcoming: .upcoming
-        case .inProgress: .inProgress
-        case .completed: .completed
-        }
-    }
-}
-
-private extension ScheduleResDTO.ConfirmationType {
-    func toDomain() -> Schedule.ConfirmationType {
-        switch self {
-        case .confirmed: .confirmed
-        case .etc: .etc
-        }
     }
 }

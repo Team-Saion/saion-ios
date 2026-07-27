@@ -31,16 +31,8 @@ struct InvitationDetailResDTO: Decodable {
 
 extension InvitationDetailResDTO {
     func toDomain() -> InvitationDetail? {
-        let fractionalFormatter = ISO8601DateFormatter()
-        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        let standardFormatter = ISO8601DateFormatter()
-        standardFormatter.formatOptions = [.withInternetDateTime]
-
-        let expiresAtWithTimeZone = expiresAt + "+09:00"
-        guard let expiresAt = fractionalFormatter.date(from: expiresAtWithTimeZone)
-                ?? standardFormatter.date(from: expiresAtWithTimeZone)
-        else { return nil }
+        let formatter = ISO8601DateFormatter.seoul
+        guard let expiresAt = formatter.date(from: expiresAt) else { return nil }
 
         return InvitationDetail(
             invitationID: invitationId,

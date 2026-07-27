@@ -77,26 +77,14 @@ struct InboxResDTO: Decodable {
 
 extension InboxResDTO {
     func toDomain() -> Pagenation<InboxItem>? {
-        let fractionalFormatter = ISO8601DateFormatter()
-        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        
-        let standardFormatter = ISO8601DateFormatter()
-        standardFormatter.formatOptions = [.withInternetDateTime]
-        
-        let timeZoneOffset = "+09:00"
+        let formatter = ISO8601DateFormatter.seoul
         var mappedItems = [InboxItem]()
         for item in items {
-            let occurredAtValue = item.occurredAt + timeZoneOffset
-            guard let occurredAt = fractionalFormatter.date(from: occurredAtValue)
-                    ?? standardFormatter.date(from: occurredAtValue)
-            else { return nil }
+            guard let occurredAt = formatter.date(from: item.occurredAt) else { return nil }
             
             let readAt: Date?
             if let readAtValue = item.readAt {
-                let offsetReadAtValue = readAtValue + timeZoneOffset
-                guard let parsedReadAt = fractionalFormatter.date(from: offsetReadAtValue)
-                        ?? standardFormatter.date(from: offsetReadAtValue)
-                else { return nil }
+                guard let parsedReadAt = formatter.date(from: readAtValue) else { return nil }
                 readAt = parsedReadAt
             } else {
                 readAt = nil

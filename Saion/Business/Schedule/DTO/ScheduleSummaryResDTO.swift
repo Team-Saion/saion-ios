@@ -63,6 +63,11 @@ extension ScheduleSummaryResDTO {
             let startAt = formatter.date(from: "\(startDate) \(startTime ?? "00:00")"),
             let endAt = formatter.date(from: "\(endDate) \(endTime ?? "23:59")")
         else { return nil }
+        let mappedStatus: ScheduleSummary.Status = switch status {
+        case .upcoming: .upcoming
+        case .inProgress: .inProgress
+        case .completed: .completed
+        }
         
         return ScheduleSummary(
             scheduleID: scheduleId,
@@ -71,19 +76,9 @@ extension ScheduleSummaryResDTO {
             endAt: endAt,
             isAllDay: isAllDay,
             needConfirm: needConfirm,
-            status: status.toDomain(),
+            status: mappedStatus,
             progressRate: progressRate,
             dDay: dday
         )
-    }
-}
-
-private extension ScheduleSummaryResDTO.Status {
-    func toDomain() -> ScheduleSummary.Status {
-        switch self {
-        case .upcoming: .upcoming
-        case .inProgress: .inProgress
-        case .completed: .completed
-        }
     }
 }

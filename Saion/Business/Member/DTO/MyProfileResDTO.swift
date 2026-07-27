@@ -70,50 +70,32 @@ struct MyProfileResDTO: Decodable {
 
 extension MyProfileResDTO {
     func toDomain() -> MyProfile? {
-        let formatter = ISO8601DateFormatter()
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-        formatter.formatOptions = [
-            .withFullDate,
-            .withTime,
-            .withDashSeparatorInDate,
-            .withColonSeparatorInTime,
-            .withFractionalSeconds
-        ]
+        let formatter = ISO8601DateFormatter.seoul
         guard let createdAt = formatter.date(from: createdAt) else { return nil }
+        let mappedRole: MyProfile.Role = switch role {
+        case .pending: .pending
+        case .member: .member
+        case .admin: .admin
+        }
+        let mappedStatus: MyProfile.Status = switch status {
+        case .active: .active
+        case .deleted: .deleted
+        }
 
         return MyProfile(
             memberID: id,
             email: email,
             name: name,
             nickname: nickname,
-            role: role.toDomain(),
+            role: mappedRole,
             avatarColor: MyProfile.AvatarColor(
                 code: avatarColor.code,
                 hex: avatarColor.hex
             ),
             profileImageKey: profileImageKey,
             profileImageURL: profileImageUrl.flatMap { URL(string: $0) },
-            status: status.toDomain(),
+            status: mappedStatus,
             createdAt: createdAt
         )
-    }
-}
-
-private extension MyProfileResDTO.Role {
-    func toDomain() -> MyProfile.Role {
-        switch self {
-        case .pending: .pending
-        case .member: .member
-        case .admin: .admin
-        }
-    }
-}
-
-private extension MyProfileResDTO.Status {
-    func toDomain() -> MyProfile.Status {
-        switch self {
-        case .active: .active
-        case .deleted: .deleted
-        }
     }
 }

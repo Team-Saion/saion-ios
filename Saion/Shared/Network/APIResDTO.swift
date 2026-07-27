@@ -23,9 +23,8 @@ struct APIResDTO<T: Decodable>: Decodable {
     // MARK: Mappers
     
     func toAPIError() -> APIError {
-        let formatter = DateFormatter.seoul
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        
+        let formatter = ISO8601DateFormatter.seoul
+
         return APIError(
             errorCode: errorCode,
             message: message,
@@ -33,4 +32,3 @@ struct APIResDTO<T: Decodable>: Decodable {
         )
     }
 }
-
