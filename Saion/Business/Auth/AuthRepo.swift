@@ -1,5 +1,5 @@
 //
-//  LoginRepo.swift
+//  AuthRepo.swift
 //  Saion
 //
 //  Created by 신정욱 on 6/28/26.
@@ -9,14 +9,14 @@ import Foundation
 
 import Alamofire
 
-protocol LoginRepo {
+protocol AuthRepo {
     /// 카카오 아이디 토큰으로 사이온 로그인
     func requestLoginWithKakao(
         idToken: String
     ) async throws -> (accessToken: String, refreshToken: String)
 }
 
-final class DefaultLoginRepo: LoginRepo {
+final class DefaultAuthRepo: AuthRepo {
     func requestLoginWithKakao(
         idToken: String
     ) async throws -> (accessToken: String, refreshToken: String) {

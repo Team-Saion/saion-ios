@@ -23,6 +23,8 @@ final class MyPageDI {
     }
     
     func makePushNotificationSettingsVM() -> PushNotificationSettingsVM {
-        PushNotificationSettingsVM(settingsRepo: DefaultSettingsRepo())
+        PushNotificationSettingsVM(
+            notificationSettingRepo: DefaultNotificationSettingRepo()
+        )
     }
 }

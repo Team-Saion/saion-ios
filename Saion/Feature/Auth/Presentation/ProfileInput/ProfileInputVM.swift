@@ -78,20 +78,20 @@ final class ProfileInputVM {
     @Published private(set) var state: State
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let onboardingRepo: OnboardingRepo
+    private let memberRepo: MemberRepo
     
     // MARK: Initializer
     
     init(
         onboardingInfo: OnboardingInfo,
-        onboardingRepo: OnboardingRepo
+        memberRepo: MemberRepo
     ) {
         self.state = .init(
             profileImageViewState: .init(from: onboardingInfo),
             nicknamePlaceholder: onboardingInfo.nickname ?? "닉네임",
             nicknameText: onboardingInfo.nickname
         )
-        self.onboardingRepo = onboardingRepo
+        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -120,7 +120,7 @@ final class ProfileInputVM {
             defer { state.isLoading = false }
             
             let (accessToken, refreshToken) =
-            try await onboardingRepo.completeOnboarding(nickname: nicknameText)
+            try await memberRepo.completeOnboarding(nickname: nicknameText)
             
             AuthManager.shared.store.send(.userDidLogin(
                 accessToken: accessToken,

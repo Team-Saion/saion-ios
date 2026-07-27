@@ -15,6 +15,6 @@ final class InboxDI {
     // MARK: Methods
     
     func makeInboxVM() -> InboxVM {
-        InboxVM(inboxRepo: DefaultInboxRepo())
+        InboxVM(notificationRepo: DefaultNotificationRepo())
     }
 }

@@ -38,12 +38,12 @@ final class PushNotificationSettingsVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let settingsRepo: SettingsRepo
+    private let notificationSettingRepo: NotificationSettingRepo
     
     // MARK: Initializer
     
-    init(settingsRepo: SettingsRepo) {
-        self.settingsRepo = settingsRepo
+    init(notificationSettingRepo: NotificationSettingRepo) {
+        self.notificationSettingRepo = notificationSettingRepo
     }
     
     // MARK: Send
@@ -67,7 +67,8 @@ final class PushNotificationSettingsVM {
             defer { state.isLoading = false }
             state.isLoading = true
             
-            state.notificationSettings = try await settingsRepo.fetchPushNotificationSettings()
+            state.notificationSettings =
+            try await notificationSettingRepo.fetchPushNotificationSettings()
             
         case .d7Changed(let bool):
             state.notificationSettings?.d7Enabled = bool
@@ -97,6 +98,6 @@ final class PushNotificationSettingsVM {
         guard let settings = state.notificationSettings else { return }
         
         state.notificationSettings =
-        try await settingsRepo.updatePushNotificationSettings(settings)
+        try await notificationSettingRepo.updatePushNotificationSettings(settings)
     }
 }

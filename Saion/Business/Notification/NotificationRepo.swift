@@ -1,5 +1,5 @@
 //
-//  InboxRepo.swift
+//  NotificationRepo.swift
 //  Saion
 //
 //  Created by 신정욱 on 7/24/26.
@@ -9,14 +9,14 @@ import Foundation
 
 import Alamofire
 
-protocol InboxRepo {
+protocol NotificationRepo {
     /// 알림 보관함 조회
     func fetchInbox(
         cursor: String?
     ) async throws -> Pagenation<InboxItem>
 }
 
-final class DefaultInboxRepo: InboxRepo {
+final class DefaultNotificationRepo: NotificationRepo {
     func fetchInbox(
         cursor: String?
     ) async throws -> Pagenation<InboxItem> {

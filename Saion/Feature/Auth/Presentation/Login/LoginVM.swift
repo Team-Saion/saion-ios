@@ -44,19 +44,19 @@ final class LoginVM {
     private var cancellables = Set<AnyCancellable>()
     
     private let kakaoAuthRepo: KakaoAuthRepo
-    private let loginRepo: LoginRepo
-    private let onboardingRepo: OnboardingRepo
+    private let authRepo: AuthRepo
+    private let memberRepo: MemberRepo
     
     // MARK: Initializer
     
     init(
         kakaoAuthRepo: KakaoAuthRepo,
-        loginRepo: LoginRepo,
-        onboardingRepo: OnboardingRepo
+        authRepo: AuthRepo,
+        memberRepo: MemberRepo
     ) {
         self.kakaoAuthRepo = kakaoAuthRepo
-        self.loginRepo = loginRepo
-        self.onboardingRepo = onboardingRepo
+        self.authRepo = authRepo
+        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -82,7 +82,7 @@ final class LoginVM {
         case .kakaoLoginTapped:
             let idToken = try await kakaoAuthRepo.fetchKakaoIDToken()
             let (accessToken, refreshToken) =
-            try await loginRepo.requestLoginWithKakao(idToken: idToken)
+            try await authRepo.requestLoginWithKakao(idToken: idToken)
             
             AuthManager.shared.store.send(.userDidLogin(
                 accessToken: accessToken,
@@ -100,7 +100,7 @@ final class LoginVM {
             state.isLoading = true
             defer { state.isLoading = false }
             
-            let onboardingInfo = try await onboardingRepo.fetchOnboardingInfo()
+            let onboardingInfo = try await memberRepo.fetchOnboardingInfo()
             effect.send(.pushProfileInput(onboardingInfo))
         }
     }
@@ -133,4 +133,3 @@ final class LoginVM {
         return role
     }
 }
-

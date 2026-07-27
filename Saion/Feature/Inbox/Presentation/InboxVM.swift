@@ -58,12 +58,12 @@ final class InboxVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let inboxRepo: InboxRepo
+    private let notificationRepo: NotificationRepo
     
     // MARK: Initializer
     
-    init(inboxRepo: InboxRepo) {
-        self.inboxRepo = inboxRepo
+    init(notificationRepo: NotificationRepo) {
+        self.notificationRepo = notificationRepo
     }
     
     // MARK: Send
@@ -84,7 +84,7 @@ final class InboxVM {
         switch action {
         case .viewDidLoad:
             // 화면 진입 시 알림 첫 페이지를 조회한다.
-            state.inboxItemsPage = try await inboxRepo.fetchInbox(
+            state.inboxItemsPage = try await notificationRepo.fetchInbox(
                 cursor: nil
             )
             
@@ -98,7 +98,7 @@ final class InboxVM {
             defer { state.isLoading = false }
             state.isLoading = true
             
-            let nextPage = try await inboxRepo.fetchInbox(
+            let nextPage = try await notificationRepo.fetchInbox(
                 cursor: currentPage.nextCursor
             )
             

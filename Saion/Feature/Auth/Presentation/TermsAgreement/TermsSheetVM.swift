@@ -51,12 +51,12 @@ final class TermsSheetVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let onboardingRepo: OnboardingRepo
+    private let termRepo: TermRepo
     
     // MARK: Initializer
     
-    init(onboardingRepo: OnboardingRepo) {
-        self.onboardingRepo = onboardingRepo
+    init(termRepo: TermRepo) {
+        self.termRepo = termRepo
     }
     
     // MARK: Send
@@ -89,9 +89,8 @@ final class TermsSheetVM {
             state.isLoading = true
             defer { state.isLoading = false }
             
-            try await onboardingRepo.agreeToTerms()
+            try await termRepo.agreeToTerms()
             effect.send(.termsAgreementCompleted)
         }
     }
 }
-

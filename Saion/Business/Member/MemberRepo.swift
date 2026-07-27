@@ -1,52 +1,61 @@
 //
-//  OnboardingRepo.swift
+//  MemberRepo.swift
 //  Saion
 //
-//  Created by 신정욱 on 7/2/26.
+//  Created by 신정욱 on 7/18/26.
 //
 
 import Foundation
 
 import Alamofire
 
-protocol OnboardingRepo {
-    /// 약관 동의 요청
-    func agreeToTerms() async throws
+protocol MemberRepo {
+    /// 내 프로필 조회
+    func fetchMyProfile() async throws -> MyProfile
     /// 온보딩 프리필 데이터 조회
     func fetchOnboardingInfo() async throws -> OnboardingInfo
     /// 온보딩 완료 요청
     func completeOnboarding(
         nickname: String
     ) async throws -> (accessToken: String, refreshToken: String)
+    /// 회원 탈퇴
+    func deleteAccount(reason: String) async throws
+    /// 로그아웃
+    func logout() async throws
 }
 
-final class DefaultOnboardingRepo: OnboardingRepo {
-    func agreeToTerms() async throws {
+final class DefaultMemberRepo: MemberRepo {
+    func fetchMyProfile() async throws -> MyProfile {
         try await withCheckedThrowingContinuation { continuation in
             
             APISession.withAuth.request(
-                Bundle.main.baseURL + "/api/v1/terms/agree",
-                method: .post,
-                parameters: TermsAgreementReqDTO(),
-                encoder: JSONParameterEncoder.default
+                Bundle.main.baseURL + "/api/v1/members/me",
+                method: .get
             )
-            .decodeResponse(decodeType: EmptyDTO.self) { _ in
-                continuation.resume(returning: ())
+            .decodeResponse(decodeType: MyProfileResDTO.self) { dto in
+                if let myProfile = dto?.toDomain() {
+                    continuation.resume(returning: myProfile)
+                } else {
+                    continuation.resume(throwing: SaionError(
+                        userMessage: "프로필 조회 중 문제가 발생했어요.",
+                        errorCode: "MR-FMP-0"
+                    ))
+                }
                 
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
-                    userMessage: "약관 동의 처리 중 문제가 발생했어요.",
-                    errorCode: "OR-ATT-0"
+                    userMessage: "프로필 조회 중 문제가 발생했어요.",
+                    errorCode: "MR-FMP-1"
                 ))
             }
             
         }
     }
-    
+
     func fetchOnboardingInfo() async throws -> OnboardingInfo {
         try await withCheckedThrowingContinuation { continuation in
-            
+
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/members/me/onboarding-info",
                 method: .get
@@ -54,14 +63,14 @@ final class DefaultOnboardingRepo: OnboardingRepo {
             .decodeResponse(decodeType: OnboardingInfoResDTO.self) { dto in
                 if let dto {
                     continuation.resume(returning: dto.toDomain())
-                    
+
                 } else {
                     continuation.resume(throwing: SaionError(
                         userMessage: "사전 정보 조회 중 문제가 발생했어요.",
                         errorCode: "OR-FOI-0"
                     ))
                 }
-                
+
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -69,15 +78,15 @@ final class DefaultOnboardingRepo: OnboardingRepo {
                     errorCode: "OR-FOI-1"
                 ))
             }
-            
+
         }
     }
-    
+
     func completeOnboarding(
         nickname: String
     ) async throws -> (accessToken: String, refreshToken: String) {
         try await withCheckedThrowingContinuation { continuation in
-            
+
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/members/me/onboarding",
                 method: .patch,
@@ -90,19 +99,63 @@ final class DefaultOnboardingRepo: OnboardingRepo {
                         dto.accessToken,
                         dto.refreshToken
                     ))
-                    
+
                 } else {
                     continuation.resume(throwing: SaionError(
                         userMessage: "온보딩 완료 중 문제가 발생했어요.",
                         errorCode: "OR-CO-0"
                     ))
                 }
-                
+
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
                     userMessage: "온보딩 완료 중 문제가 발생했어요.",
                     errorCode: "OR-CO-1"
+                ))
+            }
+
+        }
+    }
+    
+    func deleteAccount(reason: String) async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/members/me",
+                method: .delete,
+                parameters: DeleteAccountDTO(reason: reason),
+                encoder: JSONParameterEncoder.default
+            )
+            .decodeResponse(decodeType: EmptyDTO.self) { _ in
+                continuation.resume(returning: ())
+                
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "회원 탈퇴 중 문제가 발생했어요.",
+                    errorCode: "MR-DA-0"
+                ))
+            }
+            
+        }
+    }
+    
+    func logout() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            APISession.withAuth.request(
+                Bundle.main.baseURL + "/api/v1/members/me/logout",
+                method: .post
+            )
+            .decodeResponse(decodeType: EmptyDTO.self) { _ in
+                continuation.resume(returning: ())
+                
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "로그아웃 중 문제가 발생했어요.",
+                    errorCode: "MR-L-0"
                 ))
             }
             

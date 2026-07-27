@@ -1,5 +1,5 @@
 //
-//  SettingsRepo.swift
+//  NotificationSettingRepo.swift
 //  Saion
 //
 //  Created by 신정욱 on 7/23/26.
@@ -9,7 +9,7 @@ import Foundation
 
 import Alamofire
 
-protocol SettingsRepo {
+protocol NotificationSettingRepo {
     /// 푸시 알림 설정 조회
     func fetchPushNotificationSettings() async throws -> PushNotificationSettings
     /// 푸시 알림 설정 변경
@@ -18,7 +18,7 @@ protocol SettingsRepo {
     ) async throws -> PushNotificationSettings
 }
 
-final class DefaultSettingsRepo: SettingsRepo {
+final class DefaultNotificationSettingRepo: NotificationSettingRepo {
     func fetchPushNotificationSettings() async throws -> PushNotificationSettings {
         try await withCheckedThrowingContinuation { continuation in
 
