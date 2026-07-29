@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         // 인증 상태 매니저 초기화
-        AuthManager.shared.store.send(.appDidLaunch)
+        AuthManager.shared.send(.appDidLaunch)
         // Kakao SDK 초기화(소셜 로그인)
         KakaoSDK.initSDK(appKey: Bundle.main.kakaoNativeAppKey)
         // 푸시알림 매니저 초기화

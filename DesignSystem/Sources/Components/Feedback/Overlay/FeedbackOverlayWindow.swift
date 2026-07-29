@@ -1,5 +1,5 @@
 //
-//  ToastOverlayWindow.swift
+//  FeedbackOverlayWindow.swift
 //  DesignSystem
 //
 //  Created by 신정욱 on 7/17/26.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class ToastOverlayWindow: UIWindow {
+public final class FeedbackOverlayWindow: UIWindow {
     
     // MARK: Properties
     
@@ -27,7 +27,7 @@ public final class ToastOverlayWindow: UIWindow {
     // MARK: Defaults
     
     private func setupDefaults() {
-        rootViewController = ToastHostVC()
+        rootViewController = FeedbackOverlayHostVC()
         windowLevel = .normal + 1
         backgroundColor = .clear
         isOpaque = false

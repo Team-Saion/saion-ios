@@ -12,27 +12,67 @@ import Alamofire
 
 final class AuthManager {
     
+    // MARK: Types
+    
+    enum Action {
+        /// 앱이 실행됨
+        case appDidLaunch
+        /// 사용자가 로그인함
+        case userDidLogin(tokenInfo: TokenInfo)
+        /// 토큰이 재발급(리프레시)됨
+        case tokensDidRefresh(tokenInfo: TokenInfo)
+        /// 사용자가 로그아웃함
+        case userDidLogout
+    }
+    
+    struct State {
+        /// 앱 설치 후 최초 실행 여부 (키체인 초기화 용도)
+        @Storage("isFirstLaunch")
+        fileprivate var isFirstLaunch: Bool = true
+        /// 현재 인증 상태
+        @SecureStorage("authState")
+        var authState: AuthState = .signedOut
+    }
+    
     // MARK: Properties
     
-    let store = AuthManagerStore()
-    private var cancellables = Set<AnyCancellable>()
+    @Published private(set) var state = State()
     
-    var accessToken: String? { store.state.authState.tokenInfo?.accessToken }
-    var refreshToken: String? { store.state.authState.tokenInfo?.refreshToken }
+    private let validateTokenUC = ValidateTokenUC()
     
     // MARK: Singleton
     
     static let shared = AuthManager()
     private init() {}
     
-    // MARK: Reactive Interface
+    // MARK: Send
     
-    /// 현재 로그인 상태 퍼블리셔
-    /// - Warning:
-    ///   이 퍼블리셔를 API 호출 트리거로 직접 사용하면, 토큰 재발급 루프가 발생할 수 있음
-    ///   API 호출 트리거로 사용하고자 한다면, `prefix(1)` 같은 안전장치를 두어 루프 발생을 예방해야 함
+    func send(_ action: Action) {
+        switch action {
+        case .appDidLaunch:
+            // 앱을 재설치 한 경우, 키체인에 잔류하고 있는 토큰 초기화
+            guard state.isFirstLaunch else { return }
+            state.isFirstLaunch = false
+            state.authState = .signedOut
+            
+        case .userDidLogin(let tokenInfo), .tokensDidRefresh(let tokenInfo):
+            state.authState = .signedIn(tokenInfo: tokenInfo)
+            
+        case .userDidLogout:
+            state.authState = .signedOut
+        }
+    }
+}
+
+// MARK: - Public Interface
+
+extension AuthManager {
+    var accessToken: String? { state.authState.tokenInfo?.accessToken }
+    var refreshToken: String? { state.authState.tokenInfo?.refreshToken }
+    
+    /// 현재 인증 상태 퍼블리셔
     var authStatePublisher: AnyPublisher<AuthState, Never> {
-        store.$state
+        $state
             .map(\.authState)
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -43,5 +83,7 @@ final class AuthManager {
 // MARK: - AuthenticationCredential
 
 extension AuthManager: AuthenticationCredential {
-    var requiresRefresh: Bool { store.state.authState == .signedOut }
+    /// 인증 토큰 선제 갱신 여부
+    /// 서버가 만료된 access token에 대해 항상 정확하게 401을 반환한다면 requiresRefresh는 필수는 아님.
+    var requiresRefresh: Bool { false }
 }

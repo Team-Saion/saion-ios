@@ -11,15 +11,16 @@ import Foundation
 final class ValidateTokenUC {
     
     /// 만료 5분 전이거나 이미 만료되었다면 false 반환
-    func execute(with token: String?) -> Bool {
+    /// - Returns: 토큰 유효기간을 파싱할 수 없는 경우 `nil`
+    func execute(with token: String?) -> Bool? {
         guard let token else {
             print("[ValidateTokenUC] 유효기간 파싱할 토큰 없음")
-            return false
+            return nil
         }
         
         guard let expireAt = parseTokenExpiration(token) else {
             print("[ValidateTokenUC] 토큰 유효기간 파싱 실패")
-            return false
+            return nil
         }
         
         /// 토큰 만료 여부 (만료 5분 이내일 경우 만료 처리)

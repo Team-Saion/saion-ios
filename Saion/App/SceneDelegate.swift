@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // MARK: Properties
     
     var mainWindow: UIWindow?
-    var toastWindow: ToastOverlayWindow?
+    var feedbackWindow: FeedbackOverlayWindow?
     var appCoord: AppCoord?
     
     // MARK: Methods
@@ -33,9 +33,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         mainWindow.makeKeyAndVisible()
         self.mainWindow = mainWindow
         
-        // 토스트 윈도우 설정
-        let toastWindow = ToastOverlayWindow(windowScene: windowScene)
-        self.toastWindow = toastWindow
+        // 피드백 윈도우 설정
+        let feedbackWindow = FeedbackOverlayWindow(windowScene: windowScene)
+        self.feedbackWindow = feedbackWindow
         
         // 루트 뷰 컨트롤러는 AppCoord 내부에서 설정
         appCoord = AppCoord(window: mainWindow)

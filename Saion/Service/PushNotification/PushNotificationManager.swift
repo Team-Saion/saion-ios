@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 
+import CasePaths
 import FirebaseCore
 import FirebaseMessaging
 
@@ -42,7 +43,12 @@ final class PushNotificationManager: NSObject {
     private func setupBindings() {
         // 로그인 상태 변경에 따라 푸시 등록 또는 해제를 요청
         AuthManager.shared.authStatePublisher
-            .sink { [weak self] in self?.store.send(.authStateChanged($0)) }
+            .map {
+                guard let tokenInfo = $0.tokenInfo else { return false }
+                return !tokenInfo.role.is(\.pending)
+            }
+            .removeDuplicates()
+            .sink { [weak self] in self?.store.send(.authStateChanged(isSignedIn: $0)) }
             .store(in: &cancellables)
     }
 }

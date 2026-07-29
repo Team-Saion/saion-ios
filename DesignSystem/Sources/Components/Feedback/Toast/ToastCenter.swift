@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 
 public final class ToastCenter {
     
@@ -16,11 +17,15 @@ public final class ToastCenter {
     
     // MARK: Properties
     
-    let presentSubject = PassthroughSubject<String, Never>()
+    private let presentSubject = PassthroughSubject<String, Never>()
     
-    // MARK: Methods
+    // MARK: Reactive Interface
     
     public func present(message: String) {
         presentSubject.send(message)
+    }
+
+    var presentPublisher: AnyPublisher<String, Never> {
+        presentSubject.receive(on: DispatchQueue.main).eraseToAnyPublisher()
     }
 }

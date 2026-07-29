@@ -121,7 +121,7 @@ final class ProfileInputVM {
             guard let nicknameText = state.nicknameText else { return }
             
             let tokenInfo = try await memberRepo.completeOnboarding(nickname: nicknameText)
-            AuthManager.shared.store.send(.userDidLogin(tokenInfo: tokenInfo))
+            AuthManager.shared.send(.userDidLogin(tokenInfo: tokenInfo))
         }
     }
 }

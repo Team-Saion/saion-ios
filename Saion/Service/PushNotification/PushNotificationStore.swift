@@ -12,13 +12,14 @@ import CasePaths
 import FirebaseInstallations
 import FirebaseMessaging
 
+// TODO: 나중에 매니저와 병합시키는 게 깔끔할 듯 하다.
 final class PushNotificationStore {
     
     // MARK: Types
     
     enum Action {
         /// 인증 상태 변경됨
-        case authStateChanged(AuthState)
+        case authStateChanged(isSignedIn: Bool)
         /// APNs 토큰 등록 완료
         case apnsTokenRegistered(Data)
         /// FCM 토큰 수신 완료
@@ -62,9 +63,8 @@ final class PushNotificationStore {
     
     private func process(action: Action) async throws {
         switch action {
-        case .authStateChanged(let authState):
-            if authState.is(\.signedIn),
-               try await UNUserNotificationCenter.current()
+        case .authStateChanged(let isSignedIn):
+            if isSignedIn, try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.badge, .sound, .alert]) {
                 // 권한 허용 이후 메인 스레드에서 실제 원격 알림 등록 진행
                 // Firebase가 FCM 등록 토큰을 자동 생성하고 갱신하도록 허용

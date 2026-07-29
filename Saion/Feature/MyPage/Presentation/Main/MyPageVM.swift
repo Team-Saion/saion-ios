@@ -52,9 +52,9 @@ final class MyPageVM {
         self.memberRepo = memberRepo
         setupBindings()
     }
-
+    
     // MARK: Bindings
-
+    
     private func setupBindings() {
         UserSessionStore.shared.$myProfile
             .sink { [weak self] in self?.state.myProfile = $0 }
@@ -83,7 +83,7 @@ final class MyPageVM {
             state.isLoading = true
             
             try await memberRepo.logout()
-            AuthManager.shared.store.send(.userDidLogout(reason: .userInitiated))
+            AuthManager.shared.send(.userDidLogout)
         }
     }
 }

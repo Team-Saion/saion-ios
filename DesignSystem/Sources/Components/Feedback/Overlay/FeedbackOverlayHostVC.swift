@@ -1,5 +1,5 @@
 //
-//  ToastHostVC.swift
+//  FeedbackOverlayHostVC.swift
 //  DesignSystem
 //
 //  Created by 신정욱 on 7/17/26.
@@ -8,9 +8,10 @@
 import Combine
 import UIKit
 
+import CombineCocoa
 import SnapKit
 
-final class ToastHostVC: UIViewController {
+final class FeedbackOverlayHostVC: UIViewController {
     
     // MARK: Properties
     
@@ -45,28 +46,53 @@ final class ToastHostVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
-        let presentPublisher = ToastCenter.shared.presentSubject
-            .receive(on: DispatchQueue.main)
-            .share()
-        
-        presentPublisher
+        setupToastBindings()
+        setupAlertBindings()
+    }
+    
+    private func setupToastBindings() {
+        ToastCenter.shared.presentPublisher
             .sink { [weak self] message in
                 guard let self else { return }
                 toastView.messageLabel.text = message
-                
                 guard toastView.isHidden else { return }
                 toastView.present()
             }
             .store(in: &cancellables)
         
-        presentPublisher
+        ToastCenter.shared.presentPublisher
             .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in self?.toastView.dismiss() }
             .store(in: &cancellables)
+    }
+    
+    private func setupAlertBindings() {
+        AlertCenter.shared.actionPublisher
+            .sink { [weak self] in self?.process(alertAction: $0) }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: Process
+    
+    private func process(alertAction: AlertCenter.Action) {
+        guard presentedViewController == nil else { return }
+        
+        switch alertAction {
+        case .presentError(let error):
+            let alert = NoticeAlertVC()
+            alert.titleLabel.text = "문제가 발생했어요"
+            alert.descriptionLabel.text = error.errorDescription
+            
+            alert.acceptButton.tapPublisher
+                .sink { [weak alert] in alert?.dismiss(animated: true) }
+                .store(in: &alert.cancellables)
+            
+            present(alert, animated: true)
+        }
     }
 }
 
 // MARK: - Preview
 
 @available(iOS 17.0, *)
-#Preview { ToastHostVC() }
+#Preview { FeedbackOverlayHostVC() }

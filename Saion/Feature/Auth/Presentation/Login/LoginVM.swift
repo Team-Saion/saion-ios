@@ -24,6 +24,7 @@ final class LoginVM {
     }
     
     struct State {
+        /// 로그인 및 온보딩 정보 조회 진행 여부
         var isLoading = false
     }
     
@@ -31,23 +32,22 @@ final class LoginVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
+        /// 약관 동의 시트 노출
         case presentTerms
+        /// 기존 온보딩 정보와 함께 프로필 입력 화면으로 이동
         case pushProfileInput(OnboardingInfo)
     }
     
     // MARK: Properties
     
-    
+    /// 화면에 바인딩되는 현재 상태
     @Published private(set) var state = State()
-    private let effect = PassthroughSubject<Effect, Never>()
-    var effectPublisher: AnyPublisher<Effect, Never> { effect.eraseToAnyPublisher() }
-    private var cancellables = Set<AnyCancellable>()
+    /// 화면 전환 및 에러 표시를 위한 일회성 이벤트
+    let effect = PassthroughSubject<Effect, Never>()
     
     private let kakaoAuthRepo: KakaoAuthRepo
     private let authRepo: AuthRepo
     private let memberRepo: MemberRepo
-    
-    private let authStore = AuthManager.shared.store
     
     // MARK: Initializer
     
@@ -63,6 +63,7 @@ final class LoginVM {
     
     // MARK: Send
     
+    /// 사용자 액션을 전달하고 처리 중 발생한 에러를 화면 이벤트로 변환
     func send(_ action: Action) {
         Task { @MainActor in
             do {
@@ -78,25 +79,22 @@ final class LoginVM {
     private func process(action: Action) async throws {
         switch action {
         case .viewDidLoad:
-            // 강제 로그아웃 사유가 있으면 저장된 값을 제거한 뒤 에러로 전달
-            if let logoutReason = authStore.effect.value?[case: \.presentLogoutReason] {
-                authStore.effect.value = nil
-                throw logoutReason
-                
-            } else if let tokenInfo = authStore.state.authState.tokenInfo,
-                      tokenInfo.role.is(\.pending) {
-                // 소셜 인증만 완료된 사용자는 약관 동의부터 이어서 진행
-                effect.send(.presentTerms)
-            }
+            // 소셜 인증만 완료된 사용자는 약관 동의부터 이어서 진행
+            guard let tokenInfo = AuthManager.shared.state.authState.tokenInfo,
+                  tokenInfo.role.is(\.pending)
+            else { return }
+            
+            effect.send(.presentTerms)
             
         case .kakaoLoginTapped:
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
-
+            
             let idToken = try await kakaoAuthRepo.fetchKakaoIDToken()
             let tokenInfo = try await authRepo.requestLoginWithKakao(idToken: idToken)
-            authStore.send(.userDidLogin(tokenInfo: tokenInfo))
+            AuthManager.shared.send(.userDidLogin(tokenInfo: tokenInfo))
+            
             // 이미 정회원이면 바텀시트를 열지 않음
             if tokenInfo.role.is(\.pending) { effect.send(.presentTerms) }
             
