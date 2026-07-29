@@ -83,7 +83,7 @@ final class MyPageVM {
             state.isLoading = true
             
             try await memberRepo.logout()
-            AuthManager.shared.store.send(.userDidLogout)
+            AuthManager.shared.store.send(.userDidLogout(reason: .userInitiated))
         }
     }
 }

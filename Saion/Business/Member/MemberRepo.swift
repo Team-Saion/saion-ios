@@ -15,9 +15,7 @@ protocol MemberRepo {
     /// 온보딩 프리필 데이터 조회
     func fetchOnboardingInfo() async throws -> OnboardingInfo
     /// 온보딩 완료 요청
-    func completeOnboarding(
-        nickname: String
-    ) async throws -> (accessToken: String, refreshToken: String)
+    func completeOnboarding(nickname: String) async throws -> TokenInfo
     /// 회원 탈퇴
     func deleteAccount(reason: String) async throws
     /// 로그아웃
@@ -52,10 +50,10 @@ final class DefaultMemberRepo: MemberRepo {
             
         }
     }
-
+    
     func fetchOnboardingInfo() async throws -> OnboardingInfo {
         try await withCheckedThrowingContinuation { continuation in
-
+            
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/members/me/onboarding-info",
                 method: .get
@@ -63,14 +61,14 @@ final class DefaultMemberRepo: MemberRepo {
             .decodeResponse(decodeType: OnboardingInfoResDTO.self) { dto in
                 if let dto {
                     continuation.resume(returning: dto.toDomain())
-
+                    
                 } else {
                     continuation.resume(throwing: SaionError(
                         userMessage: "사전 정보 조회 중 문제가 발생했어요.",
                         errorCode: "OR-FOI-0"
                     ))
                 }
-
+                
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -78,15 +76,13 @@ final class DefaultMemberRepo: MemberRepo {
                     errorCode: "OR-FOI-1"
                 ))
             }
-
+            
         }
     }
-
-    func completeOnboarding(
-        nickname: String
-    ) async throws -> (accessToken: String, refreshToken: String) {
+    
+    func completeOnboarding(nickname: String) async throws -> TokenInfo {
         try await withCheckedThrowingContinuation { continuation in
-
+            
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/members/me/onboarding",
                 method: .patch,
@@ -94,19 +90,16 @@ final class DefaultMemberRepo: MemberRepo {
                 encoder: JSONParameterEncoder.default
             )
             .decodeResponse(decodeType: TokenResDTO.self) { dto in
-                if let dto {
-                    continuation.resume(returning: (
-                        dto.accessToken,
-                        dto.refreshToken
-                    ))
-
+                if let tokenInfo = dto?.toDomain() {
+                    continuation.resume(returning: tokenInfo)
+                    
                 } else {
                     continuation.resume(throwing: SaionError(
                         userMessage: "온보딩 완료 중 문제가 발생했어요.",
                         errorCode: "OR-CO-0"
                     ))
                 }
-
+                
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -114,7 +107,7 @@ final class DefaultMemberRepo: MemberRepo {
                     errorCode: "OR-CO-1"
                 ))
             }
-
+            
         }
     }
     

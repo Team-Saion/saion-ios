@@ -11,15 +11,11 @@ import Alamofire
 
 protocol AuthRepo {
     /// 카카오 아이디 토큰으로 사이온 로그인
-    func requestLoginWithKakao(
-        idToken: String
-    ) async throws -> (accessToken: String, refreshToken: String)
+    func requestLoginWithKakao(idToken: String) async throws -> TokenInfo
 }
 
 final class DefaultAuthRepo: AuthRepo {
-    func requestLoginWithKakao(
-        idToken: String
-    ) async throws -> (accessToken: String, refreshToken: String) {
+    func requestLoginWithKakao(idToken: String) async throws -> TokenInfo {
         try await withCheckedThrowingContinuation { continuation in
             
             APISession.plain.request(
@@ -29,11 +25,8 @@ final class DefaultAuthRepo: AuthRepo {
                 encoder: JSONParameterEncoder.default
             )
             .decodeResponse(decodeType: TokenResDTO.self) { dto in
-                if let dto {
-                    continuation.resume(returning: (
-                        dto.accessToken,
-                        dto.refreshToken
-                    ))
+                if let tokenInfo = dto?.toDomain() {
+                    continuation.resume(returning: tokenInfo)
                     
                 } else {
                     continuation.resume(throwing: SaionError(

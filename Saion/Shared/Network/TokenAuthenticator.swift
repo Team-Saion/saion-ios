@@ -49,17 +49,14 @@ final class TokenAuthenticator: Authenticator {
             encoder: JSONParameterEncoder.default
         )
         .decodeResponse(decodeType: TokenResDTO.self) { dto in
-            if let dto {
+            if let tokenInfo = dto?.toDomain() {
                 // 새 토큰을 저장하고 대기 중인 인증 요청을 재시도
-                credential.store.send(.tokensDidRefresh(
-                    accessToken: dto.accessToken,
-                    refreshToken: dto.refreshToken
-                ))
+                credential.store.send(.tokensDidRefresh(tokenInfo: tokenInfo))
                 completion(.success(credential))
                 
             } else {
                 // 토큰 응답이 없으면 인증 상태를 초기화하고 로그인 화면으로 전환
-                credential.store.send(.userDidLogout)
+                credential.store.send(.userDidLogout(reason: .tokenExpired))
                 completion(.failure(APIError(
                     message: "토큰 재발급에 실패했습니다.(TA-R-0)"
                 )))
@@ -67,9 +64,8 @@ final class TokenAuthenticator: Authenticator {
             
         } errorHandler: { error in
             // 재발급 요청이 실패하면 인증 상태를 초기화하고 로그인 화면으로 전환
-            credential.store.send(.userDidLogout)
+            credential.store.send(.userDidLogout(reason: .tokenExpired))
             completion(.failure(error))
         }
     }
 }
-

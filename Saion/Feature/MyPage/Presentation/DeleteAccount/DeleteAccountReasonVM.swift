@@ -76,7 +76,7 @@ final class DeleteAccountReasonVM {
             
             // 탈퇴 버튼 활성화 조건에 따라 reason 값이 있음을 보장
             try await memberRepo.deleteAccount(reason: state.reason!)
-            AuthManager.shared.store.send(.userDidLogout)
+            AuthManager.shared.store.send(.userDidLogout(reason: .userInitiated))
         }
     }
 }

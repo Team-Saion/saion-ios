@@ -114,18 +114,14 @@ final class ProfileInputVM {
             state.nicknameText = text?.isEmpty == false ? text : nil
             
         case .submitTapped:
-            guard !state.isLoading, let nicknameText = state.nicknameText else { return }
-            
-            state.isLoading = true
+            guard !state.isLoading else { return }
             defer { state.isLoading = false }
+            state.isLoading = true
             
-            let (accessToken, refreshToken) =
-            try await memberRepo.completeOnboarding(nickname: nicknameText)
+            guard let nicknameText = state.nicknameText else { return }
             
-            AuthManager.shared.store.send(.userDidLogin(
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            ))
+            let tokenInfo = try await memberRepo.completeOnboarding(nickname: nicknameText)
+            AuthManager.shared.store.send(.userDidLogin(tokenInfo: tokenInfo))
         }
     }
 }

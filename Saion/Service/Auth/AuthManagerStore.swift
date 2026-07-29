@@ -18,11 +18,11 @@ final class AuthManagerStore {
         /// 앱이 실행됨
         case appDidLaunch
         /// 사용자가 로그인함
-        case userDidLogin(accessToken: String, refreshToken: String)
-        /// 사용자가 로그아웃함
-        case userDidLogout
+        case userDidLogin(tokenInfo: TokenInfo)
         /// 토큰이 재발급(리프레시)됨
-        case tokensDidRefresh(accessToken: String, refreshToken: String)
+        case tokensDidRefresh(tokenInfo: TokenInfo)
+        /// 사용자가 로그아웃함
+        case userDidLogout(reason: SessionEndReason)
     }
     
     struct State {
@@ -36,6 +36,8 @@ final class AuthManagerStore {
     
     @CasePathable
     enum Effect {
+        /// 로그아웃 사유 노출
+        case presentLogoutReason(LocalizedError)
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
     }
@@ -43,7 +45,7 @@ final class AuthManagerStore {
     // MARK: Properties
     
     @Published private(set) var state = State()
-    private let effect = PassthroughSubject<Effect, Never>()
+    let effect = CurrentValueSubject<Effect?, Never>(nil)
     
     private let validateTokenUC = ValidateTokenUC()
     
@@ -69,52 +71,30 @@ final class AuthManagerStore {
             state.isFirstLaunch = false
             state.authState = .signedOut
             
-        case .userDidLogin(let accessToken, let refreshToken),
-                .tokensDidRefresh(let accessToken, let refreshToken):
-            switch decodeRole(from: accessToken) {
-            case .admin, .member:
-                state.authState = .signedIn(
-                    accessToken: accessToken,
-                    refreshToken: refreshToken
-                )
-                
-            default:
-                state.authState = .onboarding(
-                    accessToken: accessToken,
-                    refreshToken: refreshToken
-                )
-            }
+        case .userDidLogin(let tokenInfo), .tokensDidRefresh(let tokenInfo):
+            state.authState = .signedIn(tokenInfo: tokenInfo)
             
-        case .userDidLogout:
+        case .userDidLogout(let reason):
+            switch reason {
+            case .userInitiated:
+                effect.send(.presentLogoutReason(SaionError(
+                    userMessage: "정상적으로 로그인됐지만 테스트에요.",
+                    errorCode: "AMS-FL-2"
+                )))
+                
+            case .tokenExpired:
+                effect.send(.presentLogoutReason(SaionError(
+                    userMessage: "로그인이 만료됐어요. 다시 로그인해 주세요.",
+                    errorCode: "AMS-FL-0"
+                )))
+                
+            case .memberInfoUnavailable:
+                effect.send(.presentLogoutReason(SaionError(
+                    userMessage: "회원 정보를 불러올 수 없어 로그아웃했어요.",
+                    errorCode: "AMS-FL-1"
+                )))
+            }
             state.authState = .signedOut
         }
-    }
-    
-    // MARK: Private Helper
-    
-    /// JWT 페이로드에서 role 값을 디코딩하여 반환
-    private func decodeRole(from jwtToken: String) -> AuthState.Role? {
-        let segments = jwtToken.components(separatedBy: ".")
-        guard segments.count > 1 else { return nil }
-        
-        // Base64url 포맷을 Base64 표준 포맷으로 변환해
-        var base64 = segments[1]
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        
-        // 4의 배수가 되도록 패딩(=)을 추가해
-        let remainder = base64.count % 4
-        if remainder > 0 {
-            base64.append(String(repeating: "=", count: 4 - remainder))
-        }
-        
-        // Data를 JSON 객체로 변환하여 roles 배열의 첫 번째 요소를 추출
-        guard let data = Data(base64Encoded: base64),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let roleStr = (json["roles"] as? [String])?.first,
-              let role = AuthState.Role(rawValue: roleStr)
-        else { return nil }
-        
-        return role
     }
 }

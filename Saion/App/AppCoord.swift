@@ -29,7 +29,10 @@ final class AppCoord: Coordinator {
     func start() {
         // 주어진 인증 상태에 따라, 탭바/로그인 화면 분기처리
         AuthManager.shared.authStatePublisher
-            .map { $0.is(\.signedIn) }
+            .map {
+                guard let tokenInfo = $0.tokenInfo else { return false }
+                return !tokenInfo.role.is(\.pending)
+            }
             .removeDuplicates() // 코디네이터 중복 시작 차단
             .sink { [weak self] isSignedIn in
                 if isSignedIn {

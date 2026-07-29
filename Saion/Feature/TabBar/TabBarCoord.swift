@@ -50,15 +50,20 @@ final class TabBarCoord: Coordinator {
         store(child: myPageCoord)
         myPageCoord.start()
         
-        let vc = TabBarVC()
-        vc.setViewControllers(
-            [
-                homeCoord.navigation,
-                scheduleCoord.navigation,
-                myPageCoord.navigation
-            ],
-            animated: false
+        let vc = TabBarVC(
+            homeVC: homeCoord.navigation,
+            scheduleVC: scheduleCoord.navigation,
+            myPageVC: myPageCoord.navigation
         )
+        
+//        vc.setViewControllers(
+//            [
+//                homeCoord.navigation,
+//                scheduleCoord.navigation,
+//                myPageCoord.navigation
+//            ],
+//            animated: false
+//        )
         
         // 주어진 인덱스로 탭 전환
         vc.defaultTabBar.selectedIndexPublisher

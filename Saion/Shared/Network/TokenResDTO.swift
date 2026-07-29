@@ -13,4 +13,10 @@ struct TokenResDTO: Decodable {
     let accessToken: String
     /// access token 재발급에 사용하는 refresh token
     let refreshToken: String
+    
+    // MARK: Mapper
+    
+    func toDomain() -> TokenInfo? {
+        TokenInfo(accessToken: accessToken, refreshToken: refreshToken)
+    }
 }

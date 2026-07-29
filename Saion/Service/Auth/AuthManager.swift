@@ -17,8 +17,8 @@ final class AuthManager {
     let store = AuthManagerStore()
     private var cancellables = Set<AnyCancellable>()
     
-    var accessToken: String? { store.state.authState.accessToken }
-    var refreshToken: String? { store.state.authState.refreshToken }
+    var accessToken: String? { store.state.authState.tokenInfo?.accessToken }
+    var refreshToken: String? { store.state.authState.tokenInfo?.refreshToken }
     
     // MARK: Singleton
     
