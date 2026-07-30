@@ -190,22 +190,18 @@ final class CreateScheduleVC: NavigationBarVC {
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
         
-        // 닫기 버튼 누르면 화면 닫기
-        closeBarButton.tapPublisher
-            .sink { [weak self] in self?.dismiss(animated: true) }
-            .store(in: &cancellables)
+        // 일정 생성 완료 및 닫기 버튼 누르면 화면 닫기
+        Publishers.Merge(
+            vm.effect.compactMap { $0[case: \.dismiss] },
+            closeBarButton.tapPublisher
+        )
+        .sink { [weak self] in self?.dismiss(animated: true) }
+        .store(in: &cancellables)
         
         // 빈 화면 탭 시 키보드 숨김
         tapGesture.tapPublisher
             .sink { [weak self] _ in self?.view.endEditing(true) }
             .store(in: &cancellables)
-    }
-    
-    // MARK: Reactive Interface
-    
-    /// 일정 생성 완료 퍼블리셔
-    var scheduleCreatedPublisher: AnyPublisher<Void, Never> {
-        vm.effect.compactMap { $0[case: \.scheduleCreated] }.eraseToAnyPublisher()
     }
 }
 

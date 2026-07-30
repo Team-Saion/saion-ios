@@ -19,7 +19,9 @@ final class ScheduleListVC: UIViewController {
     
     // MARK: Properties
     
+    /// 화면 생명주기 동안 유지할 Combine 구독
     private var cancellables = Set<AnyCancellable>()
+    /// 일정 목록 상태와 사용자 액션을 처리하는 뷰모델
     private let vm = ScheduleDI.shared.makeScheduleListVM()
     
     // MARK: Components
@@ -54,8 +56,12 @@ final class ScheduleListVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
-        // 바인딩 구성이 끝난 뒤 최초 일정 목록 조회를 요청
-        vm.send(.viewDidLoad)
+        // 화면 등장 시 일정 변경 순번이 달라졌을 때만 목록 재조회
+        viewDidAppearPublisher
+            .map { ChangeTracker.shared.scheduleRevision }
+            .removeDuplicates()
+            .sink { [weak vm] _ in vm?.send(.reloadRequested) }
+            .store(in: &cancellables)
         
         // 셀 노출 인덱스를 VM에 전달해 다음 페이지 선조회 여부 판단
         collectionView.willDisplayCellPublisher.map { $0.indexPath.item }
@@ -91,9 +97,6 @@ final class ScheduleListVC: UIViewController {
     }
     
     // MARK: Reactive Interface
-    
-    /// 화면 새로 고침
-    func refresh() { vm.send(.refreshTriggered) }
     
     /// 일정 추가 퍼블리셔
     var createSchedulePublisher: AnyPublisher<Void, Never> {

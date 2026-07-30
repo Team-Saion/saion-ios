@@ -18,8 +18,10 @@ final class CircleOverviewVC: UIViewController {
     
     // MARK: Properties
     
+    /// 화면 생명주기 동안 유지할 Combine 구독
     private var cancellables = Set<AnyCancellable>()
     
+    /// 서클 홈 상태와 사용자 액션을 처리하는 뷰모델
     private let vm = HomeDI.shared.makeCircleOverviewVM()
     
     // MARK: Components
@@ -102,21 +104,28 @@ final class CircleOverviewVC: UIViewController {
     // MARK: Bindings
     
     private func setupBindings() {
-        vm.send(.viewDidLoad)
+        // 최초 로드와 화면 등장 시 서클 변경 순번이 달라졌을 때만 재조회
+        viewDidAppearPublisher.prepend(())
+            .map { ChangeTracker.shared.circleRevision }
+            .removeDuplicates()
+            .sink { [weak vm] _ in vm?.send(.reloadRequested) }
+            .store(in: &cancellables)
         
+        // 홈 내 초대 진입점의 탭 이벤트를 하나의 액션으로 전달
         Publishers.Merge(
             membersView.collectionView.inviteMemberTapPublisher,
             dashboardView.inviteTapPublisher
         )
         .sink { [weak self] in self?.vm.send(.inviteTapped) }
         .store(in: &cancellables)
-
+        
+        // 대표 일정 공유 확인 후 가족 알림 전송 요청
         dashboardView.shareTapPublisher
             .compactMap { [weak self] in self?.presentShareConfirmAlert() }
             .switchToLatest()
             .sink { [weak self] in self?.vm.send(.shareTapped) }
             .store(in: &cancellables)
-            
+        
         // 서클 이름을 헤더에 반영
         vm.$state.compactMap(\.circleTitle).removeDuplicates()
             .sink { [weak self] in self?.headerView.titleLabel.text = $0 }
@@ -147,6 +156,7 @@ final class CircleOverviewVC: UIViewController {
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
         
+        // 발급된 구성원 초대 링크를 외부 앱으로 열기
         vm.effect.compactMap { $0[case: \.openInviteURL] }
             .sink { UIApplication.shared.open($0) }
             .store(in: &cancellables)
@@ -180,9 +190,6 @@ final class CircleOverviewVC: UIViewController {
         } }
         .eraseToAnyPublisher()
     }
-    
-    /// 화면 새로 고침
-    func refresh() { vm.send(.refreshTriggered) }
     
     /// 일정 추가 퍼블리셔
     var createSchedulePublisher: AnyPublisher<Void, Never> {

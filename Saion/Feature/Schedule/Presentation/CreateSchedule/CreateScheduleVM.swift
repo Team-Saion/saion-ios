@@ -38,7 +38,7 @@ final class CreateScheduleVM {
         var endAt: Date { draft.endAt }
         /// 일정 추가 버튼 활성화 여부
         var submitButtonEnabled: Bool { draft.title?.isEmpty == false }
-        
+        /// 일정 생성 요청 진행 여부
         var isLoading = false
     }
     
@@ -46,15 +46,18 @@ final class CreateScheduleVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
-        /// 일정 생성 완료
-        case scheduleCreated
+        /// 일정 생성 화면 닫기
+        case dismiss
     }
     
     // MARK: Properties
     
+    /// 일정 작성 화면 렌더링에 사용하는 현재 상태
     @Published private(set) var state = State()
+    /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 일정 생성을 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
     
     // MARK: Initializer
@@ -105,7 +108,8 @@ final class CreateScheduleVM {
             let circleID = UserSessionStore.shared.currentCircle!.circleID
             // 일정 생성 요청 후 외부로 이벤트 전달, 반환값은 사용하지 않음
             _ = try await scheduleRepo.createSchedule(from: state.draft, circleID)
-            effect.send(.scheduleCreated)
+            ChangeTracker.shared.schedulesDidChange()
+            effect.send(.dismiss)
         }
         
 #if DEBUG

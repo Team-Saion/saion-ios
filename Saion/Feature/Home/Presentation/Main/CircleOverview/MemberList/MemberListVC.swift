@@ -19,12 +19,15 @@ final class MemberListVC: BackButtonVC {
     
     // MARK: Properties
     
+    /// 화면 생명주기 동안 유지할 Combine 구독
     var cancellables = Set<AnyCancellable>()
     
+    /// 구성원 목록 상태와 사용자 액션을 처리하는 뷰모델
     private let vm: MemberListVM
     
     // MARK: Components
     
+    /// 현재 서클의 구성원을 표시하는 컬렉션 뷰
     private let collectionView = MembersCollectionView()
     
     // MARK: Life Cycle
@@ -59,8 +62,12 @@ final class MemberListVC: BackButtonVC {
     // MARK: Bindings
     
     private func setupBindings() {
-        // 바인딩 구성이 끝난 뒤 구성원 목록 및 내 프로필 조회 요청
-        vm.send(.viewDidLoad)
+        // 화면 등장 시 구성원 변경 순번이 달라졌을 때만 목록 재조회
+        viewDidAppearPublisher
+            .map { ChangeTracker.shared.memberRevision }
+            .removeDuplicates()
+            .sink { [weak vm] _ in vm?.send(.reloadRequested) }
+            .store(in: &cancellables)
         
         // 구성원 셀 아이템 목록을 컬렉션뷰에 반영
         vm.$state.map(\.memberItems).removeDuplicates()

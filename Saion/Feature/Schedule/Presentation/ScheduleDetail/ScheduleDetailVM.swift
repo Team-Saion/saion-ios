@@ -19,7 +19,7 @@ final class ScheduleDetailVM {
         case viewDidLoad
         /// 삭제 확인 후 일정 삭제 요청
         case deleteButtonTapped
-        /// 확인 토클 버튼 탭
+        /// 확인 토글 버튼 탭
         case confirmToggled
     }
     
@@ -112,6 +112,7 @@ final class ScheduleDetailVM {
                 circleID: circleID,
                 scheduleID: scheduleID
             )
+            ChangeTracker.shared.schedulesDidChange()
             effect.send(.scheduleDeleted)
             
         case .confirmToggled:

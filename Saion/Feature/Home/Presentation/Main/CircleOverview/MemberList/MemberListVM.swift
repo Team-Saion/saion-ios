@@ -15,8 +15,8 @@ final class MemberListVM {
     // MARK: Types
     
     enum Action {
-        /// 화면 진입 후 구성원 목록 조회
-        case viewDidLoad
+        /// 현재 서클의 구성원 목록 재조회 요청
+        case reloadRequested
     }
     
     struct State {
@@ -44,9 +44,12 @@ final class MemberListVM {
     
     // MARK: Properties
     
+    /// 구성원 목록 화면 렌더링에 사용하는 현재 상태
     @Published private(set) var state = State()
+    /// 상태 전이 중 발생하는 일회성 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 구성원 목록 조회를 처리하는 저장소
     private let homeRepo: HomeRepo
     
     // MARK: Initializer
@@ -71,7 +74,7 @@ final class MemberListVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .viewDidLoad:
+        case .reloadRequested:
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true

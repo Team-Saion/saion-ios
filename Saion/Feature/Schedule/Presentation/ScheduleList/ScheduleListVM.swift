@@ -15,10 +15,8 @@ final class ScheduleListVM {
     // MARK: Types
     
     enum Action {
-        /// 화면 진입 후 최초 일정 목록 조회 요청
-        case viewDidLoad
-        /// 현재 서클의 일정 목록 새로고침 요청
-        case refreshTriggered
+        /// 현재 서클의 일정 목록 재조회 요청
+        case reloadRequested
         /// 노출된 셀 인덱스를 기준으로 다음 페이지 조회 여부 확인
         case cellWillDisplay(index: Int)
         /// 새 일정 생성 화면 진입 요청
@@ -40,8 +38,6 @@ final class ScheduleListVM {
         }
         /// 새로고침 또는 다음 페이지 조회 진행 여부
         var isLoading: Bool = false
-        /// 최초 화면 로드 액션 처리 여부
-        fileprivate var viewDidLoad: Bool = false
     }
     
     @CasePathable
@@ -56,28 +52,18 @@ final class ScheduleListVM {
     
     // MARK: Properties
     
+    /// 일정 목록 화면 렌더링에 사용하는 현재 상태
     @Published private(set) var state = State()
+    /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
-    private var cancellables = Set<AnyCancellable>()
     
+    /// 일정 목록 조회와 페이지네이션을 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
     
     // MARK: Initializer
     
     init(scheduleRepo: ScheduleRepo) {
         self.scheduleRepo = scheduleRepo
-        setupBindings()
-    }
-    
-    // MARK: Bindings
-    
-    private func setupBindings() {
-        // 현재 활동중인 서클 변경시, 새로고침
-        UserSessionStore.shared.$currentCircle
-            .map { $0?.circleID }
-            .removeDuplicates()
-            .sink { [weak self] _ in self?.send(.refreshTriggered) }
-            .store(in: &cancellables)
     }
     
     // MARK: Send
@@ -96,21 +82,8 @@ final class ScheduleListVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .viewDidLoad:
-            // 화면 진입 시 현재 서클의 일정 첫 페이지를 조회한다.
-            state.viewDidLoad = true
-            guard let circleID = state.circleID else { return }
-            
-            state.schedulesPage = try await scheduleRepo.fetchSchedules(
-                circleID: circleID,
-                cursor: nil
-            )
-            
-            
-        case .refreshTriggered:
-            // 최초 로드 이후에만 첫 페이지를 다시 조회하며, 진행 중인 요청과의 중복을 막는다.
+        case .reloadRequested:
             guard let circleID = state.circleID,
-                  state.viewDidLoad,
                   !state.isLoading
             else { return }
             defer { state.isLoading = false }

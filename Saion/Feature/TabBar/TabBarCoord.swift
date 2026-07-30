@@ -56,14 +56,14 @@ final class TabBarCoord: Coordinator {
             myPageVC: myPageCoord.navigation
         )
         
-//        vc.setViewControllers(
-//            [
-//                homeCoord.navigation,
-//                scheduleCoord.navigation,
-//                myPageCoord.navigation
-//            ],
-//            animated: false
-//        )
+        //        vc.setViewControllers(
+        //            [
+        //                homeCoord.navigation,
+        //                scheduleCoord.navigation,
+        //                myPageCoord.navigation
+        //            ],
+        //            animated: false
+        //        )
         
         // 주어진 인덱스로 탭 전환
         vc.defaultTabBar.selectedIndexPublisher
@@ -93,7 +93,7 @@ final class TabBarCoord: Coordinator {
         // 화면 전환
         navigation.pushViewController(vc, animated: false)
     }
-            
+    
     /// 서클 참여 흐름 시작
     private func presentJoinCircle(invitationCode: String) {
         let coord = JoinCircleCoord(navigation: .init())

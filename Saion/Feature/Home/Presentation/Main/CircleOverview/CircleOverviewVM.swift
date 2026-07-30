@@ -15,11 +15,9 @@ final class CircleOverviewVM {
     // MARK: Types
     
     enum Action {
-        /// 화면 초기 로드 완료
-        case viewDidLoad
-        /// 새로고침 이벤트가 발생함
-        case refreshTriggered
-        
+        /// 서클 홈 정보 재조회 요청
+        case reloadRequested
+        /// 구성원 초대 링크 발급 요청
         case inviteTapped
         /// 가족에게 전하기 버튼 탭
         case shareTapped
@@ -57,19 +55,25 @@ final class CircleOverviewVM {
     enum Effect {
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
-        
+        /// 발급된 구성원 초대 링크 열기
         case openInviteURL(URL)
     }
     
     // MARK: Properties
     
+    /// 서클 홈 화면 렌더링에 사용하는 현재 상태
     @Published private(set) var state = State()
+    /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 서클 홈 정보 조회를 처리하는 저장소
     private let homeRepo: HomeRepo
+    /// 구성원 초대 링크 발급을 처리하는 저장소
     private let invitationRepo: InvitationRepo
+    /// 대표 일정 공유 요청을 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
     
+    /// 카카오톡 초대 공유 흐름을 구성하는 유스케이스
     private let inviteWithKakaoUC = InviteWithKakaoUC()
     
     // MARK: Initializer
@@ -100,7 +104,7 @@ final class CircleOverviewVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .viewDidLoad, .refreshTriggered:
+        case .reloadRequested:
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
