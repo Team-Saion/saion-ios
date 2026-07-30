@@ -10,10 +10,12 @@ import Foundation
 import KakaoSDKShare
 
 final class InviteWithKakaoUC {
-    func execute(invitation: IssuedInvitation) async throws -> URL {
+    func execute(
+        invitation: IssuedInvitation,
+        inviterName: String,
+        circleName: String
+    ) async throws -> URL {
         let templateID: Int64 = 135148
-        let myProfile = UserSessionStore.shared.myProfile!
-        let currnetCircle = UserSessionStore.shared.currentCircle!
         let expiresAt = {
             let formatter = DateFormatter.seoul
             formatter.dateFormat = "yyyy년 MM월 dd일"
@@ -21,9 +23,9 @@ final class InviteWithKakaoUC {
         }()
         
         let templateArgs = [
-            "inviterName": myProfile.nickname,
+            "inviterName": inviterName,
             "inviteToken": invitation.token,
-            "circleName": currnetCircle.name,
+            "circleName": circleName,
             "expiresAt": expiresAt,
             // TODO: 이거 뭐할 때 쓰는 거지?
             "inviteCode": invitation.token

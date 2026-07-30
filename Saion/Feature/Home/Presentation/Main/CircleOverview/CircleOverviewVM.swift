@@ -72,6 +72,8 @@ final class CircleOverviewVM {
     private let invitationRepo: InvitationRepo
     /// 대표 일정 공유 요청을 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
+    /// 내 프로필 조회를 처리하는 저장소
+    private let memberRepo: MemberRepo
     
     /// 카카오톡 초대 공유 흐름을 구성하는 유스케이스
     private let inviteWithKakaoUC = InviteWithKakaoUC()
@@ -81,11 +83,13 @@ final class CircleOverviewVM {
     init(
         homeRepo: HomeRepo,
         invitationRepo: InvitationRepo,
-        scheduleRepo: ScheduleRepo
+        scheduleRepo: ScheduleRepo,
+        memberRepo: MemberRepo
     ) {
         self.homeRepo = homeRepo
         self.invitationRepo = invitationRepo
         self.scheduleRepo = scheduleRepo
+        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -115,9 +119,16 @@ final class CircleOverviewVM {
             state.circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
             
         case .inviteTapped:
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
-            let invitation =  try await invitationRepo.issueInvitation(cirlceID: circleID)
-            let url = try await inviteWithKakaoUC.execute(invitation: invitation)
+            let currentCircle = UserSessionStore.shared.currentCircle!
+            let myProfile = try await memberRepo.fetchMyProfile()
+            let invitation = try await invitationRepo.issueInvitation(
+                cirlceID: currentCircle.circleID
+            )
+            let url = try await inviteWithKakaoUC.execute(
+                invitation: invitation,
+                inviterName: myProfile.nickname,
+                circleName: currentCircle.name
+            )
             effect.send(.openInviteURL(url))
 
         case .shareTapped:

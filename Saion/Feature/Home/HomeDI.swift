@@ -18,7 +18,8 @@ final class HomeDI {
         CircleOverviewVM(
             homeRepo: DefaultHomeRepo(),
             invitationRepo: DefaultInvitationRepo(),
-            scheduleRepo: DefaultScheduleRepo()
+            scheduleRepo: DefaultScheduleRepo(),
+            memberRepo: DefaultMemberRepo()
         )
     }
     
@@ -27,6 +28,9 @@ final class HomeDI {
     }
     
     func makeMemberListVM() -> MemberListVM {
-        MemberListVM(homeRepo: DefaultHomeRepo())
+        MemberListVM(
+            homeRepo: DefaultHomeRepo(),
+            memberRepo: DefaultMemberRepo()
+        )
     }
 }

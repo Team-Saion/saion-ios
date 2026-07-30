@@ -84,6 +84,7 @@ final class MyPageVC: UIViewController {
         setupDefaults()
         setupLayout()
         setupBindings()
+        vm.send(.viewDidLoad)
     }
     
     // MARK: Defaults

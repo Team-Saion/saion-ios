@@ -51,11 +51,17 @@ final class MemberListVM {
     
     /// 구성원 목록 조회를 처리하는 저장소
     private let homeRepo: HomeRepo
+    /// 내 프로필 조회를 처리하는 저장소
+    private let memberRepo: MemberRepo
     
     // MARK: Initializer
     
-    init(homeRepo: HomeRepo) {
+    init(
+        homeRepo: HomeRepo,
+        memberRepo: MemberRepo
+    ) {
         self.homeRepo = homeRepo
+        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -81,8 +87,7 @@ final class MemberListVM {
             
             /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
             let circleID = UserSessionStore.shared.currentCircle!.circleID
-            /// 세션 시작 시 내 프로필이 조회됐음을 보장하므로 강제 언래핑
-            state.myID = UserSessionStore.shared.myProfile!.memberID
+            state.myID = try await memberRepo.fetchMyProfile().memberID
             state.memberSummaries = try await homeRepo.fetchMembers(circleID: circleID)
         }
     }

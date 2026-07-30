@@ -13,31 +13,23 @@ final class UserSessionStore {
     // MARK: Singleton
 
     static let shared = UserSessionStore(
-        memberRepo: DefaultMemberRepo(),
         circleRepo: DefaultCircleRepo()
     )
 
-    init(
-        memberRepo: MemberRepo,
-        circleRepo: CircleRepo
-    ) {
-        self.memberRepo = memberRepo
+    init(circleRepo: CircleRepo) {
         self.circleRepo = circleRepo
     }
 
     // MARK: Properties
 
-    @Published private(set) var myProfile: MyProfile?
     @Published private(set) var joinedCircles: [CircleSummary] = []
     @Published private(set) var currentCircle: CircleSummary?
 
-    private let memberRepo: MemberRepo
     private let circleRepo: CircleRepo
 
     // MARK: Public Interface
 
     func startSession() async throws {
-        myProfile = try await memberRepo.fetchMyProfile()
         joinedCircles = try await circleRepo.fetchJoinedCircles()
         currentCircle = joinedCircles.first
     }
@@ -53,7 +45,6 @@ final class UserSessionStore {
     }
 
     func endSession() {
-        myProfile = nil
         joinedCircles = []
         currentCircle = nil
     }

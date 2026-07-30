@@ -57,7 +57,7 @@ final class ScheduleListVC: UIViewController {
     
     private func setupBindings() {
         // 화면 등장 시 일정 변경 순번이 달라졌을 때만 목록 재조회
-        viewDidAppearPublisher
+        viewDidAppearPublisher.prepend(()) // viewDidLoad 이벤트 처리
             .map { ChangeTracker.shared.scheduleRevision }
             .removeDuplicates()
             .sink { [weak vm] _ in vm?.send(.reloadRequested) }
@@ -72,16 +72,14 @@ final class ScheduleListVC: UIViewController {
         collectionView.addScheduleTapPublisher
             .sink { [weak self] in self?.vm.send(.createScheduleTapped) }
             .store(in: &cancellables)
-
+        
         // 일정 선택 이벤트 전달
         collectionView.scheduleTapPublisher
             .sink { [weak self] in self?.vm.send(.scheduleTapped(scheduleID: $0)) }
             .store(in: &cancellables)
         
         // 일정 아이템으로 컬렉션뷰 스냅샷 갱신
-        vm.$state
-            .map(\.scheduleCellItems)
-            .removeDuplicates()
+        vm.$state.map(\.scheduleCellItems).removeDuplicates()
             .sink { [weak self] in self?.collectionView.setSnapshot(items: $0) }
             .store(in: &cancellables)
         
@@ -102,7 +100,7 @@ final class ScheduleListVC: UIViewController {
     var createSchedulePublisher: AnyPublisher<Void, Never> {
         vm.effect.compactMap { $0[case: \.createSchedule] }.eraseToAnyPublisher()
     }
-
+    
     /// 일정 상세 화면 전환 퍼블리셔
     var scheduleDetailPublisher: AnyPublisher<String, Never> {
         vm.effect.compactMap { $0[case: \.showScheduleDetail] }.eraseToAnyPublisher()

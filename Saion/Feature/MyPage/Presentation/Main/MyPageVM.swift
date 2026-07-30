@@ -15,12 +15,14 @@ final class MyPageVM {
     // MARK: Types
     
     enum Action {
+        /// 화면 진입 후 내 프로필 조회 요청
+        case viewDidLoad
         /// 로그아웃 버튼 탭
         case logoutTapped
     }
     
     struct State {
-        /// 세션에 저장된 내 프로필 도메인 정보
+        /// 조회한 내 프로필 도메인 정보
         var myProfile: MyProfile?
         /// 프로필 이미지 뷰 상태
         var profileViewState: ProfileImageViewState? {
@@ -42,7 +44,6 @@ final class MyPageVM {
     
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
-    private var cancellables = Set<AnyCancellable>()
     
     private let memberRepo: MemberRepo
     
@@ -50,15 +51,6 @@ final class MyPageVM {
     
     init(memberRepo: MemberRepo) {
         self.memberRepo = memberRepo
-        setupBindings()
-    }
-    
-    // MARK: Bindings
-    
-    private func setupBindings() {
-        UserSessionStore.shared.$myProfile
-            .sink { [weak self] in self?.state.myProfile = $0 }
-            .store(in: &cancellables)
     }
     
     // MARK: Send
@@ -77,6 +69,9 @@ final class MyPageVM {
     
     private func process(action: Action) async throws {
         switch action {
+        case .viewDidLoad:
+            state.myProfile = try await memberRepo.fetchMyProfile()
+
         case .logoutTapped:
             guard !state.isLoading else { return }
             defer { state.isLoading = false }

@@ -55,15 +55,19 @@ final class ScheduleDetailVM {
     private let scheduleID: String
     /// 일정 상세 조회와 삭제를 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
+    /// 내 프로필 조회를 처리하는 저장소
+    private let memberRepo: MemberRepo
     
     // MARK: Initializer
     
     init(
         scheduleID: String,
-        scheduleRepo: ScheduleRepo
+        scheduleRepo: ScheduleRepo,
+        memberRepo: MemberRepo
     ) {
         self.scheduleID = scheduleID
         self.scheduleRepo = scheduleRepo
+        self.memberRepo = memberRepo
     }
     
     // MARK: Send
@@ -87,8 +91,7 @@ final class ScheduleDetailVM {
             defer { state.isLoading = false }
             state.isLoading = true
 
-            /// 세션 시작 시 내 프로필이 조회됐음을 보장하므로 강제 언래핑
-            let memberID = UserSessionStore.shared.myProfile!.memberID
+            let memberID = try await memberRepo.fetchMyProfile().memberID
             // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
             let circleID = UserSessionStore.shared.currentCircle!.circleID
 
