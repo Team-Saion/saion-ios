@@ -9,9 +9,7 @@ import Combine
 import UIKit
 
 import CasePaths
-import CombineCocoa
 
-import DesignSystem
 import Navigation
 
 final class TabBarCoord: Coordinator {
@@ -20,62 +18,12 @@ final class TabBarCoord: Coordinator {
     
     /// 탭바 화면 초기화
     func start() {
-        /// 홈 코디네이터
-        let homeCoord = HomeCoord(navigation: .init())
-        homeCoord.navigation.tabBarItem = UITabBarItem(
-            title: "홈",
-            image: .house,
-            tag: 0
-        )
-        store(child: homeCoord)
-        homeCoord.start()
+        let vm = TabBarVM(circleRepo: DefaultCircleRepo())
+        let vc = TabBarVC(vm: vm)
         
-        /// 일정 코디네이터
-        let scheduleCoord = ScheduleCoord(navigation: .init())
-        scheduleCoord.navigation.tabBarItem = UITabBarItem(
-            title: "일정",
-            image: .calendarHeart,
-            tag: 1
-        )
-        store(child: scheduleCoord)
-        scheduleCoord.start()
-        
-        /// 마이페이지 코디네이터
-        let myPageCoord = MyPageCoord(navigation: .init())
-        myPageCoord.navigation.tabBarItem = UITabBarItem(
-            title: "마이",
-            image: .user,
-            tag: 2
-        )
-        store(child: myPageCoord)
-        myPageCoord.start()
-        
-        let vc = TabBarVC(
-            homeVC: homeCoord.navigation,
-            scheduleVC: scheduleCoord.navigation,
-            myPageVC: myPageCoord.navigation
-        )
-        
-        //        vc.setViewControllers(
-        //            [
-        //                homeCoord.navigation,
-        //                scheduleCoord.navigation,
-        //                myPageCoord.navigation
-        //            ],
-        //            animated: false
-        //        )
-        
-        // 주어진 인덱스로 탭 전환
-        vc.defaultTabBar.selectedIndexPublisher
-            .prepend(0) // 초기 탭 인덱스
-            .sink { [weak vc] index in
-                // 가입한 서클이 없으면 일정 탭 진입을 차단
-                if index == 1, UserSessionStore.shared.currentCircle == nil {
-                    ToastCenter.shared.present(message: "서클에 가입하면 일정을 확인할 수 있어요.")
-                    return
-                }
-                vc?.selectedIndex = index
-            }
+        // 선택한 서클이 바뀌면 각 탭의 화면 흐름을 새 서클 기준으로 재구성
+        vm.$state.compactMap(\.currentCircleID).removeDuplicates()
+            .sink { [weak self] _ in self?.setUpTabCoordinators(in: vc) }
             .store(in: &cancellables)
         
         // 탭바가 나타난 시점부터 대기 중이거나 새로 들어오는 딥링크 처리
@@ -92,6 +40,56 @@ final class TabBarCoord: Coordinator {
         
         // 화면 전환
         navigation.pushViewController(vc, animated: false)
+    }
+    
+    /// 기존 탭 흐름을 정리하고 탭별 코디네이터를 새로 구성
+    private func setUpTabCoordinators(in tabBarVC: TabBarVC) {
+        // 서클 변경 전에 표시 중인 모달과 기존 탭 코디네이터의 생명주기를 정리
+        navigation.dismiss(animated: true)
+        children.removeAll()
+        
+        // 홈 탭 구성
+        let homeCoord = HomeCoord(navigation: .init())
+        homeCoord.navigation.tabBarItem = UITabBarItem(
+            title: "홈",
+            image: .house,
+            tag: 0
+        )
+        store(child: homeCoord)
+        homeCoord.start()
+        
+        // 일정 탭 구성
+        let scheduleCoord = ScheduleCoord(navigation: .init())
+        scheduleCoord.navigation.tabBarItem = UITabBarItem(
+            title: "일정",
+            image: .calendarHeart,
+            tag: 1
+        )
+        store(child: scheduleCoord)
+        scheduleCoord.start()
+        
+        // 마이페이지 탭 구성
+        let myPageCoord = MyPageCoord(navigation: .init())
+        myPageCoord.navigation.tabBarItem = UITabBarItem(
+            title: "마이",
+            image: .user,
+            tag: 2
+        )
+        store(child: myPageCoord)
+        myPageCoord.start()
+        
+        // 각 코디네이터의 내비게이션을 탭바 루트 화면으로 연결
+        tabBarVC.setViewControllers(
+            [
+                homeCoord.navigation,
+                scheduleCoord.navigation,
+                myPageCoord.navigation
+            ],
+            animated: true
+        )
+        
+        // 서클이 변경되면 홈 탭부터 다시 시작
+        tabBarVC.selectedIndex = 0
     }
     
     /// 서클 참여 흐름 시작

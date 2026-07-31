@@ -10,25 +10,28 @@ import Foundation
 
 import CasePaths
 
+import DesignSystem
+
 final class TabBarVM {
     
     // MARK: Types
     
     enum Action {
+        /// 최초 진입에 필요한 서클 정보 조회
         case viewDidLoad
-        case viewControllersDidSet
+        /// 사용자가 선택한 탭 인덱스 전달
         case indexChanged(Int)
     }
     
     struct State {
-        var selectedIndex: Int?
+        /// 현재 사용 중인 서클 ID. 가입한 서클이 없으면 `nil`
+        var currentCircleID: String?
     }
     
     @CasePathable
     enum Effect {
-        case setViewControllers
-        case presentToast(String)
-        case presentErrorWithLogout(LocalizedError)
+        /// 접근 가능한 탭으로 화면 전환 요청
+        case selectTabIndex(Int)
         /// 상태 전이 중 발생한 에러
         case presentError(LocalizedError)
     }
@@ -38,12 +41,17 @@ final class TabBarVM {
     @Published private(set) var state = State()
     let effect = PassthroughSubject<Effect, Never>()
     
-    private let memberRepo: MemberRepo
+    /// 가입한 서클 정보를 조회하는 저장소
+    private let circleRepo: CircleRepo
     
     // MARK: Initializer
     
-    init(memberRepo: MemberRepo) {
-        self.memberRepo = memberRepo
+    init(
+        state: State = State(),
+        circleRepo: CircleRepo
+    ) {
+        self.state = state
+        self.circleRepo = circleRepo
     }
     
     // MARK: Send
@@ -63,25 +71,27 @@ final class TabBarVM {
     private func process(action: Action) async throws {
         switch action {
         case .viewDidLoad:
-            guard let myProfile = try? await memberRepo.fetchMyProfile() else {
-                throw SaionError(
-                    userMessage: "회원 정보를 불러오는 데 문제가 있어 로그아웃했어요.",
-                    errorCode: "TBVM-P-0"
-                )
+            do {
+                // 첫 번째 가입 서클을 현재 서클로 설정해 탭 화면 구성을 시작
+                state.currentCircleID = try await circleRepo.fetchJoinedCircles().first?.circleID
+            } catch {
+                // 초기 서클 정보가 유효하지 않으면 세션을 종료하고 인증 흐름으로 복귀
+                AlertCenter.shared.send(.presentError(SaionError(
+                    userMessage: "가입한 서클 정보를 불러오는 중 문제가 발생했어요.\n잠시 후 다시 로그인해 주세요.",
+                    errorCode: "TBVM-VDL-0"
+                )))
+                AuthManager.shared.send(.userDidLogout)
             }
-            effect.send(.setViewControllers)
-            
-        case .viewControllersDidSet:
-            state.selectedIndex = 0
             
         case .indexChanged(let index):
             // 가입한 서클이 없으면 일정 탭 진입을 차단
-            if index == 1, UserSessionStore.shared.currentCircle == nil {
-                effect.send(.presentToast("서클에 가입하면 일정을 확인할 수 있어요."))
+            if index == 1, state.currentCircleID == nil {
+                ToastCenter.shared.present(message: "서클에 가입하면 일정을 확인할 수 있어요.")
                 return
             }
-            state.selectedIndex = 0
+            
+            // 접근 검증을 통과한 탭만 화면에 선택 요청
+            effect.send(.selectTabIndex(index))
         }
     }
 }
-

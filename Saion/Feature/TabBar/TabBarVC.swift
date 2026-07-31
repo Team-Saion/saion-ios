@@ -8,6 +8,8 @@
 import Combine
 import UIKit
 
+import CasePaths
+
 import Navigation
 
 final class TabBarVC: BaseTabBarVC<TabBar> {
@@ -15,24 +17,16 @@ final class TabBarVC: BaseTabBarVC<TabBar> {
     // MARK: Properties
     
     private var cancellables = Set<AnyCancellable>()
-    
-    /// 홈 뷰컨트롤러
-    private let homeVC: UIViewController
-    /// 일정 뷰컨트롤러
-    private let scheduleVC: UIViewController
-    /// 마이페이지 뷰컨트롤러
-    private let myPageVC: UIViewController
+    private let vm: TabBarVM
     
     // MARK: Life Cycle
     
     init(
-        homeVC: UIViewController,
-        scheduleVC: UIViewController,
-        myPageVC: UIViewController
+        cancellables: Set<AnyCancellable> = Set<AnyCancellable>(),
+        vm: TabBarVM
     ) {
-        self.homeVC = homeVC
-        self.scheduleVC = scheduleVC
-        self.myPageVC = myPageVC
+        self.cancellables = cancellables
+        self.vm = vm
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -42,19 +36,25 @@ final class TabBarVC: BaseTabBarVC<TabBar> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupDefaults()
         setupBindings()
-    }
-    
-    // MARK: Defaults
-    
-    private func setupDefaults() {
-        setViewControllers([homeVC, scheduleVC, myPageVC], animated: false)
     }
     
     // MARK: Bindings
     
     private func setupBindings() {
+        // 최초 화면 구성에 필요한 데이터 조회 요청
+        vm.send(.viewDidLoad)
+        
+        // 사용자가 선택한 탭을 뷰모델에 전달해 접근 가능 여부 확인
+        defaultTabBar.selectedIndexPublisher
+            .sink { [weak vm] in vm?.send(.indexChanged($0)) }
+            .store(in: &cancellables)
+        
+        // 접근 검증이 완료된 탭으로 실제 화면 전환
+        vm.effect.compactMap { $0[case: \.selectTabIndex] }
+            .sink { [weak self] in self?.selectedIndex = $0 }
+            .store(in: &cancellables)
+        
         // 현재 탭 인덱스로 탭바 UI 갱신
         publisher(for: \.selectedIndex)
             .sink { [weak self] in self?.defaultTabBar.updateUI($0) }
