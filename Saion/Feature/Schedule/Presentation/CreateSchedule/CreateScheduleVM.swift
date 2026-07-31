@@ -57,12 +57,18 @@ final class CreateScheduleVM {
     /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 일정 생성에 사용할 서클 식별자
+    private let circleID: String
     /// 일정 생성을 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
     
     // MARK: Initializer
     
-    init(scheduleRepo: ScheduleRepo) {
+    init(
+        circleID: String,
+        scheduleRepo: ScheduleRepo
+    ) {
+        self.circleID = circleID
         self.scheduleRepo = scheduleRepo
     }
     
@@ -104,8 +110,6 @@ final class CreateScheduleVM {
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
-            /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
             // 일정 생성 요청 후 외부로 이벤트 전달, 반환값은 사용하지 않음
             _ = try await scheduleRepo.createSchedule(from: state.draft, circleID)
             ChangeTracker.shared.schedulesDidChange()

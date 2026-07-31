@@ -14,8 +14,9 @@ final class HomeDI {
     
     // MARK: Methods
     
-    func makeCircleOverviewVM() -> CircleOverviewVM {
+    func makeCircleOverviewVM(circleID: String) -> CircleOverviewVM {
         CircleOverviewVM(
+            circleID: circleID,
             homeRepo: DefaultHomeRepo(),
             invitationRepo: DefaultInvitationRepo(),
             scheduleRepo: DefaultScheduleRepo(),
@@ -27,8 +28,9 @@ final class HomeDI {
         CircleInitializationVM(circleRepo: DefaultCircleRepo())
     }
     
-    func makeMemberListVM() -> MemberListVM {
+    func makeMemberListVM(circleID: String) -> MemberListVM {
         MemberListVM(
+            circleID: circleID,
             homeRepo: DefaultHomeRepo(),
             memberRepo: DefaultMemberRepo()
         )

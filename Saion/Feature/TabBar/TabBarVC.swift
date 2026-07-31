@@ -55,6 +55,11 @@ final class TabBarVC: BaseTabBarVC<TabBar> {
             .sink { [weak self] in self?.selectedIndex = $0 }
             .store(in: &cancellables)
         
+        // 가입 서클 재조회 중 발생한 에러를 알림으로 표시
+        vm.effect.compactMap { $0[case: \.presentError] }
+            .sink { [weak self] in self?.presentErrorAlert(error: $0) }
+            .store(in: &cancellables)
+
         // 현재 탭 인덱스로 탭바 UI 갱신
         publisher(for: \.selectedIndex)
             .sink { [weak self] in self?.defaultTabBar.updateUI($0) }

@@ -16,17 +16,20 @@ final class ScheduleCoord: Coordinator {
     
     // MARK: Start
     
-    func start() {
-        let vc = ScheduleListVC()
+    func start(circleID: String) {
+        let vm = ScheduleDI.shared.makeScheduleListVM(circleID: circleID)
+        let vc = ScheduleListVC(vm: vm)
         
         // 일정 생성 화면으로 이동
         vc.createSchedulePublisher
-            .sink { [weak self] in self?.presentCreateScheduleVC() }
+            .sink { [weak self] in self?.presentCreateScheduleVC(circleID: circleID) }
             .store(in: &cancellables)
         
         // 일정 상세 화면으로 이동
         vc.scheduleDetailPublisher
-            .sink { [weak self] in self?.pushScheduleDetailVC(scheduleID: $0) }
+            .sink { [weak self] in
+                self?.pushScheduleDetailVC(circleID: circleID, scheduleID: $0)
+            }
             .store(in: &cancellables)
         
         // 화면 전환
@@ -34,8 +37,8 @@ final class ScheduleCoord: Coordinator {
     }
     
     /// 일정 생성 화면으로 이동
-    private func presentCreateScheduleVC() {
-        let vm = ScheduleDI.shared.makeCreateScheduleVM()
+    private func presentCreateScheduleVC(circleID: String) {
+        let vm = ScheduleDI.shared.makeCreateScheduleVM(circleID: circleID)
         let vc = CreateScheduleVC(vm: vm)
         vc.modalPresentationStyle = .fullScreen
 
@@ -44,8 +47,14 @@ final class ScheduleCoord: Coordinator {
     }
     
     /// 일정 상세 화면으로 이동
-    private func pushScheduleDetailVC(scheduleID: String) {
-        let vm = ScheduleDI.shared.makeScheduleDetailVM(scheduleID: scheduleID)
+    private func pushScheduleDetailVC(
+        circleID: String,
+        scheduleID: String
+    ) {
+        let vm = ScheduleDI.shared.makeScheduleDetailVM(
+            circleID: circleID,
+            scheduleID: scheduleID
+        )
         let vc = ScheduleDetailVC(vm: vm)
         vc.hidesDefaultTabBarWhenPushed = true
 

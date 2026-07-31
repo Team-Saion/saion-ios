@@ -51,6 +51,8 @@ final class ScheduleDetailVM {
     /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 일정 조회와 작업 요청에 사용할 서클 식별자
+    private let circleID: String
     /// 상세 조회와 삭제에 사용할 일정 식별자
     private let scheduleID: String
     /// 일정 상세 조회와 삭제를 처리하는 저장소
@@ -61,10 +63,12 @@ final class ScheduleDetailVM {
     // MARK: Initializer
     
     init(
+        circleID: String,
         scheduleID: String,
         scheduleRepo: ScheduleRepo,
         memberRepo: MemberRepo
     ) {
+        self.circleID = circleID
         self.scheduleID = scheduleID
         self.scheduleRepo = scheduleRepo
         self.memberRepo = memberRepo
@@ -92,8 +96,6 @@ final class ScheduleDetailVM {
             state.isLoading = true
 
             let memberID = try await memberRepo.fetchMyProfile().memberID
-            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
 
             let schedule = try await scheduleRepo.fetchScheduleDetail(
                 circleID: circleID,
@@ -108,9 +110,6 @@ final class ScheduleDetailVM {
             defer { state.isLoading = false }
             state.isLoading = true
 
-            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
-
             try await scheduleRepo.deleteSchedule(
                 circleID: circleID,
                 scheduleID: scheduleID
@@ -122,9 +121,6 @@ final class ScheduleDetailVM {
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
-            
-            // 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
             
             guard var confirmation = state.schedule?.confirmations.first,
                   let confirmationID = confirmation.confirmationID

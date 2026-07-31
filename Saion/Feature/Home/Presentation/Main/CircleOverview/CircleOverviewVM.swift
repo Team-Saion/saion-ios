@@ -66,6 +66,8 @@ final class CircleOverviewVM {
     /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 서클 홈 조회와 작업 요청에 사용할 서클 식별자
+    private let circleID: String
     /// 서클 홈 정보 조회를 처리하는 저장소
     private let homeRepo: HomeRepo
     /// 구성원 초대 링크 발급을 처리하는 저장소
@@ -81,11 +83,13 @@ final class CircleOverviewVM {
     // MARK: Initializer
     
     init(
+        circleID: String,
         homeRepo: HomeRepo,
         invitationRepo: InvitationRepo,
         scheduleRepo: ScheduleRepo,
         memberRepo: MemberRepo
     ) {
+        self.circleID = circleID
         self.homeRepo = homeRepo
         self.invitationRepo = invitationRepo
         self.scheduleRepo = scheduleRepo
@@ -113,21 +117,19 @@ final class CircleOverviewVM {
             defer { state.isLoading = false }
             state.isLoading = true
             
-            /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
             /// 서클 홈 정보 조회
             state.circleHomeInfo = try await homeRepo.fetchCircleHomeInfo(id: circleID)
             
         case .inviteTapped:
-            let currentCircle = UserSessionStore.shared.currentCircle!
+            guard let circleName = state.circleHomeInfo?.circle.name else { return }
             let myProfile = try await memberRepo.fetchMyProfile()
             let invitation = try await invitationRepo.issueInvitation(
-                cirlceID: currentCircle.circleID
+                cirlceID: circleID
             )
             let url = try await inviteWithKakaoUC.execute(
                 invitation: invitation,
                 inviterName: myProfile.nickname,
-                circleName: currentCircle.name
+                circleName: circleName
             )
             effect.send(.openInviteURL(url))
 
@@ -138,7 +140,6 @@ final class CircleOverviewVM {
             defer { state.isLoading = false }
             state.isLoading = true
 
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
             try await scheduleRepo.requestFamilyNotification(
                 circleID: circleID,
                 scheduleID: scheduleID

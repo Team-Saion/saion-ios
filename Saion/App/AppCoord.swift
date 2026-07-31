@@ -38,7 +38,6 @@ final class AppCoord: Coordinator {
                 if isSignedIn {
                     self?.startTabBar()
                 } else {
-                    UserSessionStore.shared.endSession()
                     self?.startLogin()
                 }
             }

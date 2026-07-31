@@ -49,6 +49,8 @@ final class MemberListVM {
     /// 상태 전이 중 발생하는 일회성 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 구성원 목록 조회에 사용할 서클 식별자
+    private let circleID: String
     /// 구성원 목록 조회를 처리하는 저장소
     private let homeRepo: HomeRepo
     /// 내 프로필 조회를 처리하는 저장소
@@ -57,9 +59,11 @@ final class MemberListVM {
     // MARK: Initializer
     
     init(
+        circleID: String,
         homeRepo: HomeRepo,
         memberRepo: MemberRepo
     ) {
+        self.circleID = circleID
         self.homeRepo = homeRepo
         self.memberRepo = memberRepo
     }
@@ -85,8 +89,6 @@ final class MemberListVM {
             defer { state.isLoading = false }
             state.isLoading = true
             
-            /// 진입 전 가입한 서클이 있음을 보장하므로 강제 언래핑
-            let circleID = UserSessionStore.shared.currentCircle!.circleID
             state.myID = try await memberRepo.fetchMyProfile().memberID
             state.memberSummaries = try await homeRepo.fetchMembers(circleID: circleID)
         }

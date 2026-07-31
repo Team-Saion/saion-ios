@@ -33,6 +33,10 @@ final class CircleEntryVC: UIViewController {
     
     // MARK: Life Cycle
     
+    override func loadView() {
+        view = HomeBackgroundView()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()

@@ -14,16 +14,26 @@ final class ScheduleDI {
     
     // MARK: Methods
     
-    func makeCreateScheduleVM() -> CreateScheduleVM {
-        CreateScheduleVM(scheduleRepo: DefaultScheduleRepo())
+    func makeCreateScheduleVM(circleID: String) -> CreateScheduleVM {
+        CreateScheduleVM(
+            circleID: circleID,
+            scheduleRepo: DefaultScheduleRepo()
+        )
     }
     
-    func makeScheduleListVM() -> ScheduleListVM {
-        ScheduleListVM(scheduleRepo: DefaultScheduleRepo())
+    func makeScheduleListVM(circleID: String) -> ScheduleListVM {
+        ScheduleListVM(
+            circleID: circleID,
+            scheduleRepo: DefaultScheduleRepo()
+        )
     }
     
-    func makeScheduleDetailVM(scheduleID: String) -> ScheduleDetailVM {
+    func makeScheduleDetailVM(
+        circleID: String,
+        scheduleID: String
+    ) -> ScheduleDetailVM {
         ScheduleDetailVM(
+            circleID: circleID,
             scheduleID: scheduleID,
             scheduleRepo: DefaultScheduleRepo(),
             memberRepo: DefaultMemberRepo()

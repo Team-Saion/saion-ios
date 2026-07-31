@@ -22,10 +22,13 @@ final class CircleOverviewVC: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     /// 서클 홈 상태와 사용자 액션을 처리하는 뷰모델
-    private let vm = HomeDI.shared.makeCircleOverviewVM()
+    private let vm: CircleOverviewVM
     
     // MARK: Components
     
+    /// 홈 상단 내비게이션 바
+    private let navigationBar = HomeNavigationBar()
+
     /// 홈 콘텐츠를 세로로 탐색하는 스크롤 뷰
     private let scrollView = {
         let view = ResponsiveScrollView()
@@ -69,6 +72,19 @@ final class CircleOverviewVC: UIViewController {
     
     // MARK: Life Cycle
     
+    init(vm: CircleOverviewVM) {
+        self.vm = vm
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @MainActor required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        view = HomeBackgroundView()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
@@ -78,6 +94,7 @@ final class CircleOverviewVC: UIViewController {
     // MARK: Layout
     
     private func setupLayout() {
+        view.addSubview(navigationBar)
         view.addSubview(scrollView)
         view.addSubview(addScheduleButtonContainer)
         addScheduleButtonContainer.addSubview(addScheduleButton)
@@ -92,7 +109,13 @@ final class CircleOverviewVC: UIViewController {
         contentVStack.addArrangedSubview(membersView)
         contentVStack.addArrangedSubview(UISpacer(64))
         
-        scrollView.snp.makeConstraints { $0.edges.equalTo(view.safeAreaLayoutGuide) }
+        navigationBar.snp.makeConstraints {
+            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(scrollView.snp.top)
+        }
+        scrollView.snp.makeConstraints {
+            $0.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
         contentVStack.snp.makeConstraints { $0.edges.width.equalToSuperview() }
         addScheduleButtonContainer.snp.makeConstraints {
             $0.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
@@ -169,6 +192,11 @@ final class CircleOverviewVC: UIViewController {
     
     // MARK: Reactive Interface
     
+    /// 알림 버튼 탭 퍼블리셔
+    var notificationTapPublisher: AnyPublisher<Void, Never> {
+        navigationBar.notificationButton.tapPublisher.eraseToAnyPublisher()
+    }
+
     /// 일정 공유 확인 얼럿 노출
     private func presentShareConfirmAlert() -> AnyPublisher<Void, Never> {
         Deferred { [weak self] in Future { promise in
@@ -208,4 +236,8 @@ final class CircleOverviewVC: UIViewController {
 
 // MARK: - Preview
 
-#Preview { CircleOverviewVC() }
+#Preview {
+    CircleOverviewVC(
+        vm: HomeDI.shared.makeCircleOverviewVM(circleID: "preview-circle-id")
+    )
+}

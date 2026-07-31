@@ -14,6 +14,10 @@ import Navigation
 
 final class TabBarCoord: Coordinator {
     
+    // MARK: Subjects
+    
+    private let joinedCirclesDidChangeSubject = PassthroughSubject<Void, Never>()
+    
     // MARK: Start
     
     /// 탭바 화면 초기화
@@ -22,8 +26,13 @@ final class TabBarCoord: Coordinator {
         let vc = TabBarVC(vm: vm)
         
         // 선택한 서클이 바뀌면 각 탭의 화면 흐름을 새 서클 기준으로 재구성
-        vm.$state.compactMap(\.currentCircleID).removeDuplicates()
-            .sink { [weak self] _ in self?.setUpTabCoordinators(in: vc) }
+        vm.effect.compactMap { $0[case: \.setUpTabCoordinators] }.removeDuplicates()
+            .sink { [weak self, weak vc] in self?.setUpTabCoordinators(in: vc, circleID: $0) }
+            .store(in: &cancellables)
+        
+        // 서클 참여나 생성 후 가입 서클을 다시 조회
+        joinedCirclesDidChangeSubject
+            .sink { [weak vm] in vm?.send(.joinedCirclesDidChange) }
             .store(in: &cancellables)
         
         // 탭바가 나타난 시점부터 대기 중이거나 새로 들어오는 딥링크 처리
@@ -42,44 +51,23 @@ final class TabBarCoord: Coordinator {
         navigation.pushViewController(vc, animated: false)
     }
     
+    // MARK: TabCoordinators
+    
     /// 기존 탭 흐름을 정리하고 탭별 코디네이터를 새로 구성
-    private func setUpTabCoordinators(in tabBarVC: TabBarVC) {
+    private func setUpTabCoordinators(
+        in tabBarVC: TabBarVC?,
+        circleID: String?
+    ) {
         // 서클 변경 전에 표시 중인 모달과 기존 탭 코디네이터의 생명주기를 정리
         navigation.dismiss(animated: true)
         children.removeAll()
         
-        // 홈 탭 구성
-        let homeCoord = HomeCoord(navigation: .init())
-        homeCoord.navigation.tabBarItem = UITabBarItem(
-            title: "홈",
-            image: .house,
-            tag: 0
-        )
-        store(child: homeCoord)
-        homeCoord.start()
-        
-        // 일정 탭 구성
-        let scheduleCoord = ScheduleCoord(navigation: .init())
-        scheduleCoord.navigation.tabBarItem = UITabBarItem(
-            title: "일정",
-            image: .calendarHeart,
-            tag: 1
-        )
-        store(child: scheduleCoord)
-        scheduleCoord.start()
-        
-        // 마이페이지 탭 구성
-        let myPageCoord = MyPageCoord(navigation: .init())
-        myPageCoord.navigation.tabBarItem = UITabBarItem(
-            title: "마이",
-            image: .user,
-            tag: 2
-        )
-        store(child: myPageCoord)
-        myPageCoord.start()
+        let homeCoord = startHomeCoordinator(circleID: circleID)
+        let scheduleCoord = startScheduleCoordinator(circleID: circleID)
+        let myPageCoord = startMyPageCoordinator()
         
         // 각 코디네이터의 내비게이션을 탭바 루트 화면으로 연결
-        tabBarVC.setViewControllers(
+        tabBarVC?.setViewControllers(
             [
                 homeCoord.navigation,
                 scheduleCoord.navigation,
@@ -87,10 +75,57 @@ final class TabBarCoord: Coordinator {
             ],
             animated: true
         )
-        
         // 서클이 변경되면 홈 탭부터 다시 시작
-        tabBarVC.selectedIndex = 0
+        tabBarVC?.selectedIndex = 0
     }
+    
+    /// 홈 탭 코디네이터 시작
+    private func startHomeCoordinator(circleID: String?) -> HomeCoord {
+        let coord = HomeCoord(navigation: .init())
+        coord.navigation.tabBarItem = UITabBarItem(
+            title: "홈",
+            image: .house,
+            tag: 0
+        )
+        store(child: coord)
+        coord.start(circleID: circleID)
+        
+        coord.joinedCirclesDidChangePublisher
+            .sink { [weak self] in self?.joinedCirclesDidChangeSubject.send() }
+            .store(in: &coord.cancellables)
+        
+        return coord
+    }
+    
+    /// 일정 탭 코디네이터 시작
+    private func startScheduleCoordinator(circleID: String?) -> ScheduleCoord {
+        let coord = ScheduleCoord(navigation: .init())
+        coord.navigation.tabBarItem = UITabBarItem(
+            title: "일정",
+            image: .calendarHeart,
+            tag: 1
+        )
+        store(child: coord)
+        if let circleID { coord.start(circleID: circleID) }
+        
+        return coord
+    }
+    
+    /// 마이페이지 탭 코디네이터 시작
+    private func startMyPageCoordinator() -> MyPageCoord {
+        let coord = MyPageCoord(navigation: .init())
+        coord.navigation.tabBarItem = UITabBarItem(
+            title: "마이",
+            image: .user,
+            tag: 2
+        )
+        store(child: coord)
+        coord.start()
+        
+        return coord
+    }
+    
+    // MARK: Priavte Methods
     
     /// 서클 참여 흐름 시작
     private func presentJoinCircle(invitationCode: String) {
@@ -100,6 +135,11 @@ final class TabBarCoord: Coordinator {
         // 참여 흐름 종료 시 자식 코디네이터 해제
         coord.didFinishPublisher
             .sink { [weak self, weak coord] in self?.free(child: coord) }
+            .store(in: &coord.cancellables)
+        
+        // 딥링크를 통한 참여 완료 후 가입 서클 갱신
+        coord.circleJoinedPublisher
+            .sink { [weak self] in self?.joinedCirclesDidChangeSubject.send() }
             .store(in: &coord.cancellables)
         
         store(child: coord)

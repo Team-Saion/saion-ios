@@ -413,6 +413,9 @@ struct ScheduleDetailVCState: Hashable {
 // MARK: - Preview
 
 #Preview {
-    let vm = ScheduleDI.shared.makeScheduleDetailVM(scheduleID: "preview-schedule-id")
+    let vm = ScheduleDI.shared.makeScheduleDetailVM(
+        circleID: "preview-circle-id",
+        scheduleID: "preview-schedule-id"
+    )
     return ScheduleDetailVC(vm: vm)
 }

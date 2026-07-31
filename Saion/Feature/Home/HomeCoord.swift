@@ -14,39 +14,57 @@ import Navigation
 
 final class HomeCoord: Coordinator {
 
+    // MARK: Subjects
+
+    private let joinedCirclesDidChangeSubject = PassthroughSubject<Void, Never>()
+
+    var joinedCirclesDidChangePublisher: AnyPublisher<Void, Never> {
+        joinedCirclesDidChangeSubject.eraseToAnyPublisher()
+    }
+
     // MARK: Start
 
-    func start() {
-        let vc = HomeVC()
+    func start(circleID: String?) {
+        let vc: UIViewController
 
-        // 서클 참여 화면으로 이동
-        vc.entryVC.joinButton.tapPublisher
-            .compactMap { [weak self] in self?.presentJoinCircle() }
-            .switchToLatest()
-            .sink { [weak vc] in vc?.refresh() }
-            .store(in: &vc.cancellables)
+        if let circleID {
+            let vm = HomeDI.shared.makeCircleOverviewVM(circleID: circleID)
+            let overviewVC = CircleOverviewVC(vm: vm)
+            vc = overviewVC
 
-        // 서클 생성 화면으로 이동하고, 생성 완료 시 목록 갱신
-        vc.entryVC.createButton.tapPublisher
-            .compactMap { [weak self] in self?.presentCircleInitializationVC() }
-            .switchToLatest()
-            .sink { [weak vc] in vc?.refresh() }
-            .store(in: &vc.cancellables)
+            // 일정 생성 화면으로 이동
+            overviewVC.createSchedulePublisher
+                .sink { [weak self] in self?.presentCreateScheduleVC(circleID: circleID) }
+                .store(in: &cancellables)
 
-        // 일정 생성 화면으로 이동
-        vc.overviewVC.createSchedulePublisher
-            .sink { [weak self] in self?.presentCreateScheduleVC() }
-            .store(in: &vc.cancellables)
+            // 전체 구성원 목록 화면으로 이동
+            overviewVC.showAllMembersTapPublisher
+                .sink { [weak self] in self?.pushMemberListVC(circleID: circleID) }
+                .store(in: &cancellables)
 
-        // 전체 구성원 목록 화면으로 이동
-        vc.overviewVC.showAllMembersTapPublisher
-            .sink { [weak self] in self?.pushMemberListVC() }
-            .store(in: &vc.cancellables)
+            // 알림 목록 화면으로 이동
+            overviewVC.notificationTapPublisher
+                .sink { [weak self] in self?.pushInboxVC() }
+                .store(in: &cancellables)
 
-        // 알림 목록 화면으로 이동
-        vc.navigationBar.notificationButton.tapPublisher
-            .sink { [weak self] in self?.pushInboxVC() }
-            .store(in: &vc.cancellables)
+        } else {
+            let entryVC = CircleEntryVC()
+            vc = entryVC
+
+            // 서클 참여 화면으로 이동
+            entryVC.joinButton.tapPublisher
+                .compactMap { [weak self] in self?.presentJoinCircle() }
+                .switchToLatest()
+                .sink { [weak self] in self?.joinedCirclesDidChangeSubject.send() }
+                .store(in: &cancellables)
+
+            // 서클 생성 화면으로 이동
+            entryVC.createButton.tapPublisher
+                .compactMap { [weak self] in self?.presentCircleInitializationVC() }
+                .switchToLatest()
+                .sink { [weak self] in self?.joinedCirclesDidChangeSubject.send() }
+                .store(in: &cancellables)
+        }
 
         // 화면 전환
         navigation.pushViewController(vc, animated: false)
@@ -90,8 +108,8 @@ final class HomeCoord: Coordinator {
     }
 
     /// 일정 생성 화면으로 이동
-    private func presentCreateScheduleVC() {
-        let vm = ScheduleDI.shared.makeCreateScheduleVM()
+    private func presentCreateScheduleVC(circleID: String) {
+        let vm = ScheduleDI.shared.makeCreateScheduleVM(circleID: circleID)
         let vc = CreateScheduleVC(vm: vm)
         vc.modalPresentationStyle = .fullScreen
 
@@ -100,8 +118,8 @@ final class HomeCoord: Coordinator {
     }
 
     /// 전체 구성원 목록 화면으로 이동
-    func pushMemberListVC() {
-        let vm = HomeDI.shared.makeMemberListVM()
+    func pushMemberListVC(circleID: String) {
+        let vm = HomeDI.shared.makeMemberListVM(circleID: circleID)
         let vc = MemberListVC(vm: vm)
         vc.hidesDefaultTabBarWhenPushed = true
 

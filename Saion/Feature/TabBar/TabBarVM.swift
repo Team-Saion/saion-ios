@@ -19,17 +19,21 @@ final class TabBarVM {
     enum Action {
         /// 최초 진입에 필요한 서클 정보 조회
         case viewDidLoad
+        /// 서클 참여나 생성 후 가입 서클 재조회
+        case joinedCirclesDidChange
         /// 사용자가 선택한 탭 인덱스 전달
         case indexChanged(Int)
     }
     
     struct State {
         /// 현재 사용 중인 서클 ID. 가입한 서클이 없으면 `nil`
-        var currentCircleID: String?
+        fileprivate var currentCircleID: String?
     }
     
     @CasePathable
     enum Effect {
+        /// 탭별 코디네이터를 새로 구성
+        case setUpTabCoordinators(circleID: String?)
         /// 접근 가능한 탭으로 화면 전환 요청
         case selectTabIndex(Int)
         /// 상태 전이 중 발생한 에러
@@ -70,10 +74,16 @@ final class TabBarVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .viewDidLoad:
+        case .viewDidLoad, .joinedCirclesDidChange:
             do {
-                // 첫 번째 가입 서클을 현재 서클로 설정해 탭 화면 구성을 시작
-                state.currentCircleID = try await circleRepo.fetchJoinedCircles().first?.circleID
+                let joinedCircles = try await circleRepo.fetchJoinedCircles()
+                
+                state.currentCircleID = state.currentCircleID.flatMap { id in
+                    joinedCircles.first { $0.circleID == id }?.circleID
+                } ?? joinedCircles.first?.circleID
+                
+                effect.send(.setUpTabCoordinators(circleID: state.currentCircleID))
+                
             } catch {
                 // 초기 서클 정보가 유효하지 않으면 세션을 종료하고 인증 흐름으로 복귀
                 AlertCenter.shared.send(.presentError(SaionError(

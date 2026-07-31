@@ -26,10 +26,6 @@ final class ScheduleListVM {
     }
     
     struct State {
-        /// 일정 조회 기준이 되는 현재 활동 서클 식별자
-        fileprivate var circleID: String? {
-            UserSessionStore.shared.currentCircle?.circleID
-        }
         /// 페이지네이션 정보와 원본 일정 목록
         fileprivate var schedulesPage: Pagenation<ScheduleSummary>?
         /// 일정 컬렉션뷰에 표시할 아이템 목록
@@ -57,12 +53,18 @@ final class ScheduleListVM {
     /// 화면 전환이나 알림처럼 일회성으로 처리할 이벤트
     let effect = PassthroughSubject<Effect, Never>()
     
+    /// 일정 목록 조회에 사용할 서클 식별자
+    private let circleID: String
     /// 일정 목록 조회와 페이지네이션을 처리하는 저장소
     private let scheduleRepo: ScheduleRepo
     
     // MARK: Initializer
     
-    init(scheduleRepo: ScheduleRepo) {
+    init(
+        circleID: String,
+        scheduleRepo: ScheduleRepo
+    ) {
+        self.circleID = circleID
         self.scheduleRepo = scheduleRepo
     }
     
@@ -83,9 +85,7 @@ final class ScheduleListVM {
     private func process(action: Action) async throws {
         switch action {
         case .reloadRequested:
-            guard let circleID = state.circleID,
-                  !state.isLoading
-            else { return }
+            guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
             
@@ -96,8 +96,7 @@ final class ScheduleListVM {
             
         case .cellWillDisplay(let index):
             // 다음 페이지가 있고 마지막 5개 셀에 진입했을 때만 선조회한다.
-            guard let circleID = state.circleID,
-                  let currentPage = state.schedulesPage,
+            guard let currentPage = state.schedulesPage,
                   currentPage.hasNext,
                   index >= currentPage.elemets.count - 5,
                   !state.isLoading
