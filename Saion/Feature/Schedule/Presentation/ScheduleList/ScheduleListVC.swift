@@ -20,7 +20,7 @@ final class ScheduleListVC: UIViewController {
     // MARK: Properties
     
     /// 화면 생명주기 동안 유지할 Combine 구독
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     /// 일정 목록 상태와 사용자 액션을 처리하는 뷰모델
     private let vm: ScheduleListVM
     
@@ -35,11 +35,11 @@ final class ScheduleListVC: UIViewController {
         self.vm = vm
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupDefaults()

@@ -191,6 +191,11 @@ final class ScheduleDetailVC: BackButtonVC {
         vm.effect.compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
+        
+        // 일정 삭제 완료 시 이전 화면으로 돌아가기
+        vm.effect.compactMap { $0[case: \.scheduleDeleted] }
+            .sink { [weak self] in self?.navigationController?.popViewController(animated: true) }
+            .store(in: &cancellables)
     }
     
     // MARK: Reactive Interface
@@ -227,10 +232,6 @@ final class ScheduleDetailVC: BackButtonVC {
         .eraseToAnyPublisher()
     }
     
-    /// 일정 삭제 완료 퍼블리셔
-    var scheduleDeletedPublisher: AnyPublisher<Void, Never> {
-        vm.effect.compactMap { $0[case: \.scheduleDeleted] }.eraseToAnyPublisher()
-    }
 }
 
 // MARK: - MemoTextView

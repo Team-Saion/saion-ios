@@ -157,6 +157,11 @@ final class CircleInitializationVC: NavigationBarVC {
         closeBarButton.tapPublisher
             .sink { [weak self] in self?.dismiss(animated: true) }
             .store(in: &cancellables)
+        
+        // 서클 생성 완료 시 화면 닫기
+        vm.effect.compactMap { $0[case: \.circleCreated] }
+            .sink { [weak self] in self?.dismiss(animated: true) }
+            .store(in: &cancellables)
     }
     
     // MARK: Overrides

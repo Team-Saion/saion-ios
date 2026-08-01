@@ -19,7 +19,7 @@ final class ProfileInputVC: BackButtonVC {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm: ProfileInputVM
     
     // MARK: Components

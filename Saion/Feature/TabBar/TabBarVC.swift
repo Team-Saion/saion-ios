@@ -16,7 +16,7 @@ final class TabBarVC: BaseTabBarVC<TabBar> {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm: TabBarVM
     
     // MARK: Life Cycle
@@ -59,7 +59,7 @@ final class TabBarVC: BaseTabBarVC<TabBar> {
         vm.effect.compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
-
+        
         // 현재 탭 인덱스로 탭바 UI 갱신
         publisher(for: \.selectedIndex)
             .sink { [weak self] in self?.defaultTabBar.updateUI($0) }

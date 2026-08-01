@@ -17,24 +17,18 @@ class Coordinator: NSObject {
     
     /// 하위 흐름을 관리하기 위한 자식 코디네이터 참조 배열
     /// - Note: 자식의 생명주기를 유지하기 위해 강한 참조를 보관해야 함
-    var children: [Coordinator] = []
+    private var children: [Coordinator] = []
     
     /// 화면 전환을 수행할 내비게이션 컨트롤러
     let navigation: NavigationController
     
-    /// Combine 구독 생명주기 보관소
+    /// 현재 코디네이터가 소유한 Combine 구독 생명주기 보관소
     var cancellables = Set<AnyCancellable>()
     
     // MARK: Subjects
     
-    /// 코디네이터 종료 이벤트 서브젝트
+    /// 현재 코디네이터의 종료를 부모에게 전달하는 이벤트 스트림
     private let didFinishSubject = PassthroughSubject<Void, Never>()
-    
-    /// 코디네이터 종료 이벤트 스트림
-    /// - 부모에서 이 이벤트를 구독해서 자식을 정리
-    var didFinishPublisher: AnyPublisher<Void, Never> {
-        didFinishSubject.eraseToAnyPublisher()
-    }
     
     // MARK: Life Cycle
     
@@ -47,18 +41,22 @@ class Coordinator: NSObject {
     
     // MARK: Public Methods
     
-    /// 특정 자식 코디네이터를 해제하여 메모리에서 제거
-    func free(child: Coordinator?) {
-        children.removeAll { $0 === child }
-    }
-    
-    /// 자식 코디네이터를 배열에 추가하여 생명주기 관리 시작
-    func store(child: Coordinator) {
+    /// 자식 코디네이터를 등록하고 종료 시 배열에서 자동으로 해제
+    func addChild(_ child: Coordinator) {
         children.append(child)
+        
+        // 종료 이벤트를 구독해 부모가 보유한 강한 참조 제거
+        child.didFinishSubject
+            .sink { [weak self, weak child] in self?.removeChild(child) }
+            .store(in: &child.cancellables)
     }
     
-    /// 코디네이터 종료 이벤트 외부(부모)에 전달
-    func finish() {
-        didFinishSubject.send(())
-    }
+    /// 전달받은 자식 코디네이터의 생명주기 관리 종료
+    func removeChild(_ child: Coordinator?) { children.removeAll { $0 === child } }
+    
+    /// 모든 자식 코디네이터의 생명주기 관리 종료
+    func removeAllChildren() { children.removeAll() }
+    
+    /// 부모에게 종료 이벤트를 전달하여 현재 코디네이터의 해제를 요청
+    func removeFromParent() { didFinishSubject.send(()) }
 }

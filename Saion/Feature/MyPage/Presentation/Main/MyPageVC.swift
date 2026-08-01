@@ -18,7 +18,7 @@ final class MyPageVC: UIViewController {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm = MyPageDI.shared.makeMyPageVM()
     
     // MARK: Components

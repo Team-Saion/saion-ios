@@ -19,7 +19,7 @@ final class CircleOverviewVC: UIViewController {
     // MARK: Properties
     
     /// 화면 생명주기 동안 유지할 Combine 구독
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     
     /// 서클 홈 상태와 사용자 액션을 처리하는 뷰모델
     private let vm: CircleOverviewVM

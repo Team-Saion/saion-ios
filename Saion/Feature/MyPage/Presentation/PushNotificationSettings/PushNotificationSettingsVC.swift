@@ -19,7 +19,7 @@ final class PushNotificationSettingsVC: BackButtonVC {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm = MyPageDI.shared.makePushNotificationSettingsVM()
     
     // MARK: Components

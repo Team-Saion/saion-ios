@@ -8,26 +8,23 @@
 import Combine
 import UIKit
 
-import CombineCocoa
-
 final class AuthCoord: Coordinator {
     func start() {
         let vc = LoginVC()
         
+        // 로그인 완료 이벤트를 프로필 입력 화면 전환으로 연결
         vc.pushProfileInputPublisher
             .sink { [weak self] in self?.pushProfileInput(onboardingInfo: $0) }
-            .store(in: &cancellables)
+            .store(in: &vc.cancellables)
         
         navigation.pushViewController(vc, animated: false)
     }
+
+    // MARK: Routing
     
     func pushProfileInput(onboardingInfo: OnboardingInfo) {
         let vm = AuthDI.shared.makeProfileInputVM(onboardingInfo: onboardingInfo)
         let vc = ProfileInputVC(vm: vm)
-        
-        vc.backBarButton.tapPublisher
-            .sink { [weak self] in self?.navigation.popViewController(animated: true) }
-            .store(in: &cancellables)
         
         navigation.pushViewController(vc, animated: true)
     }

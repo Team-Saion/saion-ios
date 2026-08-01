@@ -18,7 +18,7 @@ final class LoginVC: UIViewController {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm = AuthDI.shared.makeLoginVM()
     
     // MARK: Components

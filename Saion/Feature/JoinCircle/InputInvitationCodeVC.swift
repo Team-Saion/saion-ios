@@ -18,7 +18,7 @@ final class InputInvitationCodeVC: NavigationBarVC {
 
     // MARK: Properties
 
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
 
     // MARK: Components
 

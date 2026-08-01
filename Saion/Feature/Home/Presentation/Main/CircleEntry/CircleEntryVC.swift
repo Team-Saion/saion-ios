@@ -5,6 +5,7 @@
 //  Created by 신정욱 on 7/10/26.
 //
 
+import Combine
 import UIKit
 
 import SnapKit
@@ -12,7 +13,12 @@ import SnapKit
 import DesignSystem
 
 final class CircleEntryVC: UIViewController {
-    
+
+    // MARK: Properties
+
+    /// 화면 생명주기 동안 유지할 Combine 구독
+    var cancellables = Set<AnyCancellable>()
+
     // MARK: Components
     
     private let buttonVStack = UIStackView(.vertical, spacing: 16)

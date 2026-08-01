@@ -19,7 +19,7 @@ final class DeleteAccountReasonVC: BackButtonVC {
     
     // MARK: Properties
     
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let vm = MyPageDI.shared.makeDeleteAccountReasonVM()
     
     private lazy var tapGesture = {

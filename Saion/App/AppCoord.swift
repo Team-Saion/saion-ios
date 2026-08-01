@@ -34,33 +34,29 @@ final class AppCoord: Coordinator {
                 return !tokenInfo.role.is(\.pending)
             }
             .removeDuplicates() // 코디네이터 중복 시작 차단
-            .sink { [weak self] isSignedIn in
-                if isSignedIn {
-                    self?.startTabBar()
-                } else {
-                    self?.startLogin()
-                }
-            }
+            .sink { [weak self] in $0 ? self?.startTabBar() : self?.startLogin() }
             .store(in: &cancellables)
     }
     
+    // MARK: Routing
+    
     private func startTabBar() {
         // 전환 전에 기존 자식 코디네이터 정리
-        children.removeAll()
+        removeAllChildren()
         // 새 코디네이터의 네비게이션을 루트로 설정
         let coord = TabBarCoord(navigation: .init())
         setRootWithAnimation(coord.navigation)
-        store(child: coord)
+        addChild(coord)
         coord.start()
     }
     
     private func startLogin() {
         // 전환 전에 기존 자식 코디네이터 정리
-        children.removeAll()
+        removeAllChildren()
         // 새 코디네이터의 네비게이션을 루트로 설정
         let coord = AuthCoord(navigation: .init())
         setRootWithAnimation(coord.navigation)
-        store(child: coord)
+        addChild(coord)
         coord.start()
     }
     
