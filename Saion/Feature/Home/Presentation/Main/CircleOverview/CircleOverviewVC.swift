@@ -228,6 +228,11 @@ final class CircleOverviewVC: UIViewController {
         .eraseToAnyPublisher()
     }
     
+    /// 일정 상세 화면 전환 퍼블리셔
+    var scheduleDetailPublisher: AnyPublisher<String, Never> {
+        schedulesView.collectionView.scheduleTapPublisher
+    }
+
     /// 전체 구성원 보기 탭 퍼블리셔
     var showAllMembersTapPublisher: AnyPublisher<Void, Never> {
         membersView.showAllButton.tapPublisher

@@ -148,6 +148,7 @@ final class ScheduleDetailVC: BackButtonVC {
         // 바인딩 구성이 끝난 뒤 일정 상세 조회 요청
         vm.send(.viewDidLoad)
         
+        // "확인했어요" 토글 처리 요청 전달
         confirmToggleButton.tapPublisher
             .sink { [weak self] in self?.vm.send(.confirmToggled) }
             .store(in: &cancellables)

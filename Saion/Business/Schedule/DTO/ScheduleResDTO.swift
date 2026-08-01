@@ -91,6 +91,13 @@ struct ScheduleResDTO: Decodable {
         case confirmed = "CONFIRMED"
         /// 기타
         case etc = "ETC"
+        
+        func toDomain() -> Schedule.ConfirmationType {
+            switch self {
+            case .confirmed: .confirmed
+            case .etc: .etc
+            }
+        }
     }
 }
 
@@ -113,6 +120,29 @@ extension ScheduleResDTO {
         case .completed: .completed
         }
         
+        // 나의 확인 정보를 한 번만 변환해 반복 비교에 재사용합니다.
+        let selectedConfirmation = myConfirmation.map {
+            (type: $0.confirmationType.toDomain(), id: Int($0.confirmationId))
+        }
+        
+        // 종류별 카운트를 Dictionary로 구성해 반복 탐색을 제거합니다.
+        let confirmationCounts = confirmations.reduce(
+            into: [Schedule.ConfirmationType: Int]()
+        ) { counts, confirmation in
+            counts[confirmation.type.toDomain()] = confirmation.count
+        }
+        
+        // 서버 응답에 없는 종류도 count 0인 상태로 구성합니다.
+        let mappedConfirmations = Schedule.ConfirmationType.allCases.map { confirmationType in
+            let isSelected = selectedConfirmation?.type == confirmationType
+            return Schedule.Confirmation(
+                confirmationID: isSelected ? selectedConfirmation?.id : nil,
+                type: confirmationType,
+                count: confirmationCounts[confirmationType, default: 0],
+                isSelected: isSelected
+            )
+        }
+        
         return Schedule(
             scheduleID: scheduleId,
             title: title,
@@ -123,22 +153,7 @@ extension ScheduleResDTO {
             status: mappedStatus,
             progressRate: progressRate,
             memo: memo,
-            confirmations: confirmations.map { confirmation in
-                let myConfirmation = myConfirmation.flatMap {
-                    $0.confirmationType == confirmation.type ? $0 : nil
-                }
-                let type: Schedule.ConfirmationType = switch confirmation.type {
-                case .confirmed: .confirmed
-                case .etc: .etc
-                }
-
-                return Schedule.Confirmation(
-                    confirmationID: myConfirmation.map { Int($0.confirmationId) },
-                    type: type,
-                    count: confirmation.count,
-                    isSelected: myConfirmation != nil
-                )
-            },
+            confirmations: mappedConfirmations,
             creatorID: createdBy,
             createdAt: createdAt,
             dDay: dDay

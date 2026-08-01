@@ -49,7 +49,7 @@ struct Schedule: Hashable {
     }
     
     /// 확인하기 종류
-    enum ConfirmationType: String, Hashable {
+    enum ConfirmationType: String, Hashable, CaseIterable {
         /// 확인했어요
         case confirmed = "확인했어요"
         /// 기타

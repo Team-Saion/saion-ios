@@ -15,8 +15,8 @@ final class MemberListVM {
     // MARK: Types
     
     enum Action {
-        /// 현재 서클의 구성원 목록 재조회 요청
-        case reloadRequested
+        /// 화면 진입 후 구성원 목록 및 내 프로필 조회 요청
+        case viewDidLoad
     }
     
     struct State {
@@ -84,7 +84,7 @@ final class MemberListVM {
     
     private func process(action: Action) async throws {
         switch action {
-        case .reloadRequested:
+        case .viewDidLoad:
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true

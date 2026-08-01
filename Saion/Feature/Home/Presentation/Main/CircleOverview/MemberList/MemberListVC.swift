@@ -62,12 +62,8 @@ final class MemberListVC: BackButtonVC {
     // MARK: Bindings
     
     private func setupBindings() {
-        // 화면 등장 시 구성원 변경 순번이 달라졌을 때만 목록 재조회
-        viewDidAppearPublisher
-            .map { ChangeTracker.shared.memberRevision }
-            .removeDuplicates()
-            .sink { [weak vm] _ in vm?.send(.reloadRequested) }
-            .store(in: &cancellables)
+        // 화면 진입 후 구성원 목록 및 내 프로필 조회 요청
+        vm.send(.viewDidLoad)
         
         // 구성원 셀 아이템 목록을 컬렉션뷰에 반영
         vm.$state.map(\.memberItems).removeDuplicates()

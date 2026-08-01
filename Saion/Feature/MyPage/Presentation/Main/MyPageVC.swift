@@ -89,7 +89,11 @@ final class MyPageVC: UIViewController {
     
     // MARK: Defaults
     
-    private func setupDefaults() { view.backgroundColor = .backgroundMuted }
+    private func setupDefaults() {
+        view.backgroundColor = .backgroundMuted
+        // TODO: 프로필 수정 기능 추가 시, 버튼 노출해줄 것
+        editProfileButton.isHidden = true
+    }
     
     // MARK: Layout
     

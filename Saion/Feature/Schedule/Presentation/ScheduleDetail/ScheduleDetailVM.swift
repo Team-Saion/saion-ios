@@ -121,29 +121,30 @@ final class ScheduleDetailVM {
             guard !state.isLoading else { return }
             defer { state.isLoading = false }
             state.isLoading = true
-            
-            guard var confirmation = state.schedule?.confirmations.first,
-                  let confirmationID = confirmation.confirmationID
-            else { return }
-            
-            if confirmation.isSelected  {
+
+            guard let confirmation = state.schedule?.confirmations.first else { return }
+
+            // 선택 상태에 따라 확인을 등록하거나 기존 확인을 취소합니다.
+            if confirmation.isSelected {
+                guard let confirmationID = confirmation.confirmationID else { return }
+
                 try await scheduleRepo.setUnconfirmed(
                     circleID: circleID,
                     scheduleID: scheduleID,
                     confirmationID: confirmationID
                 )
-                confirmation.isSelected = false
-                confirmation.count -= 1
-                
             } else {
                 try await scheduleRepo.setConfirmed(
                     circleID: circleID,
                     scheduleID: scheduleID
                 )
-                confirmation.isSelected = true
-                confirmation.count += 1
             }
-            
+
+            // 확인 ID와 인원수를 서버의 최신 상태로 동기화합니다.
+            state.schedule = try await scheduleRepo.fetchScheduleDetail(
+                circleID: circleID,
+                scheduleID: scheduleID
+            )
         }
     }
 }

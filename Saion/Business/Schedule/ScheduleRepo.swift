@@ -28,26 +28,26 @@ protocol ScheduleRepo {
         circleID: String,
         scheduleID: String
     ) async throws -> Schedule
-
+    
     /// 일정 삭제
     func deleteSchedule(
         circleID: String,
         scheduleID: String
     ) async throws
-
+    
     /// 일정 확인 등록
     func setConfirmed(
         circleID: String,
         scheduleID: String
     ) async throws
-
+    
     /// 일정 확인 취소
     func setUnconfirmed(
         circleID: String,
         scheduleID: String,
         confirmationID: Int
     ) async throws
-
+    
     /// 일정 내용을 가족에게 전달
     func requestFamilyNotification(
         circleID: String,
@@ -154,20 +154,20 @@ final class DefaultScheduleRepo: ScheduleRepo {
             
         }
     }
-
+    
     func deleteSchedule(
         circleID: String,
         scheduleID: String
     ) async throws {
         try await withCheckedThrowingContinuation { continuation in
-
+            
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)",
                 method: .delete
             )
             .decodeResponse(decodeType: EmptyDTO.self) { _ in
                 continuation.resume(returning: ())
-
+                
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -175,16 +175,16 @@ final class DefaultScheduleRepo: ScheduleRepo {
                     errorCode: "SR-DS-0"
                 ))
             }
-
+            
         }
     }
-
+    
     func setConfirmed(
         circleID: String,
         scheduleID: String
     ) async throws {
         try await withCheckedThrowingContinuation { continuation in
-
+            
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)/confirmations",
                 method: .post,
@@ -193,7 +193,7 @@ final class DefaultScheduleRepo: ScheduleRepo {
             )
             .decodeResponse(decodeType: RegisterConfirmationResDTO.self) { _ in
                 continuation.resume(returning: ())
-
+                
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -201,24 +201,24 @@ final class DefaultScheduleRepo: ScheduleRepo {
                     errorCode: "SR-SC-0"
                 ))
             }
-
+            
         }
     }
-
+    
     func setUnconfirmed(
         circleID: String,
         scheduleID: String,
         confirmationID: Int
     ) async throws {
         try await withCheckedThrowingContinuation { continuation in
-
+            
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)/confirmations/\(confirmationID)",
                 method: .delete
             )
             .decodeResponse(decodeType: EmptyDTO.self) { _ in
                 continuation.resume(returning: ())
-
+                
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -226,23 +226,23 @@ final class DefaultScheduleRepo: ScheduleRepo {
                     errorCode: "SR-SU-0"
                 ))
             }
-
+            
         }
     }
-
+    
     func requestFamilyNotification(
         circleID: String,
         scheduleID: String
     ) async throws {
         try await withCheckedThrowingContinuation { continuation in
-
+            
             APISession.withAuth.request(
                 Bundle.main.baseURL + "/api/v1/circles/\(circleID)/schedules/\(scheduleID)/family-notifications",
                 method: .post
             )
             .decodeResponse(decodeType: EmptyDTO.self) { _ in
                 continuation.resume(returning: ())
-
+                
             } errorHandler: { error in
                 continuation.resume(throwing: SaionError(
                     with: error,
@@ -250,7 +250,7 @@ final class DefaultScheduleRepo: ScheduleRepo {
                     errorCode: "SR-RFN-0"
                 ))
             }
-
+            
         }
     }
 }

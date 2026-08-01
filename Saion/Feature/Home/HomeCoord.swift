@@ -34,6 +34,13 @@ final class HomeCoord: Coordinator {
                 .sink { [weak self] in self?.presentCreateScheduleVC(circleID: circleID) }
                 .store(in: &overviewVC.cancellables)
             
+            // 일정 상세 화면으로 이동
+            overviewVC.scheduleDetailPublisher
+                .sink { [weak self] in
+                    self?.pushScheduleDetailVC(circleID: circleID, scheduleID: $0)
+                }
+                .store(in: &overviewVC.cancellables)
+            
             // 전체 구성원 목록 화면으로 이동
             overviewVC.showAllMembersTapPublisher
                 .sink { [weak self] in self?.pushMemberListVC(circleID: circleID) }
@@ -102,6 +109,22 @@ final class HomeCoord: Coordinator {
         
         // 화면 전환
         navigation.present(vc, animated: true)
+    }
+    
+    /// 일정 상세 화면으로 이동
+    private func pushScheduleDetailVC(
+        circleID: String,
+        scheduleID: String
+    ) {
+        let vm = ScheduleDI.shared.makeScheduleDetailVM(
+            circleID: circleID,
+            scheduleID: scheduleID
+        )
+        let vc = ScheduleDetailVC(vm: vm)
+        vc.hidesDefaultTabBarWhenPushed = true
+        
+        // 화면 전환
+        navigation.pushViewController(vc, animated: true)
     }
     
     /// 전체 구성원 목록 화면으로 이동
