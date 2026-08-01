@@ -22,19 +22,9 @@ struct ScheduleSummary: Hashable {
     /// 확인하기 기능 활성 여부
     let needConfirm: Bool
     /// 일정 상태
-    let status: Status
+    let status: ScheduleStatus
     /// 진행률 (0~100)
     let progressRate: Int
     /// 시작일까지 남은 일수
     let dDay: Int?
-    
-    /// 일정 상태
-    enum Status: Hashable {
-        /// 시작 전
-        case upcoming
-        /// 진행 중
-        case inProgress
-        /// 완료
-        case completed
-    }
 }

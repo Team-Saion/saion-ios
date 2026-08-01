@@ -40,7 +40,7 @@ struct ScheduleSummaryResDTO: Decodable {
     /// - example: 0
     let progressRate: Int
     /// startDate와 오늘(KST) 간의 양수 차이. 진행 중이거나 과거 일정은 null.
-    let dday: Int?
+    let dDay: Int?
     
     /// 일정 상태
     enum Status: String, Decodable {
@@ -63,8 +63,8 @@ extension ScheduleSummaryResDTO {
             let startAt = formatter.date(from: "\(startDate) \(startTime ?? "00:00")"),
             let endAt = formatter.date(from: "\(endDate) \(endTime ?? "23:59")")
         else { return nil }
-        let mappedStatus: ScheduleSummary.Status = switch status {
-        case .upcoming: .upcoming
+        let mappedStatus: ScheduleStatus = switch status {
+        case .upcoming: .upcoming(dDay: dDay)
         case .inProgress: .inProgress
         case .completed: .completed
         }
@@ -78,7 +78,7 @@ extension ScheduleSummaryResDTO {
             needConfirm: needConfirm,
             status: mappedStatus,
             progressRate: progressRate,
-            dDay: dday
+            dDay: dDay
         )
     }
 }

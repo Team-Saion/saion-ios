@@ -17,6 +17,8 @@ final class CreateScheduleVM {
     enum Action {
         /// 일정 제목 변경됨
         case titleChanged(String?)
+        
+        case isAllDayChanged(Bool)
         /// 시작 일시 변경됨
         case startAtChanged(Date)
         /// 종료 일시 변경됨
@@ -36,6 +38,8 @@ final class CreateScheduleVM {
         var startAt: Date { draft.startAt }
         /// 종료 일시
         var endAt: Date { draft.endAt }
+        
+        var isAllDay: Bool { draft.isAllDay }
         /// 일정 추가 버튼 활성화 여부
         var submitButtonEnabled: Bool { draft.title?.isEmpty == false }
         /// 일정 생성 요청 진행 여부
@@ -92,12 +96,15 @@ final class CreateScheduleVM {
             let trimmed = string?.trimmingCharacters(in: .whitespacesAndNewlines)
             state.draft.title = trimmed?.isEmpty == true ? nil : trimmed
             
+        case .isAllDayChanged(let bool):
+            state.draft.isAllDay = bool
+            
         case .startAtChanged(let date):
             state.draft.startAt = date
-            state.draft.endAt = max(state.draft.endAt, date)
+            state.draft.endAt = max(state.draft.endAt, date.addingTimeInterval(60))
             
         case .endAtChanged(let date):
-            state.draft.endAt = max(date, state.draft.startAt)
+            state.draft.endAt = max(date, state.draft.startAt.addingTimeInterval(60))
             
         case .needConfirmChanged(let bool):
             state.draft.needConfirm = bool

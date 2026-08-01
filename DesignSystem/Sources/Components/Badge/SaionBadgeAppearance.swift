@@ -9,13 +9,13 @@ import UIKit
 
 public struct SaionBadgeAppearance {
     public let sizeMetrics: SizeMetrics
-    public var foregroundColor: UIColor
-    public var backgroundColor: UIColor
+    public var foregroundColor: UIColor?
+    public var backgroundColor: UIColor?
     
     public init(
         sizeMetrics: SizeMetrics,
-        foregroundColor: UIColor,
-        backgroundColor: UIColor
+        foregroundColor: UIColor? = nil,
+        backgroundColor: UIColor? = nil
     ) {
         self.sizeMetrics = sizeMetrics
         self.foregroundColor = foregroundColor

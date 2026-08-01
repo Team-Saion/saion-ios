@@ -11,12 +11,29 @@ import DesignSystem
 
 final class DDayBadge: SaionBadge {
     
+    // MARK: Life Cycle
+    
+    override init(appearance: SaionBadgeAppearance) {
+        super.init(appearance: appearance)
+        setupLayout()
+    }
+    
+    @MainActor required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Layout
+    
+    private func setupLayout() {
+        setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+    
     // MARK: Configure
     
-    func configure(with state: DDayBadgeState) {
-        appearance.foregroundColor = state.foregroundColor
-        appearance.backgroundColor = state.backgroundColor
-        text = state.text
+    func configure(with state: DDayBadgeState?) {
+        appearance.foregroundColor = state?.foregroundColor
+        appearance.backgroundColor = state?.backgroundColor
+        text = state?.title
     }
 }
 
@@ -25,23 +42,34 @@ final class DDayBadge: SaionBadge {
 struct DDayBadgeState: Hashable {
     let foregroundColor: UIColor
     let backgroundColor: UIColor
-    let text: String
+    let title: String
     
-    init(dDay: Int?) {
+    init(status: ScheduleStatus) {
         var foregroundColor: UIColor = .labelSubtle
         var backgroundColor: UIColor = .grey100
-        var text = "종료"
+        let title: String
         
-        if let dDay {
+        switch status {
+        case .upcoming(let dDay?):
+            title = "\(dDay)일 전"
+            
             if dDay <= 7 {
                 foregroundColor = .red600
                 backgroundColor = .red50
             }
-            text = "\(dDay)일 전"
+            
+        case .upcoming(nil):
+            title = "시작 전"
+            
+        case .inProgress:
+            title = "진행중"
+            
+        case .completed:
+            title = "완료"
         }
         
         self.foregroundColor = foregroundColor
         self.backgroundColor = backgroundColor
-        self.text = text
+        self.title = title
     }
 }

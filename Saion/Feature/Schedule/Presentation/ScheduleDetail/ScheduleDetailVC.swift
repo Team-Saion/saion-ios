@@ -31,21 +31,17 @@ final class ScheduleDetailVC: BackButtonVC {
         inset: .init(edges: 20)
     )
     
-    /// 일정까지 남은 날짜를 표시하는 레이블
-    private let dDayLabel = {
-        let style = TextStyle(
-            typography: .label1,
-            decoration: .init(foregroundColor: .red600)
-        )
-        let label = InsetAttributedLabel()
-        label.inset = .init(horizontal: 8)
-        label.textAttributes = style.toDictionary()
-        label.layer.cornerRadius = 14
-        label.clipsToBounds = true
-        label.backgroundColor = .red50
-        
-        label.snp.makeConstraints { $0.height.equalTo(28) }
-        return label
+    /// 일정 상태를 표시하는 배지
+    private let dDayBadge = DDayBadge(appearance: .init(sizeMetrics: .large))
+    
+    /// 배지 바깥으로 흰색 그림자를 표시하는 컨테이너
+    private let dDayBadgeContainer = {
+        let view = UIView()
+        view.layer.shadowColor = UIColor.white.cgColor
+        view.layer.shadowOpacity = 1
+        view.layer.shadowOffset = .zero
+        view.layer.shadowRadius = 12
+        return view
     }()
     
     /// 일정 제목을 표시하는 레이블
@@ -59,18 +55,7 @@ final class ScheduleDetailVC: BackButtonVC {
         return label
     }()
     
-    /// 일정 날짜 또는 날짜 범위를 표시하는 레이블
-    private let dateLabel = {
-        let style = TextStyle(
-            typography: .body1,
-            decoration: .init(foregroundColor: .labelStrong)
-        )
-        let label = AttributedLabel()
-        label.textAttributes = style.toDictionary()
-        return label
-    }()
-    
-    /// 종일 여부 또는 일정 시간 범위를 표시하는 레이블
+    /// 일정의 날짜와 시간 범위를 표시하는 레이블
     private let periodLabel = {
         let style = TextStyle(
             typography: .body1,
@@ -78,6 +63,7 @@ final class ScheduleDetailVC: BackButtonVC {
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
+        label.numberOfLines = 2
         return label
     }()
     
@@ -135,12 +121,10 @@ final class ScheduleDetailVC: BackButtonVC {
         view.addSubview(mainVStack)
         view.addSubview(deleteButton)
         
-        mainVStack.addArrangedSubview(dDayLabel)
+        mainVStack.addArrangedSubview(dDayBadgeContainer)
         mainVStack.addArrangedSubview(UISpacer(8))
         mainVStack.addArrangedSubview(titleLabel)
         mainVStack.addArrangedSubview(UISpacer(16))
-        mainVStack.addArrangedSubview(dateLabel)
-        mainVStack.addArrangedSubview(UISpacer(4))
         mainVStack.addArrangedSubview(periodLabel)
         mainVStack.addArrangedSubview(UISpacer(24))
         mainVStack.addArrangedSubview(progressView)
@@ -149,7 +133,10 @@ final class ScheduleDetailVC: BackButtonVC {
         mainVStack.addArrangedSubview(UISpacer(24))
         mainVStack.addArrangedSubview(confirmToggleButton)
         
+        dDayBadgeContainer.addSubview(dDayBadge)
+        
         mainVStack.snp.makeConstraints { $0.top.horizontalEdges.equalTo(contentLayoutGuide) }
+        dDayBadge.snp.makeConstraints { $0.edges.equalToSuperview() }
         progressView.snp.makeConstraints { $0.horizontalEdges.equalToSuperview().inset(20) }
         memoTextView.snp.makeConstraints { $0.horizontalEdges.equalToSuperview().inset(20) }
         deleteButton.snp.makeConstraints { $0.centerX.bottom.equalTo(contentLayoutGuide) }
@@ -201,12 +188,11 @@ final class ScheduleDetailVC: BackButtonVC {
     // MARK: Reactive Interface
     
     private func updateUI(with state: ScheduleDetailVCState) {
-        dDayLabel.text = state.dDay
+        dDayBadge.configure(with: state.badgeState)
         titleLabel.text = state.title
-        dateLabel.text = state.date
-        periodLabel.text = state.period
+        periodLabel.text = state.periodText
         progressView.setProgress(state.progress)
-        memoTextView.text = state.memo
+        memoTextView.configure(with: state.memo)
         confirmToggleButton.title = state.confirmToggleTitle
         confirmToggleButton.isHidden = state.confirmToggleHidden
         confirmToggleButton.isSelected = state.confirmSelected
@@ -238,17 +224,6 @@ final class ScheduleDetailVC: BackButtonVC {
 
 private final class MemoTextView: UITextView {
     
-    // MARK: Properties
-    
-    override var text: String? {
-        set {
-            attributedText = newValue.map {
-                NSAttributedString(string: $0, attributes: typingAttributes)
-            }
-        }
-        get { attributedText.string }
-    }
-    
     // MARK: Life Cycle
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
@@ -264,12 +239,6 @@ private final class MemoTextView: UITextView {
     // MARK: Defaults
     
     private func setupDefaults() {
-        let style = TextStyle(
-            typography: .body1,
-            decoration: .init(foregroundColor: .labelStrong)
-        )
-        typingAttributes = style.toDictionary()
-        
         textContainer.lineFragmentPadding = .zero
         textContainerInset = .init(horizontal: 16, vertical: 12)
         isEditable = false
@@ -285,6 +254,27 @@ private final class MemoTextView: UITextView {
     
     private func setupLayout() {
         self.snp.makeConstraints { $0.height.equalTo(96) }
+    }
+    
+    // MARK: Configure
+    
+    func configure(with memo: String?) {
+        let text: String
+        let foregroundColor: UIColor
+        
+        if let memo, !memo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            text = memo
+            foregroundColor = .labelStrong
+        } else {
+            text = "등록된 메모가 없어요"
+            foregroundColor = .labelMuted
+        }
+        
+        let style = TextStyle(
+            typography: .body1,
+            decoration: .init(foregroundColor: foregroundColor)
+        )
+        attributedText = style.toNSAttrStr(text)
     }
 }
 
@@ -350,14 +340,12 @@ private final class ConfirmToggleButton: UIButton {
 // MARK: - Presentation Model
 
 struct ScheduleDetailVCState: Hashable {
-    /// 일정 시작일까지 남은 일수
-    let dDay: String
+    /// 일정 상태 배지
+    let badgeState: DDayBadgeState
     /// 일정 제목
     let title: String
-    /// 일정 날짜 또는 날짜 범위
-    let date: String
-    /// 일정 시간 범위
-    let period: String
+    /// 일정 날짜와 시간 범위
+    let periodText: String
     /// 일정 진행률 (0~1)
     let progress: CGFloat
     /// 일정 메모
@@ -381,15 +369,19 @@ struct ScheduleDetailVCState: Hashable {
             inSameDayAs: schedule.endAt
         )
         
-        let period: String
+        let periodText: String
         if schedule.isAllDay {
-            period = "종일"
+            periodText = isSameDay
+            ? "\(startDateText) · 종일"
+            : "\(startDateText) ~ \(endDateText)"
         } else {
             let timeFormatter = DateFormatter.seoul
             timeFormatter.dateFormat = "a h:mm"
             let startTimeText = timeFormatter.string(from: schedule.startAt)
             let endTimeText = timeFormatter.string(from: schedule.endAt)
-            period = "\(startTimeText) ~ \(endTimeText)"
+            periodText = isSameDay
+            ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
+            : "\(startDateText) · \(startTimeText) ~\n\(endDateText) · \(endTimeText)"
         }
         
         let confirmToggleTitle = {
@@ -399,10 +391,9 @@ struct ScheduleDetailVCState: Hashable {
             return "\(type) \(count)"
         }()
         
-        self.dDay = schedule.dDay.map { "\($0)일 전" } ?? "만료됨"
+        self.badgeState = .init(status: schedule.status)
         self.title = schedule.title
-        self.date = isSameDay ? startDateText : "\(startDateText) ~ \(endDateText)"
-        self.period = period
+        self.periodText = periodText
         self.progress = CGFloat(schedule.progressRate) / 100
         self.memo = schedule.memo
         self.confirmToggleHidden = !schedule.needConfirm

@@ -107,8 +107,8 @@ extension ScheduleResDTO {
         
         let isoFormatter = ISO8601DateFormatter.seoul
         guard let createdAt = isoFormatter.date(from: createdAt) else { return nil }
-        let mappedStatus: Schedule.Status = switch status {
-        case .upcoming: .upcoming
+        let mappedStatus: ScheduleStatus = switch status {
+        case .upcoming: .upcoming(dDay: dDay)
         case .inProgress: .inProgress
         case .completed: .completed
         }

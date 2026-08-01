@@ -52,6 +52,8 @@ final class CreateScheduleVC: NavigationBarVC {
         return field
     }()
     
+    private let isAllDayView = IsAllDayToggleView()
+    
     /// 일정 시작 및 종료 일시 선택 뷰
     private let periodView = PerioidPickerView()
     
@@ -110,6 +112,7 @@ final class CreateScheduleVC: NavigationBarVC {
         
         contentVStack.addArrangedSubview(titleTextField)
         contentVStack.addArrangedSubview(UISpacer(20))
+        contentVStack.addArrangedSubview(isAllDayView)
         contentVStack.addArrangedSubview(periodView)
         contentVStack.addArrangedSubview(UISpacer(32))
         contentVStack.addArrangedSubview(needConfirmView)
@@ -137,6 +140,10 @@ final class CreateScheduleVC: NavigationBarVC {
             .sink { [weak self] in self?.vm.send(.titleChanged($0)) }
             .store(in: &cancellables)
         
+        isAllDayView.allDayToggle.isOnPublisher
+            .sink { [weak self] in self?.vm.send(.isAllDayChanged($0)) }
+            .store(in: &cancellables)
+        
         // 시작 일시 변경 이벤트 전달 (구독 시 방출되는 초기 값 무시)
         periodView.startAtPicker.datePublisher.dropFirst()
             .sink { [weak self] in self?.vm.send(.startAtChanged($0)) }
@@ -160,6 +167,13 @@ final class CreateScheduleVC: NavigationBarVC {
         // 제출 버튼 탭 이벤트 전달
         submitButton.tapPublisher
             .sink { [weak self] in self?.vm.send(.submitTapped) }
+            .store(in: &cancellables)
+        
+        vm.$state.map(\.isAllDay).removeDuplicates()
+            .sink { [weak self] in
+                self?.periodView.startAtPicker.datePickerMode =  $0 ? .date : .dateAndTime
+                self?.periodView.endAtPicker.datePickerMode =  $0 ? .date : .dateAndTime
+            }
             .store(in: &cancellables)
         
         // 시작 일시와 종료 선택 가능 범위 바인딩
@@ -372,6 +386,56 @@ private final class NeedConfirmToggleView: UIStackView {
         addArrangedSubview(toggle)
         
         snp.makeConstraints { $0.height.equalTo(56) }
+    }
+}
+
+// MARK: - IsAllDayToggleView
+
+private final class IsAllDayToggleView: UIStackView {
+    
+    // MARK: Components
+    
+    /// 종일 여부 안내 레이블
+    private let allDayLabel = {
+        let style = TextStyle(
+            typography: .body1,
+            decoration: .init(foregroundColor: .labelMuted)
+        )
+        let label = UILabel()
+        label.attributedText = style.toNSAttrStr("종일")
+        return label
+    }()
+    
+    /// 종일 여부 선택 토글
+    let allDayToggle = {
+        let toggle = UISwitch()
+        toggle.transform = .init(scaleX: 0.64, y: 0.64)
+        
+        return toggle
+    }()
+    
+    // MARK: Life Cycle
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupDefaults()
+        setupLayout()
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Defaults
+    
+    private func setupDefaults() { alignment = .center }
+    
+    // MARK: Layout
+    
+    private func setupLayout() {
+        addArrangedSubview(allDayLabel)
+        addArrangedSubview(allDayToggle)
+        addArrangedSubview(UISpacer())
     }
 }
 

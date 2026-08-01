@@ -44,14 +44,12 @@ struct CreateScheduleReqDTO: Encodable {
         formatter.dateFormat = "HH:mm"
         let startTime = formatter.string(from: domain.startAt)
         let endTime = formatter.string(from: domain.endAt)
-        /// 기본 시간(00:00~23:59)을 유지하면 종일 일정으로 처리한다. (``ScheduleDraft``참고)
-        let isAllDay = startTime == "00:00" && endTime == "23:59"
         
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
-        self.startTime = isAllDay ? nil : startTime
-        self.endTime = isAllDay ? nil : endTime
+        self.startTime = domain.isAllDay ? nil : startTime
+        self.endTime = domain.isAllDay ? nil : endTime
         self.needConfirm = domain.needConfirm
         self.memo = domain.memo
     }

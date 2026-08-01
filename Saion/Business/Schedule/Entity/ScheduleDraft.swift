@@ -15,6 +15,8 @@ struct ScheduleDraft: Hashable {
     var startAt: Date
     /// 시작 일시
     var endAt: Date
+    /// 종일 일정 여부
+    var isAllDay: Bool
     /// 확인하기 기능 활성 여부
     var needConfirm: Bool
     /// 메모
@@ -32,6 +34,7 @@ struct ScheduleDraft: Hashable {
             byAdding: DateComponents(day: 1, minute: -1),
             to: startAt
         )!
+        self.isAllDay = false
         self.needConfirm = false
         self.memo = nil
     }

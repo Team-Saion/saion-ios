@@ -88,10 +88,10 @@ final class HomeDashboardView: UIStackView {
         case .idle:
             idleView.isHidden = false
             
-        case .schedule(let title, let period, let dDay, let progress):
+        case .schedule(let title, let period, let badgeState, let progress):
             shceduleView.titleLabel.text = title
             shceduleView.periodLabel.text = period
-            shceduleView.dDayLabel.text = dDay
+            shceduleView.dDayBadge.configure(with: badgeState)
             shceduleView.progressView.setProgress(progress)
             shceduleView.isHidden = false
         }
@@ -132,7 +132,7 @@ private final class IdleView: UIStackView {
             paragraph: .init(alignment: .center)
         )
         let label = UILabel()
-        label.attributedText = style.toNSAttrStr("써클에 함께할 가족을 초대해주세요")
+        label.attributedText = style.toNSAttrStr("소중한 가족과 함께 시작해 보세요")
         return label
     }()
     
@@ -199,25 +199,12 @@ private final class ScheduleView: UIStackView {
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
+        label.numberOfLines = 2
         return label
     }()
     
     /// 일정까지 남은 날짜를 표시하는 레이블
-    let dDayLabel = {
-        let style = TextStyle(
-            typography: .label1,
-            decoration: .init(foregroundColor: .red600)
-        )
-        let label = InsetAttributedLabel()
-        label.inset = .init(horizontal: 8)
-        label.textAttributes = style.toDictionary()
-        label.layer.cornerRadius = 14
-        label.clipsToBounds = true
-        label.backgroundColor = .red50
-        
-        label.snp.makeConstraints { $0.height.equalTo(28) }
-        return label
-    }()
+    let dDayBadge = DDayBadge(appearance: .init(sizeMetrics: .large))
     
     /// 일정 진행률과 구간별 상태 문구를 표시하는 뷰
     let progressView = ScheduleProgressView()
@@ -261,9 +248,9 @@ private final class ScheduleView: UIStackView {
         // TODO: 멤버가 나 밖에 없으면 공유 버튼 숨겨야 함
         addArrangedSubview(shareButton)
         
-        addSubview(dDayLabel)
+        addSubview(dDayBadge)
         
-        dDayLabel.snp.makeConstraints { $0.top.trailing.equalToSuperview() }
+        dDayBadge.snp.makeConstraints { $0.top.trailing.equalToSuperview() }
     }
 }
 
@@ -276,7 +263,7 @@ enum HomeDashboardViewState: Hashable {
     case schedule(
         title: String,
         period: String,
-        dDay: String,
+        badgeState: DDayBadgeState,
         progress: CGFloat
     )
     
@@ -298,25 +285,28 @@ enum HomeDashboardViewState: Hashable {
             schedule.startAt,
             inSameDayAs: schedule.endAt
         )
-        let dateText = isSameDay ? startDateText : "\(startDateText)~\(endDateText)"
         
-        // 종일 여부에 따라 시간 구간 구성
-        let timeText: String
+        // 일정의 일자와 종일 여부에 따라 기간 구성
+        let period: String
         if schedule.isAllDay {
-            timeText = "종일"
+            period = isSameDay
+                ? "\(startDateText) · 종일"
+                : "\(startDateText) ~ \(endDateText)"
         } else {
             let timeFormatter = DateFormatter.seoul
             timeFormatter.dateFormat = "a h:mm"
             let startTimeText = timeFormatter.string(from: schedule.startAt)
             let endTimeText = timeFormatter.string(from: schedule.endAt)
-            timeText = "\(startTimeText)~\(endTimeText)"
+            period = isSameDay
+                ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
+                : "\(startDateText) · \(startTimeText) ~ \(endDateText) · \(endTimeText)"
         }
         
         // 화면 표시에 필요한 값으로 일정 상태 구성
         self = .schedule(
             title: schedule.title,
-            period: "\(dateText) · \(timeText)",
-            dDay: schedule.dDay.map { "\($0)일 전" } ?? "만료됨",
+            period: period,
+            badgeState: .init(status: schedule.status),
             progress: CGFloat(schedule.progressRate) / 100
         )
     }

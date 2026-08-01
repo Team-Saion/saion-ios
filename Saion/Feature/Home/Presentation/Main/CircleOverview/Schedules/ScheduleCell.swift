@@ -44,31 +44,16 @@ final class ScheduleCell: UICollectionViewCell {
     private let captionLabel = {
         let style = TextStyle(
             typography: .caption1,
-            decoration: .init(foregroundColor: .labelSubtle)
+            decoration: .init(foregroundColor: .labelSubtle),
+            paragraph: .init(lineBreakMode: .byTruncatingTail)
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
         return label
     }()
     
-    /// 디데이 레이블 (예: "10일 전")
-    private let dDayLabel = {
-        let style = TextStyle(
-            typography: .label2,
-            decoration: .init(foregroundColor: .labelSubtle)
-        )
-        let label = InsetAttributedLabel()
-        label.textAttributes = style.toDictionary()
-        label.inset = .init(horizontal: 6)
-        
-        label.layer.cornerRadius = 23 / 2
-        label.clipsToBounds = true
-        
-        label.backgroundColor = .grey100
-        
-        label.snp.makeConstraints { $0.height.equalTo(23) }
-        return label
-    }()
+    /// 일정 상태를 표시하는 배지
+    private let dDayBadge = DDayBadge(appearance: .init(sizeMetrics: .medium))
     
     private let chevronImageView: UIImageView = {
         let view = UIImageView()
@@ -108,7 +93,7 @@ final class ScheduleCell: UICollectionViewCell {
         contentView.addSubview(mainHStack)
         
         mainHStack.addArrangedSubview(titleVStack)
-        mainHStack.addArrangedSubview(dDayLabel)
+        mainHStack.addArrangedSubview(dDayBadge)
         mainHStack.addArrangedSubview(chevronImageView)
         
         titleVStack.addArrangedSubview(titleLabel)
@@ -116,8 +101,8 @@ final class ScheduleCell: UICollectionViewCell {
         
         mainHStack.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        dDayLabel.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
-        chevronImageView.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
+        dDayBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
+        chevronImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     // MARK: Configure
@@ -125,7 +110,7 @@ final class ScheduleCell: UICollectionViewCell {
     func configure(with item: ScheduleCellItem?) {
         titleLabel.text = item?.title
         captionLabel.text = item?.caption
-        dDayLabel.text = item?.dDay
+        dDayBadge.configure(with: item?.badgeState)
     }
 }
 
@@ -138,21 +123,43 @@ struct ScheduleCellItem: Hashable {
     let title: String
     /// 시작 일시 (예: "6월 28일 (토)")
     let caption: String
-    /// 시작일까지 남은 일수 (예: "10일 전", 경과 시 "만료됨")
-    let dDay: String
+    /// 일정 상태 배지
+    let badgeState: DDayBadgeState
 }
 
 extension ScheduleCellItem {
     /// 일정 요약 정보로 셀 아이템 생성
     init(_ schedule: ScheduleSummary) {
-        // 시작 일시를 사용자에게 표시할 날짜 형식으로 변환
+        // 시작일과 종료일을 조합해 일정 기간 구성
         let dateFormatter = DateFormatter.seoul
         dateFormatter.dateFormat = "M월 d일 (E)"
+
+        let startDateText = dateFormatter.string(from: schedule.startAt)
+        let endDateText = dateFormatter.string(from: schedule.endAt)
+        let isSameDay = Calendar.seoul.isDate(
+            schedule.startAt,
+            inSameDayAs: schedule.endAt
+        )
+
+        let caption: String
+        if schedule.isAllDay {
+            caption = isSameDay
+                ? "\(startDateText) · 종일"
+                : "\(startDateText) ~ \(endDateText)"
+        } else {
+            let timeFormatter = DateFormatter.seoul
+            timeFormatter.dateFormat = "a h:mm"
+            let startTimeText = timeFormatter.string(from: schedule.startAt)
+            let endTimeText = timeFormatter.string(from: schedule.endAt)
+            caption = isSameDay
+                ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
+                : "\(startDateText) · \(startTimeText) ~ \(endDateText) · \(endTimeText)"
+        }
         
         scheduleID = schedule.scheduleID
         title = schedule.title
-        caption = dateFormatter.string(from: schedule.startAt)
-        dDay = schedule.dDay.map { "\($0)일 전" } ?? "만료됨"
+        self.caption = caption
+        badgeState = .init(status: schedule.status)
     }
 }
 
@@ -164,7 +171,7 @@ extension ScheduleCellItem {
         scheduleID: "0",
         title: "아빠 병원 검진",
         caption: "6월 28일 (토)",
-        dDay: "10일 전"
+        badgeState: .init(status: .upcoming(dDay: 10))
     ))
     return cell
 }
