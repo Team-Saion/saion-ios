@@ -19,6 +19,8 @@ final class LoginVM {
         case viewDidLoad
         /// 카카오 로그인 버튼 탭
         case kakaoLoginTapped
+        /// 데모 모드 진입 요청됨
+        case demoModeRequested
         /// 확인 버튼 탭
         case submitTapped
     }
@@ -97,6 +99,14 @@ final class LoginVM {
             
             // 이미 정회원이면 바텀시트를 열지 않음
             if tokenInfo.role.is(\.pending) { effect.send(.presentTerms) }
+            
+        case .demoModeRequested:
+            guard let tokenInfo = TokenInfo(
+                accessToken: Bundle.main.demoAccessToken,
+                refreshToken: ""
+            ) else { return }
+            
+            AuthManager.shared.send(.userDidLogin(tokenInfo: tokenInfo))
             
         case .submitTapped:
             guard !state.isLoading else { return }

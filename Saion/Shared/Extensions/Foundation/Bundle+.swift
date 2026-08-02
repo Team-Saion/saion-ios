@@ -28,4 +28,12 @@ extension Bundle {
         }
         return kakaoKey
     }
+    
+    /// 데모 계정 액세스 토큰
+    var demoAccessToken: String {
+        guard let token = appEnvironment["DEMO_ACCESS_TOKEN"] as? String else {
+            preconditionFailure("AppEnvironment에 DEMO_ACCESS_TOKEN이 누락되었어.")
+        }
+        return token
+    }
 }

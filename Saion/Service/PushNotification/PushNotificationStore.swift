@@ -77,6 +77,8 @@ final class PushNotificationStore {
                 await UIApplication.shared.unregisterForRemoteNotifications()
                 // Firebase의 FCM 토큰 자동 생성과 갱신 비활성화
                 Messaging.messaging().isAutoInitEnabled = false
+                // 기존 FCM 토큰 삭제
+                try await Messaging.messaging().deleteToken()
             }
             
         case .apnsTokenRegistered(let apnsToken):
@@ -84,6 +86,9 @@ final class PushNotificationStore {
             Messaging.messaging().apnsToken = apnsToken
             
         case .fcmTokenReceived(let fcmToken):
+            // 미인증 상태의 경우 Saion 서버 등록 차단
+            guard AuthManager.shared.accessToken != nil else { return }
+            
             let installationID = try await Installations.installations().installationID()
             // 토큰이 새로 발급되거나 갱신되면 서버에 동기화
             try await fcmTokenRepo.register(token: fcmToken, installationID: installationID)

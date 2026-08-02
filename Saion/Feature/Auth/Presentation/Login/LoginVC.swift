@@ -31,8 +31,15 @@ final class LoginVC: UIViewController {
         return view
     }()
     
+    /// 데모 모드 진입을 위한 롱 프레스 제스처
+    private let longPressGesture = {
+        let gesture = UILongPressGestureRecognizer()
+        gesture.minimumPressDuration = 5
+        return gesture
+    }()
+    
     /// 카카오 로그인을 요청하는 버튼
-    private let loginButton = {
+    private lazy var loginButton = {
         let appearance = SaionButton.Appearance(
             size: .xlarge,
             variant: .init(
@@ -44,6 +51,7 @@ final class LoginVC: UIViewController {
         )
         
         let button = SaionButton(with: appearance)
+        button.addGestureRecognizer(longPressGesture)
         button.title = "카카오로 시작하기"
         return button
     }()
@@ -109,6 +117,13 @@ final class LoginVC: UIViewController {
             .sink { [weak self] in self?.vm.send(.kakaoLoginTapped) }
             .store(in: &cancellables)
         
+        // 로그인 버튼 롱 프레스 후 데모 모드 진입 확인
+        longPressGesture.longPressPublisher.filter { $0.state == .began }
+            .compactMap { [weak self] _ in self?.presentDemoModeEntryAlert() }
+            .switchToLatest()
+            .sink { [weak self] in self?.vm.send(.demoModeRequested) }
+            .store(in: &cancellables)
+        
         // 약관 동의 완료 후 프로필 입력에 필요한 정보 요청
         vm.effect.compactMap { $0[case: \.presentTerms] }
             .compactMap { [weak self] in self?.presentTermsSheet() }
@@ -141,6 +156,26 @@ final class LoginVC: UIViewController {
                 .store(in: &sheet.cancellables)
             
             self?.present(sheet, animated: true)
+        } }
+        .eraseToAnyPublisher()
+    }
+    
+    /// 데모 모드로 진입 팝업 노출
+    private func presentDemoModeEntryAlert() -> AnyPublisher<Void, Never> {
+        Deferred { [weak self] in Future { promise in
+            let alert = ConfirmAlertVC()
+            alert.titleLabel.text = "데모 모드로 진입할까요?"
+            alert.descriptionLabel.text = "데모 모드로 앱을 둘러볼 수 있어요."
+            
+            alert.cancelButton.tapPublisher
+                .sink { [weak alert] in alert?.dismiss(animated: true) }
+                .store(in: &alert.cancellables)
+            
+            alert.acceptButton.tapPublisher
+                .sink { [weak alert] in alert?.dismiss(animated: true) { promise(.success(())) } }
+                .store(in: &alert.cancellables)
+            
+            self?.present(alert, animated: true)
         } }
         .eraseToAnyPublisher()
     }

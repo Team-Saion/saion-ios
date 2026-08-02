@@ -28,7 +28,8 @@ final class TokenAuthenticator: Authenticator {
         with response: HTTPURLResponse,
         failDueToAuthenticationError error: any Error
     ) -> Bool {
-        response.statusCode == 401
+        return response.statusCode == 401
+        && urlRequest.headers["Authorization"] != nil
     }
     
     func isRequest(
