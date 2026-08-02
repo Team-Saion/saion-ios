@@ -78,13 +78,17 @@ struct InboxResDTO: Decodable {
 extension InboxResDTO {
     func toDomain() -> Pagenation<InboxItem>? {
         let formatter = ISO8601DateFormatter.seoul
+        // FIXME: 소수점 없이 들어오는 경우를 대비한 임시 대안책, 백엔드에 날짜 포맷 정정 요청해야 함.
+        let parseDate: (String) -> Date? = {
+            formatter.date(from: $0.contains(".") ? $0 : "\($0).000")
+        }
         var mappedItems = [InboxItem]()
         for item in items {
-            guard let occurredAt = formatter.date(from: item.occurredAt) else { return nil }
+            guard let occurredAt = parseDate(item.occurredAt) else { return nil }
             
             let readAt: Date?
             if let readAtValue = item.readAt {
-                guard let parsedReadAt = formatter.date(from: readAtValue) else { return nil }
+                guard let parsedReadAt = parseDate(readAtValue) else { return nil }
                 readAt = parsedReadAt
             } else {
                 readAt = nil
