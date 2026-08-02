@@ -26,6 +26,7 @@ escape_xcconfig_value() {
 
 BASE_URL_VALUE="$(escape_xcconfig_value "$(require_env BASE_URL)")"
 KAKAO_NATIVE_APP_KEY_VALUE="$(require_env KAKAO_NATIVE_APP_KEY)"
+DEMO_ACCESS_TOKEN_VALUE="$(require_env DEMO_ACCESS_TOKEN)"
 
 mkdir -p "$CONFIG_DIR"
 
@@ -33,5 +34,6 @@ for config in ConfigDebug.xcconfig ConfigRelease.xcconfig; do
   {
     echo "BASE_URL = $BASE_URL_VALUE"
     echo "KAKAO_NATIVE_APP_KEY = $KAKAO_NATIVE_APP_KEY_VALUE"
+    echo "DEMO_ACCESS_TOKEN = $DEMO_ACCESS_TOKEN_VALUE"
   } > "$CONFIG_DIR/$config"
 done
