@@ -13,6 +13,7 @@ import CombineCocoa
 import SnapKit
 
 import DesignSystem
+import Navigation
 
 final class MyPageVC: UIViewController {
     
@@ -72,10 +73,24 @@ final class MyPageVC: UIViewController {
     
     /// 알림 설정 메뉴
     private let notificationRow = RowButton(title: "알림 설정")
+    /// 약관 확인 메뉴
+    private let termsRow = RowButton(title: "약관 확인")
     /// 로그아웃 메뉴
     private let logoutRow = RowButton(title: "로그아웃")
     /// 회원 탈퇴 메뉴
     private let deleteAccountRow = RowButton(title: "회원 탈퇴")
+    
+    /// 앱 버전 레이블
+    private let appVersionLabel = {
+        let appVersion = Bundle.main.appVersion ?? "알 수 없음"
+        let textStyle = TextStyle(
+            typography: .caption1,
+            decoration: .init(foregroundColor: .labelSubtle)
+        )
+        let label = UILabel()
+        label.attributedText = textStyle.toNSAttrStr("앱 버전 \(appVersion)")
+        return label
+    }()
     
     // MARK: Life Cycle
     
@@ -109,10 +124,13 @@ final class MyPageVC: UIViewController {
         contentVStack.addArrangedSubview(rowVStack1)
         contentVStack.addArrangedSubview(UISpacer(12))
         contentVStack.addArrangedSubview(rowVStack2)
+        contentVStack.addArrangedSubview(UISpacer(136))
+        contentVStack.addArrangedSubview(appVersionLabel)
         
         contentVStack.addSubview(editProfileButton)
         
         rowVStack1.addArrangedSubview(notificationRow)
+        rowVStack1.addArrangedSubview(termsRow)
         rowVStack2.addArrangedSubview(logoutRow)
         rowVStack2.addArrangedSubview(deleteAccountRow)
         
@@ -155,6 +173,11 @@ final class MyPageVC: UIViewController {
         vm.effect.compactMap { $0[case: \.presentError] }
             .sink { [weak self] in self?.presentErrorAlert(error: $0) }
             .store(in: &cancellables)
+        
+        // 약관 확인 화면으로 이동
+        termsRow.tapPublisher
+            .sink { [weak self] in self?.pushTermsVC() }
+            .store(in: &cancellables)
     }
     
     // MARK: Reactive Interface
@@ -177,6 +200,13 @@ final class MyPageVC: UIViewController {
             self?.present(alert, animated: true)
         } }
         .eraseToAnyPublisher()
+    }
+    
+    /// 약관 확인 화면으로 이동
+    private func pushTermsVC() {
+        let vc = TermsVC()
+        vc.hidesDefaultTabBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     /// 회원 탈퇴 탭 퍼블리셔

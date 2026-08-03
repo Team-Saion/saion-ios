@@ -8,6 +8,11 @@
 import Foundation
 
 extension Bundle {
+    /// 현재 앱 버전
+    var appVersion: String? {
+        return infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+    
     /// Info.plist에 등록된 앱 환경설정 딕셔너리
     private var appEnvironment: [String: Any] {
         return infoDictionary?["AppEnvironment"] as? [String: Any] ?? [:]
