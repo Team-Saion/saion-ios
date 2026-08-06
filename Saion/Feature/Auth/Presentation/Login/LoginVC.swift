@@ -34,6 +34,7 @@ final class LoginVC: UIViewController {
     /// 데모 모드 진입을 위한 롱 프레스 제스처
     private let longPressGesture = {
         let gesture = UILongPressGestureRecognizer()
+        gesture.allowableMovement = .greatestFiniteMagnitude
         gesture.minimumPressDuration = 5
         return gesture
     }()
