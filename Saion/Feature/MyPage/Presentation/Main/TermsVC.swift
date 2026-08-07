@@ -92,7 +92,7 @@ final class TermsVC: BackButtonVC {
         
         // 개인정보 수집 및 이용 상세 버튼 탭 시 해당 링크 웹페이지 사파리 표시
         privacyButton.tapPublisher
-            .map { "https://sites.google.com/view/saio-terms-personalinfo-v1-0/홈?authuser=8" }
+            .map { "https://sites.google.com/view/saio-terms-personalinfo-v1-0/%ED%99%88" }
             .sink { [weak self] in self?.openSafari(url: $0) }
             .store(in: &cancellables)
     }
