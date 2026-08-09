@@ -6,7 +6,7 @@
 //
 
 import Combine
-import Foundation
+import UIKit
 
 import CasePaths
 
@@ -17,6 +17,8 @@ final class LoginVM {
     enum Action {
         /// 화면 표시됨
         case viewDidLoad
+        /// 애플 로그인 버튼 탭
+        case appleLoginTapped(window: UIWindow)
         /// 카카오 로그인 버튼 탭
         case kakaoLoginTapped
         /// 데모 모드 진입 요청됨
@@ -46,6 +48,8 @@ final class LoginVM {
     @Published private(set) var state = State()
     /// 화면 전환 및 에러 표시를 위한 일회성 이벤트
     let effect = PassthroughSubject<Effect, Never>()
+    
+    private let appleSignInClient = AppleSignInClient()
     
     private let kakaoAuthRepo: KakaoAuthRepo
     private let authRepo: AuthRepo
@@ -87,6 +91,18 @@ final class LoginVM {
             else { return }
             
             effect.send(.presentTerms)
+            
+        case .appleLoginTapped(let window):
+            guard !state.isLoading else { return }
+            defer { state.isLoading = false }
+            state.isLoading = true
+            
+            let idToken = try await appleSignInClient.signIn(presenter: window)
+            let tokenInfo = try await authRepo.requestLoginWithApple(idToken: idToken)
+            AuthManager.shared.send(.userDidLogin(tokenInfo: tokenInfo))
+            
+            // 이미 정회원이면 바텀시트를 열지 않음
+            if tokenInfo.role.is(\.pending) { effect.send(.presentTerms) }
             
         case .kakaoLoginTapped:
             guard !state.isLoading else { return }

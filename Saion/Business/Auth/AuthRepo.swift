@@ -10,11 +10,44 @@ import Foundation
 import Alamofire
 
 protocol AuthRepo {
+    /// 애플 아이디 토큰으로 사이온 로그인
+    func requestLoginWithApple(idToken: String) async throws -> TokenInfo
     /// 카카오 아이디 토큰으로 사이온 로그인
     func requestLoginWithKakao(idToken: String) async throws -> TokenInfo
 }
 
 final class DefaultAuthRepo: AuthRepo {
+    func requestLoginWithApple(idToken: String) async throws -> TokenInfo {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            APISession.plain.request(
+                Bundle.main.baseURL + "/api/v1/auth/apple",
+                method: .post,
+                parameters: AppleLoginReqDTO(idToken: idToken),
+                encoder: JSONParameterEncoder.default
+            )
+            .decodeResponse(decodeType: TokenResDTO.self) { dto in
+                if let tokenInfo = dto?.toDomain() {
+                    continuation.resume(returning: tokenInfo)
+                    
+                } else {
+                    continuation.resume(throwing: SaionError(
+                        userMessage: "사용자 인증 중 문제가 발생했어요.",
+                        errorCode: "LR-RLWA-0"
+                    ))
+                }
+                
+            } errorHandler: { error in
+                continuation.resume(throwing: SaionError(
+                    with: error,
+                    userMessage: "사용자 인증 중 문제가 발생했어요.",
+                    errorCode: "LR-RLWA-1"
+                ))
+            }
+            
+        }
+    }
+    
     func requestLoginWithKakao(idToken: String) async throws -> TokenInfo {
         try await withCheckedThrowingContinuation { continuation in
             

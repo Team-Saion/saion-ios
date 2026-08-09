@@ -23,6 +23,8 @@ final class LoginVC: UIViewController {
     
     // MARK: Components
     
+    private let buttonVStack = UIStackView(.vertical, spacing: 20, inset: .init(horizontal: 16))
+    
     /// 로그인 화면 상단 로고
     private let logoImageView = {
         let view = UIImageView()
@@ -39,8 +41,25 @@ final class LoginVC: UIViewController {
         return gesture
     }()
     
+    /// 애플 로그인을 요청하는 버튼
+    private lazy var appleButton = {
+        let appearance = SaionButton.Appearance(
+            size: .xlarge,
+            variant: .init(
+                foregroundColor: .white,
+                backgroundColor: .black
+            ),
+            image: .authApple,
+            imagePlacement: .leading
+        )
+        let button = SaionButton(with: appearance)
+        button.addGestureRecognizer(longPressGesture)
+        button.title = "Apple로 시작하기"
+        return button
+    }()
+    
     /// 카카오 로그인을 요청하는 버튼
-    private lazy var loginButton = {
+    private let kakaoButton = {
         let appearance = SaionButton.Appearance(
             size: .xlarge,
             variant: .init(
@@ -50,9 +69,7 @@ final class LoginVC: UIViewController {
             image: .authKakao,
             imagePlacement: .leading
         )
-        
         let button = SaionButton(with: appearance)
-        button.addGestureRecognizer(longPressGesture)
         button.title = "카카오로 시작하기"
         return button
     }()
@@ -95,14 +112,17 @@ final class LoginVC: UIViewController {
         view.layer.addSublayer(backgroundLayer)
         
         view.addSubview(logoImageView)
-        view.addSubview(loginButton)
+        view.addSubview(buttonVStack)
+        
+        buttonVStack.addArrangedSubview(appleButton)
+        buttonVStack.addArrangedSubview(kakaoButton)
         
         logoImageView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).inset(156)
             $0.centerX.equalToSuperview()
         }
-        loginButton.snp.makeConstraints {
-            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+        buttonVStack.snp.makeConstraints {
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(40)
         }
     }
@@ -113,12 +133,17 @@ final class LoginVC: UIViewController {
         // 기존 로그인 정보에 따라 이어서 진행할 온보딩 화면 확인
         vm.send(.viewDidLoad)
         
+        // 애플 로그인 버튼 탭 이벤트 전달
+        appleButton.tapPublisher.compactMap { [weak self] in self?.view.window }
+            .sink { [weak self] in self?.vm.send(.appleLoginTapped(window: $0)) }
+            .store(in: &cancellables)
+        
         // 카카오 로그인 버튼 탭 이벤트 전달
-        loginButton.tapPublisher
+        kakaoButton.tapPublisher
             .sink { [weak self] in self?.vm.send(.kakaoLoginTapped) }
             .store(in: &cancellables)
         
-        // 로그인 버튼 롱 프레스 후 데모 모드 진입 확인
+        // 애플 로그인 버튼 롱 프레스 후 데모 모드 진입 확인
         longPressGesture.longPressPublisher.filter { $0.state == .began }
             .compactMap { [weak self] _ in self?.presentDemoModeEntryAlert() }
             .switchToLatest()
