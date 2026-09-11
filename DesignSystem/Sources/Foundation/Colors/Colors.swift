@@ -39,6 +39,7 @@ extension UIColor {
     public static let blue900 = UIColor(resource: .blue900)
 
     // Grey
+    public static let grey0 = UIColor(resource: .grey0)
     public static let grey50 = UIColor(resource: .grey50)
     public static let grey100 = UIColor(resource: .grey100)
     public static let grey200 = UIColor(resource: .grey200)
@@ -123,7 +124,7 @@ extension UIColor {
     public static let orange900 = UIColor(resource: .orange900)
 
     // Common
-    public static let common0 = UIColor(resource: .common0)
+    public static let common0 = UIColor.grey0
     public static let common100 = UIColor(resource: .common100)
 
     // Opacity
@@ -170,12 +171,17 @@ extension UIColor {
     public static let lineSubtle = UIColor(resource: .grey100)
     
     // Status
-    public static let statusPositiveDefault = UIColor(resource: .green500)
-    public static let statusPositiveSubtle = UIColor(resource: .green50)
+    public static let success = UIColor(resource: .success)
+    public static let successBg = UIColor(resource: .successBg)
+    public static let error = UIColor(resource: .error)
+    public static let errorBg = UIColor(resource: .errorBg)
+
+    public static let statusPositiveDefault = UIColor.success
+    public static let statusPositiveSubtle = UIColor.successBg
     public static let statusCautionaryDefault = UIColor(resource: .orange500)
     public static let statusCautionarySubtle = UIColor(resource: .orange50)
-    public static let statusNegativeDefault = UIColor(resource: .red500)
-    public static let statusNegativeSubtle = UIColor(resource: .red50)
+    public static let statusNegativeDefault = UIColor.error
+    public static let statusNegativeSubtle = UIColor.errorBg
     
     // Fill
     public static let fillDefault = UIColor(resource: .grey100)
@@ -220,6 +226,7 @@ extension Color {
     public static let blue900 = Color(.blue900)
 
     // Grey
+    public static let grey0 = Color(.grey0)
     public static let grey50 = Color(.grey50)
     public static let grey100 = Color(.grey100)
     public static let grey200 = Color(.grey200)
@@ -304,7 +311,7 @@ extension Color {
     public static let orange900 = Color(.orange900)
 
     // Common
-    public static let common0 = Color(.common0)
+    public static let common0 = Color.grey0
     public static let common100 = Color(.common100)
 
     // Opacity
@@ -351,12 +358,17 @@ extension Color {
     public static let lineSubtle = Color(.grey100)
     
     // Status
-    public static let statusPositiveDefault = Color(.green500)
-    public static let statusPositiveSubtle = Color(.green50)
+    public static let success = Color(.success)
+    public static let successBg = Color(.successBg)
+    public static let error = Color(.error)
+    public static let errorBg = Color(.errorBg)
+
+    public static let statusPositiveDefault = Color.success
+    public static let statusPositiveSubtle = Color.successBg
     public static let statusCautionaryDefault = Color(.orange500)
     public static let statusCautionarySubtle = Color(.orange50)
-    public static let statusNegativeDefault = Color(.red500)
-    public static let statusNegativeSubtle = Color(.red50)
+    public static let statusNegativeDefault = Color.error
+    public static let statusNegativeSubtle = Color.errorBg
     
     // Fill
     public static let fillDefault = Color(.grey100)
