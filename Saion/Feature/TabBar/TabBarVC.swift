@@ -9,6 +9,7 @@ import Combine
 import UIKit
 
 import CasePaths
+import SnapKit
 
 import Navigation
 
@@ -66,3 +67,40 @@ final class TabBarVC: BaseTabBarVC<TabBar> {
             .store(in: &cancellables)
     }
 }
+
+// MARK: - Preview
+
+#if DEBUG
+private struct PreviewCircleRepo: CircleRepo {
+    func fetchJoinedCircles() async throws -> [CircleSummary] {
+        [CircleSummary(circleID: "preview-circle-id", name: "프리뷰 서클", ownerID: "preview-owner-id")]
+    }
+
+    func createCircle(name: String?) async throws -> CircleSummary {
+        CircleSummary(circleID: "preview-circle-id", name: name ?? "프리뷰 서클", ownerID: "preview-owner-id")
+    }
+}
+
+#Preview {
+    let vc = TabBarVC(vm: TabBarVM(circleRepo: PreviewCircleRepo()))
+    let items: [(title: String, image: UIImage)] = [
+        ("홈", .house),
+        ("일정", .calendarHeart),
+        ("마이", .user)
+    ]
+    let viewControllers = items.enumerated().map { index, item in
+        let screen = UIViewController()
+        screen.view.backgroundColor = .white
+        screen.tabBarItem = UITabBarItem(title: item.title, image: item.image, tag: index)
+
+        let label = UILabel()
+        label.text = item.title
+        label.font = .preferredFont(forTextStyle: .largeTitle)
+        screen.view.addSubview(label)
+        label.snp.makeConstraints { $0.center.equalToSuperview() }
+        return screen
+    }
+    vc.setViewControllers(viewControllers, animated: false)
+    return vc
+}
+#endif

@@ -31,15 +31,6 @@ final class TabBar: BaseTabBar {
     
     // MARK: Components
     
-    /// ㄷ자 테두리만 그리기 위한 레이어
-    private let borderLayer = {
-        let layer = CAShapeLayer()
-        layer.strokeColor = UIColor.lineSubtle.cgColor
-        layer.fillColor = UIColor.clear.cgColor
-        layer.lineWidth = 1
-        return layer
-    }()
-    
     /// 버튼들을 담는 컨테이너 뷰
     private let buttonsHStack = {
         let sv = UIStackView()
@@ -64,26 +55,24 @@ final class TabBar: BaseTabBar {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        drawBorder()
-    }
-    
     // MARK: Defaults
     
     private func setupDefaults() {
-        backgroundView.backgroundColor = .backgroundDefault
+        backgroundView.backgroundColor = .grey100
         // 곡률 설정
         backgroundView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         backgroundView.layer.cornerRadius = Radius.componentXxlarge
+        // 그림자 설정
+        backgroundView.layer.shadowColor = UIColor.black.cgColor
+        backgroundView.layer.shadowOpacity = 0.1
+        backgroundView.layer.shadowOffset = .zero
+        backgroundView.layer.shadowRadius = 12
     }
     
     // MARK: Layout
     
     private func setupLayout() {
-        backgroundView.layer.addSublayer(borderLayer)
         contentView.addSubview(buttonsHStack)
-        
         buttonsHStack.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
@@ -109,55 +98,6 @@ final class TabBar: BaseTabBar {
             .MergeMany(buttons.map { $0.tapWithTagPublisher })
             .sink { [weak self] in self?.selectedIndexSubject.send($0) }
             .store(in: &cancellables)
-    }
-    
-    // MARK: Private Methods
-    
-    /// ㄷ자 모양의 스트로크 그리기
-    private func drawBorder() {
-        // 테두리 레이어의 프레임을 배경 뷰의 크기와 동기화
-        borderLayer.frame = backgroundView.bounds
-        
-        let bounds = backgroundView.bounds
-        let radius = Radius.componentXxlarge
-        let lineWidth: CGFloat = 1.0
-        
-        // 선의 절반 두께만큼 안쪽으로 경로를 이동시켜 잘림 현상 방지
-        let offset = lineWidth / 2.0
-        
-        let path = UIBezierPath()
-        
-        // 1. 왼쪽 아래(시작점)로 이동
-        path.move(to: CGPoint(x: offset, y: bounds.height))
-        
-        // 2. 왼쪽 위 둥근 모서리가 시작되는 지점까지 위로 직선을 그림
-        path.addLine(to: CGPoint(x: offset, y: radius))
-        
-        // 3. 왼쪽 위 둥근 모서리를 호(Arc)로 그림
-        path.addArc(
-            withCenter: CGPoint(x: radius, y: radius),
-            radius: radius - offset,
-            startAngle: .pi,
-            endAngle: -.pi / 2,
-            clockwise: true
-        )
-        
-        // 4. 오른쪽 위 둥근 모서리가 시작되는 지점까지 가로 직선을 그림
-        path.addLine(to: CGPoint(x: bounds.width - radius, y: offset))
-        
-        // 5. 오른쪽 위 둥근 모서리를 호(Arc)로 그림
-        path.addArc(
-            withCenter: CGPoint(x: bounds.width - radius, y: radius),
-            radius: radius - offset,
-            startAngle: -.pi / 2,
-            endAngle: 0,
-            clockwise: true
-        )
-        
-        // 6. 오른쪽 아래(끝점)까지 아래로 직선을 그림
-        path.addLine(to: CGPoint(x: bounds.width - offset, y: bounds.height))
-        
-        borderLayer.path = path.cgPath
     }
     
     // MARK: Reactive Interface
@@ -221,8 +161,8 @@ private final class TabBarButton: UIButton {
         super.updateConfiguration()
         guard var configuration else { return }
         
-        let titleForegroundColor: UIColor = isSelected ? .labelStrong : .labelMuted
-        let imageForegroundColor: UIColor = isSelected ? .primaryStrong : .grey400
+        let titleForegroundColor: UIColor = isSelected ? .grey900 : .grey400
+        let imageForegroundColor: UIColor = isSelected ? .grey900 : .grey300
         
         let style = TextStyle(
             typography: .caption2,
