@@ -55,6 +55,8 @@ final class PushNotificationStore {
                 try await process(action: action)
             } catch let error as LocalizedError {
                 effect.send(.presentError(error))
+            } catch {
+                print("[\(type(of: self))] 액션 처리 실패:", error)
             }
         }
     }

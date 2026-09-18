@@ -67,7 +67,7 @@ final class SaionCheckbox: UIButton {
         configuration.image = isSelected ? .checkboxSelected : .checkboxDefault
         
         /// 타이틀 스타일 반영
-        var titleStyle = TextStyle(
+        let titleStyle = TextStyle(
             typography: .init(
                 font: .pretendard(size: 16, weight: .medium),
                 lineHeight: 24

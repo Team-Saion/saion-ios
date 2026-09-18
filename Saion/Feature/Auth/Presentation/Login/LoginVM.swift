@@ -76,6 +76,8 @@ final class LoginVM {
                 try await process(action: action)
             } catch let error as LocalizedError {
                 effect.send(.presentError(error))
+            } catch {
+                print("[\(type(of: self))] 액션 처리 실패:", error)
             }
         }
     }
@@ -88,7 +90,7 @@ final class LoginVM {
             // 소셜 인증만 완료된 사용자는 약관 동의부터 이어서 진행
             guard let tokenInfo = AuthManager.shared.state.authState.tokenInfo,
                   tokenInfo.role.is(\.pending)
-            else { return }
+                    else { return }
             
             effect.send(.presentTerms)
             
