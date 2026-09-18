@@ -41,7 +41,7 @@ public final class SaionBoxTextField: InsetAttributedTextField {
         placeholderAttributes = placeholderStyle.toDictionary()
         defaultTextAttributes = textStyle.toDictionary()
         
-        layer.cornerRadius = Radius.componentXlarge
+        layer.cornerRadius = 16
         inset = .init(left: 16, right: 8)
     }
     

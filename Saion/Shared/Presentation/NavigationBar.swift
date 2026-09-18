@@ -18,7 +18,7 @@ final class NavigationBar: BaseNavigationBar {
     // MARK: Properties
     
     /// 네비게이션 바의 고정 높이
-    override class var height: CGFloat { 52 }
+    override class var height: CGFloat { 43 }
     
     // MARK: Components
     
@@ -32,8 +32,11 @@ final class NavigationBar: BaseNavigationBar {
     /// 제목 레이블
     let titleLabel = {
         let style = TextStyle(
-            typography: .title2,
-            decoration: .init(foregroundColor: .labelDefault)
+            typography: .init(
+                font: .pretendard(size: 20, weight: .semiBold),
+                lineHeight: 25
+            ),
+            decoration: .init(foregroundColor: .gray900)
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()

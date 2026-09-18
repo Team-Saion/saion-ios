@@ -84,7 +84,7 @@ final class DeleteAccountReasonVC: BackButtonVC {
     // MARK: Defaults
     
     private func setupDefaults() {
-        view.backgroundColor = .white
+        view.backgroundColor = .gray100
         defaultNavBar.titleLabel.text = "회원 탈퇴"
     }
     

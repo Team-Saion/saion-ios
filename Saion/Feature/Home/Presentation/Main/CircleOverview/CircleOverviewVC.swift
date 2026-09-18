@@ -28,7 +28,7 @@ final class CircleOverviewVC: UIViewController {
     
     /// 홈 상단 내비게이션 바
     private let navigationBar = HomeNavigationBar()
-
+    
     /// 홈 콘텐츠를 세로로 탐색하는 스크롤 뷰
     private let scrollView = {
         let view = ResponsiveScrollView()
@@ -39,9 +39,6 @@ final class CircleOverviewVC: UIViewController {
     
     /// 홈의 각 섹션을 세로로 배치하는 콘텐츠 스택
     private let contentVStack = UIStackView(.vertical)
-    
-    /// 서클 이름을 표시하는 헤더 뷰
-    private let headerView = HomeHeaderView()
     
     /// 서클의 대표 일정과 요약 정보를 표시하는 대시보드 뷰
     private let dashboardView = HomeDashboardView()
@@ -76,20 +73,21 @@ final class CircleOverviewVC: UIViewController {
         self.vm = vm
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    override func loadView() {
-        view = HomeBackgroundView()
-    }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupDefaults()
         setupLayout()
         setupBindings()
     }
+    
+    // MARK: Defaults
+    
+    private func setupDefaults() { view.backgroundColor = .gray100 }
     
     // MARK: Layout
     
@@ -100,7 +98,6 @@ final class CircleOverviewVC: UIViewController {
         addScheduleButtonContainer.addSubview(addScheduleButton)
         scrollView.addSubview(contentVStack)
         
-        contentVStack.addArrangedSubview(headerView)
         contentVStack.addArrangedSubview(UISpacer(12))
         contentVStack.addArrangedSubview(dashboardView)
         contentVStack.addArrangedSubview(UISpacer(32))
@@ -151,7 +148,7 @@ final class CircleOverviewVC: UIViewController {
         
         // 서클 이름을 헤더에 반영
         vm.$state.compactMap(\.circleTitle).removeDuplicates()
-            .sink { [weak self] in self?.headerView.titleLabel.text = $0 }
+            .sink { [weak self] in self?.navigationBar.circleLabel.text = $0 }
             .store(in: &cancellables)
         
         // 대시보드 상태를 대시보드 뷰에 반영
@@ -196,7 +193,7 @@ final class CircleOverviewVC: UIViewController {
     var notificationTapPublisher: AnyPublisher<Void, Never> {
         navigationBar.notificationButton.tapPublisher.eraseToAnyPublisher()
     }
-
+    
     /// 일정 공유 확인 얼럿 노출
     private func presentShareConfirmAlert() -> AnyPublisher<Void, Never> {
         Deferred { [weak self] in Future { promise in
@@ -232,7 +229,7 @@ final class CircleOverviewVC: UIViewController {
     var scheduleDetailPublisher: AnyPublisher<String, Never> {
         schedulesView.collectionView.scheduleTapPublisher
     }
-
+    
     /// 전체 구성원 보기 탭 퍼블리셔
     var showAllMembersTapPublisher: AnyPublisher<Void, Never> {
         membersView.showAllButton.tapPublisher

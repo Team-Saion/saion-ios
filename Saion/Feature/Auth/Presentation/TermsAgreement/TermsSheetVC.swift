@@ -262,7 +262,7 @@ private final class CheckListButton: UIButton {
         
         configuration.image = isSelected
         ? .authCheck.withTintColor(.primaryStrong)
-        : .authCheck.withTintColor(.grey300)
+        : .authCheck.withTintColor(.gray300)
         
         self.configuration = configuration
     }

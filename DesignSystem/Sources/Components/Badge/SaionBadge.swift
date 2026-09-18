@@ -44,7 +44,7 @@ open class SaionBadge: InsetAttributedLabel {
         textAttributes = style.toDictionary()
         
         inset = appearance.sizeMetrics.inset
-        layer.cornerRadius = appearance.sizeMetrics.radius
+        layer.cornerRadius = 8
         clipsToBounds = true
         backgroundColor = appearance.backgroundColor
     }

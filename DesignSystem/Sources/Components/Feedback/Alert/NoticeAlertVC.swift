@@ -100,3 +100,7 @@ open class NoticeAlertVC: AlertPresentationVC {
         }
     }
 }
+
+// MARK: - Preview
+
+#Preview { NoticeAlertVC() }

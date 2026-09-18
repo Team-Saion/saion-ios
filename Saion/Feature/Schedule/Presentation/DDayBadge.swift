@@ -45,8 +45,8 @@ struct DDayBadgeState: Hashable {
     let title: String
     
     init(status: ScheduleStatus) {
-        var foregroundColor: UIColor = .labelSubtle
-        var backgroundColor: UIColor = .grey100
+        var foregroundColor: UIColor = .gray600
+        var backgroundColor: UIColor = .gray200
         let title: String
         
         switch status {
@@ -54,8 +54,8 @@ struct DDayBadgeState: Hashable {
             title = "\(dDay)일 전"
             
             if dDay <= 7 {
-                foregroundColor = .red600
-                backgroundColor = .red50
+                foregroundColor = .error
+                backgroundColor = .errorBg
             }
             
         case .upcoming(nil):

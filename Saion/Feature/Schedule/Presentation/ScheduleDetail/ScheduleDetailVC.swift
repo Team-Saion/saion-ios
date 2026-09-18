@@ -322,7 +322,7 @@ private final class ConfirmToggleButton: UIButton {
         guard var configuration else { return }
         
         let foregroundColor: UIColor = isSelected ? .labelInverse : .labelStrong
-        let backgroundColor: UIColor = isSelected ? .grey800 : .common0
+        let backgroundColor: UIColor = isSelected ? .gray800 : .common0
         let strokeColor: UIColor = isSelected ? .clear : .lineSubtle
         
         let style = TextStyle(

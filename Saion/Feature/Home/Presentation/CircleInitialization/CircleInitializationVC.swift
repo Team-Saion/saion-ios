@@ -27,7 +27,7 @@ final class CircleInitializationVC: NavigationBarVC {
     private let closeBarButton = {
         let appearance = SaionIconButton.Appearance(size: .large)
         let button = SaionIconButton(with: appearance)
-        button.image = .xBold.withTintColor(.grey800)
+        button.image = .xBold.withTintColor(.gray800)
         return button
     }()
     

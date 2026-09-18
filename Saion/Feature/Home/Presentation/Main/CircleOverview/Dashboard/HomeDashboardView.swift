@@ -21,7 +21,7 @@ final class HomeDashboardView: UIStackView {
     private let titleLabel = {
         let style = TextStyle(
             typography: .title1,
-            decoration: .init(foregroundColor: .labelStrong)
+            decoration: .init(foregroundColor: .gray900)
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
@@ -38,7 +38,7 @@ final class HomeDashboardView: UIStackView {
         let view = UIStackView(.vertical)
         view.inset = .init(edges: 20)
         view.backgroundColor = .backgroundDefault
-        view.layer.cornerRadius = Radius.containerXlarge
+        view.layer.cornerRadius = 16
         view.clipsToBounds = true
         return view
     }()
@@ -103,7 +103,7 @@ final class HomeDashboardView: UIStackView {
     var inviteTapPublisher: AnyPublisher<Void, Never> {
         idleView.sendInviteButton.tapPublisher
     }
-
+    
     /// 가족에게 전하기 버튼 탭 퍼블리셔
     var shareTapPublisher: AnyPublisher<Void, Never> {
         shceduleView.shareButton.tapPublisher
@@ -138,7 +138,13 @@ private final class IdleView: UIStackView {
     
     /// 초대장 전송 화면으로 이동하는 버튼
     let sendInviteButton = {
-        let appearance = SaionButton.Appearance(size: .large, variant: .primary)
+        let appearance = SaionButton.Appearance(
+            size: .large,
+            variant: .init(
+                foregroundColor: .gray900,
+                backgroundColor: .saion
+            )
+        )
         let button = SaionButton(with: appearance)
         button.title = "초대장 보내기"
         return button
@@ -184,7 +190,7 @@ private final class ScheduleView: UIStackView {
     let titleLabel = {
         let style = TextStyle(
             typography: .body1,
-            decoration: .init(foregroundColor: .labelDefault)
+            decoration: .init(foregroundColor: .gray900)
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
@@ -211,7 +217,13 @@ private final class ScheduleView: UIStackView {
     
     /// 일정 내용을 가족에게 공유하는 버튼
     let shareButton = {
-        let appearance = SaionButton.Appearance(size: .large, variant: .primary)
+        let appearance = SaionButton.Appearance(
+            size: .large,
+            variant: .init(
+                foregroundColor: .gray900,
+                backgroundColor: .saion
+            )
+        )
         let button = SaionButton(with: appearance)
         button.title = "모두에게 전하기"
         return button
@@ -290,16 +302,16 @@ enum HomeDashboardViewState: Hashable {
         let period: String
         if schedule.isAllDay {
             period = isSameDay
-                ? "\(startDateText) · 종일"
-                : "\(startDateText) ~ \(endDateText)"
+            ? "\(startDateText) · 종일"
+            : "\(startDateText) ~ \(endDateText)"
         } else {
             let timeFormatter = DateFormatter.seoul
             timeFormatter.dateFormat = "a h:mm"
             let startTimeText = timeFormatter.string(from: schedule.startAt)
             let endTimeText = timeFormatter.string(from: schedule.endAt)
             period = isSameDay
-                ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
-                : "\(startDateText) · \(startTimeText) ~ \(endDateText) · \(endTimeText)"
+            ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
+            : "\(startDateText) · \(startTimeText) ~ \(endDateText) · \(endTimeText)"
         }
         
         // 화면 표시에 필요한 값으로 일정 상태 구성
@@ -314,4 +326,13 @@ enum HomeDashboardViewState: Hashable {
 
 // MARK: - Preview
 
-#Preview { HomeDashboardView() }
+#Preview("일정 있음") {
+    let view = HomeDashboardView()
+    view.configure(with: .schedule(
+        title: "가족 여행",
+        period: "9월 18일 (금) ~ 9월 20일 (일)",
+        badgeState: .init(status: .inProgress),
+        progress: 0.5
+    ))
+    return view
+}

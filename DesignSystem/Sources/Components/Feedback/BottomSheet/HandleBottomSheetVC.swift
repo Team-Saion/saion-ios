@@ -17,7 +17,7 @@ open class HandleBottomSheetVC: BottomSheetPresentationVC {
     
     private let handleView = {
         let view = UIView()
-        view.backgroundColor = .grey200
+        view.backgroundColor = .gray200
         view.layer.cornerRadius = 2
         view.clipsToBounds = true
         view.snp.makeConstraints { $0.size.equalTo(CGSize(width: 44, height: 4)) }

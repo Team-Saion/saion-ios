@@ -8,6 +8,9 @@
 import UIKit
 
 extension SaionButton {
+    
+    // MARK: Appearance
+    
     public struct Appearance: Sendable {
         public let size: SizeMetrics
         public let variant: Variant
@@ -27,6 +30,8 @@ extension SaionButton {
             self.imagePlacement = imagePlacement
         }
         
+        // MARK: SizeMetrics
+        
         public struct SizeMetrics: Sendable {
             public let typography: TextStyle.Typography
             public let contentInset: NSDirectionalEdgeInsets
@@ -42,6 +47,8 @@ extension SaionButton {
                 self.height = height
             }
         }
+        
+        // MARK: Variant
         
         public struct Variant: Sendable {
             public let foregroundColor: UIColor
@@ -91,7 +98,7 @@ extension SaionButton.Appearance.SizeMetrics {
 extension SaionButton.Appearance.Variant {
     public static let primary: Self = .init(
         foregroundColor: .labelInverse,
-        backgroundColor: .primaryDefault
+        backgroundColor: .gray900
     )
     
     public static let subtle: Self = .init(

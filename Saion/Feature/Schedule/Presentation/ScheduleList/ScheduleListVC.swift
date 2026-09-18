@@ -15,7 +15,7 @@ import SnapKit
 import DesignSystem
 import Navigation
 
-final class ScheduleListVC: UIViewController {
+final class ScheduleListVC: NavigationBarVC {
     
     // MARK: Properties
     
@@ -50,6 +50,7 @@ final class ScheduleListVC: UIViewController {
     // MARK: Defaults
     
     private func setupDefaults() {
+        defaultNavBar.titleLabel.text = "일정 목록"
         view.backgroundColor = .backgroundMuted
     }
     
@@ -57,9 +58,7 @@ final class ScheduleListVC: UIViewController {
     
     private func setupLayout() {
         view.addSubview(collectionView)
-        collectionView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
-        }
+        collectionView.snp.makeConstraints { $0.edges.equalTo(contentLayoutGuide) }
     }
     
     // MARK: Bindings
@@ -115,3 +114,47 @@ final class ScheduleListVC: UIViewController {
         vm.effect.compactMap { $0[case: \.showScheduleDetail] }.eraseToAnyPublisher()
     }
 }
+
+// MARK: - Preview
+
+#if DEBUG
+#Preview("일정 없음") {
+    ScheduleListVC(vm: ScheduleListVM(
+        circleID: "preview-circle-id",
+        scheduleRepo: EmptySchedulePreviewRepo()
+    ))
+}
+
+private struct EmptySchedulePreviewRepo: ScheduleRepo {
+    func fetchSchedules(
+        circleID: String,
+        cursor: String?
+    ) async throws -> Pagenation<ScheduleSummary> {
+        .init(elemets: [], nextCursor: nil, hasNext: false)
+    }
+
+    func createSchedule(from draft: ScheduleDraft, _ circleID: String) async throws -> String {
+        fatalError("일정 목록 프리뷰에서 사용하지 않는 메서드")
+    }
+
+    func fetchScheduleDetail(circleID: String, scheduleID: String) async throws -> Schedule {
+        fatalError("일정 목록 프리뷰에서 사용하지 않는 메서드")
+    }
+
+    func deleteSchedule(circleID: String, scheduleID: String) async throws {
+        fatalError("일정 목록 프리뷰에서 사용하지 않는 메서드")
+    }
+
+    func setConfirmed(circleID: String, scheduleID: String) async throws {
+        fatalError("일정 목록 프리뷰에서 사용하지 않는 메서드")
+    }
+
+    func setUnconfirmed(circleID: String, scheduleID: String, confirmationID: Int) async throws {
+        fatalError("일정 목록 프리뷰에서 사용하지 않는 메서드")
+    }
+
+    func requestFamilyNotification(circleID: String, scheduleID: String) async throws {
+        fatalError("일정 목록 프리뷰에서 사용하지 않는 메서드")
+    }
+}
+#endif

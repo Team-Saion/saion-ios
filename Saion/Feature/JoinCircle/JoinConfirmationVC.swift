@@ -31,7 +31,7 @@ final class JoinConfirmationVC: BackButtonVC {
     private let promptLabel = {
         let style = TextStyle(
             typography: .heading1,
-            decoration: .init(foregroundColor: .grey900),
+            decoration: .init(foregroundColor: .gray900),
             paragraph: .init(alignment: .center)
         )
         let label = AttributedLabel()

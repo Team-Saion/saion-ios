@@ -43,7 +43,7 @@ final class PushNotificationSettingsVC: BackButtonVC {
     // MARK: Defaults
     
     private func setupDefaults() {
-        view.backgroundColor = .backgroundDefault
+        view.backgroundColor = .gray100
         defaultNavBar.titleLabel.text = "알림 설정"
     }
     
@@ -127,7 +127,11 @@ private final class ToggleRow: UIStackView {
         return label
     }()
     
-    let toggle = UISwitch()
+    let toggle = {
+        let toggle = UISwitch()
+        toggle.onTintColor = .gray900
+        return toggle
+    }()
     
     // MARK: Life Cycle
     

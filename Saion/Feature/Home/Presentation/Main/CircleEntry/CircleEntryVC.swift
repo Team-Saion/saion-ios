@@ -13,12 +13,12 @@ import SnapKit
 import DesignSystem
 
 final class CircleEntryVC: UIViewController {
-
+    
     // MARK: Properties
-
+    
     /// 화면 생명주기 동안 유지할 Combine 구독
     var cancellables = Set<AnyCancellable>()
-
+    
     // MARK: Components
     
     private let buttonVStack = UIStackView(.vertical, spacing: 16)
@@ -39,13 +39,16 @@ final class CircleEntryVC: UIViewController {
     
     // MARK: Life Cycle
     
-    override func loadView() {
-        view = HomeBackgroundView()
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupDefaults()
         setupLayout()
+    }
+    
+    // MARK: Defaults
+    
+    private func setupDefaults() {
+        view.backgroundColor = .gray100
     }
     
     // MARK: Layout

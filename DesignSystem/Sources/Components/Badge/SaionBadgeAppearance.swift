@@ -26,7 +26,6 @@ public struct SaionBadgeAppearance {
         public let typography: TextStyle.Typography
         public let height: CGFloat
         public let inset: UIEdgeInsets
-        public var radius: CGFloat { height / 2 }
         
         public init(
             typography: TextStyle.Typography,

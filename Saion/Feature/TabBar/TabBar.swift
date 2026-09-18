@@ -58,7 +58,7 @@ final class TabBar: BaseTabBar {
     // MARK: Defaults
     
     private func setupDefaults() {
-        backgroundView.backgroundColor = .grey100
+        backgroundView.backgroundColor = .gray100
         // 곡률 설정
         backgroundView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         backgroundView.layer.cornerRadius = Radius.componentXxlarge
@@ -161,8 +161,8 @@ private final class TabBarButton: UIButton {
         super.updateConfiguration()
         guard var configuration else { return }
         
-        let titleForegroundColor: UIColor = isSelected ? .grey900 : .grey400
-        let imageForegroundColor: UIColor = isSelected ? .grey900 : .grey300
+        let titleForegroundColor: UIColor = isSelected ? .gray900 : .gray400
+        let imageForegroundColor: UIColor = isSelected ? .gray900 : .gray300
         
         let style = TextStyle(
             typography: .caption2,

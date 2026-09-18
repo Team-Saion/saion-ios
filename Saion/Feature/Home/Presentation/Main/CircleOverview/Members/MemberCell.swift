@@ -22,7 +22,7 @@ final class MemberCell: UICollectionViewCell {
     private let nameLabel = {
         let style = TextStyle(
             typography: .label1Subtle,
-            decoration: .init(foregroundColor: .labelSubtle)
+            decoration: .init(foregroundColor: .gray600)
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()

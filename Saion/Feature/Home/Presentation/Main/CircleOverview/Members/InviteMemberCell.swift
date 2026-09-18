@@ -27,7 +27,7 @@ final class InviteMemberCell: UICollectionViewCell {
     private let nameLabel = {
         let style = TextStyle(
             typography: .label1Subtle,
-            decoration: .init(foregroundColor: .labelSubtle)
+            decoration: .init(foregroundColor: .gray600)
         )
         let label = UILabel()
         label.attributedText = style.toNSAttrStr("가족 초대")
@@ -58,3 +58,7 @@ final class InviteMemberCell: UICollectionViewCell {
         mainVStack.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 }
+
+// MARK: - Preview
+
+#Preview { InviteMemberCell() }

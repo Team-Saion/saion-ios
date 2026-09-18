@@ -247,7 +247,7 @@ private final class RowButton: UIButton {
         var config = UIButton.Configuration.plain()
         config.contentInsets = .init(leading: 24, trailing: 16)
         config.attributedTitle = titleStyle.toAttrStr(title)
-        config.image = .chevronRightMedium.withTintColor(.grey400)
+        config.image = .chevronRightMedium.withTintColor(.gray400)
         config.imagePlacement = .trailing
         
         contentHorizontalAlignment = .fill

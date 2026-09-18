@@ -30,21 +30,30 @@ final class ScheduleCell: UICollectionViewCell {
     /// 제목 레이블 (예: "아빠 병원 검진")
     private let titleLabel = {
         let style = TextStyle(
-            typography: .title3Strong,
-            decoration: .init(foregroundColor: .labelDefault),
-            paragraph: .init(lineBreakMode: .byTruncatingTail)
+            typography: .init(
+                font: .pretendard(size: 18, weight: .semiBold),
+                lineHeight: 25
+            ),
+            decoration: .init(foregroundColor: .gray900),
+            paragraph: .init(
+                lineBreakMode: .byTruncatingTail,
+                lineBreakStrategy: .hangulWordPriority
+            )
         )
         let label = AttributedLabel()
         label.textAttributes = style.toDictionary()
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         return label
     }()
     
     /// 캡션 레이블 (예: "6월 28일 (토)")
     private let captionLabel = {
         let style = TextStyle(
-            typography: .caption1,
-            decoration: .init(foregroundColor: .labelSubtle),
+            typography: .init(
+                font: .pretendard(size: 12, weight: .medium),
+                lineHeight: 20
+            ),
+            decoration: .init(foregroundColor: .gray500),
             paragraph: .init(lineBreakMode: .byTruncatingTail)
         )
         let label = AttributedLabel()
@@ -57,7 +66,7 @@ final class ScheduleCell: UICollectionViewCell {
     
     private let chevronImageView: UIImageView = {
         let view = UIImageView()
-        view.image = .chevronRightMedium.withTintColor(.grey400)
+        view.image = .chevronRightMedium.withTintColor(.gray400)
         view.contentMode = .center
         return view
     }()
@@ -133,27 +142,27 @@ extension ScheduleCellItem {
         // 시작일과 종료일을 조합해 일정 기간 구성
         let dateFormatter = DateFormatter.seoul
         dateFormatter.dateFormat = "M월 d일 (E)"
-
+        
         let startDateText = dateFormatter.string(from: schedule.startAt)
         let endDateText = dateFormatter.string(from: schedule.endAt)
         let isSameDay = Calendar.seoul.isDate(
             schedule.startAt,
             inSameDayAs: schedule.endAt
         )
-
+        
         let caption: String
         if schedule.isAllDay {
             caption = isSameDay
-                ? "\(startDateText) · 종일"
-                : "\(startDateText) ~ \(endDateText)"
+            ? "\(startDateText) · 종일"
+            : "\(startDateText) ~ \(endDateText)"
         } else {
             let timeFormatter = DateFormatter.seoul
             timeFormatter.dateFormat = "a h:mm"
             let startTimeText = timeFormatter.string(from: schedule.startAt)
             let endTimeText = timeFormatter.string(from: schedule.endAt)
             caption = isSameDay
-                ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
-                : "\(startDateText) · \(startTimeText) ~ \(endDateText) · \(endTimeText)"
+            ? "\(startDateText) · \(startTimeText) ~ \(endTimeText)"
+            : "\(startDateText) · \(startTimeText) ~ \(endDateText) · \(endTimeText)"
         }
         
         scheduleID = schedule.scheduleID

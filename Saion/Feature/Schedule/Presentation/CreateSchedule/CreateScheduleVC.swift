@@ -36,12 +36,14 @@ final class CreateScheduleVC: NavigationBarVC {
     private let scrollView = ResponsiveScrollView()
     /// 일정 입력 컴포넌트를 세로로 배치하는 스택 뷰
     private let contentVStack = UIStackView(.vertical, inset: .init(edges: 20))
+    /// 종일 체크박스 배치하는 스택 뷰
+    private let isAllDayHStack = UIStackView()
     
     /// 일정 생성 화면 닫기 버튼
     private let closeBarButton = {
         let appearance = SaionIconButton.Appearance(size: .large)
         let button = SaionIconButton(with: appearance)
-        button.image = .xBold
+        button.image = .xBold.withTintColor(.gray700)
         return button
     }()
     
@@ -52,10 +54,15 @@ final class CreateScheduleVC: NavigationBarVC {
         return field
     }()
     
-    private let isAllDayView = IsAllDayToggleView()
-    
     /// 일정 시작 및 종료 일시 선택 뷰
     private let periodView = PerioidPickerView()
+    
+    /// 종일 일정 체크박스
+    private let isAllDayCheckbox = {
+        let checkbox = SaionCheckbox()
+        checkbox.title = "종일 일정"
+        return checkbox
+    }()
     
     /// 확인 응답 필요 여부 선택 뷰
     private let needConfirmView = NeedConfirmToggleView()
@@ -63,7 +70,7 @@ final class CreateScheduleVC: NavigationBarVC {
     /// 일정 메모 입력 뷰
     private let memoTextView = {
         let textView = SaionBoxTextView()
-        textView.placeholder = "일정 설명 추가"
+        textView.placeholder = "메모 (선택 사항)"
         textView.snp.makeConstraints { $0.height.equalTo(96) }
         return textView
     }()
@@ -98,7 +105,7 @@ final class CreateScheduleVC: NavigationBarVC {
     
     private func setupDefaults() {
         defaultNavBar.titleLabel.text = "일정 추가"
-        view.backgroundColor = .backgroundDefault
+        view.backgroundColor = .gray100
     }
     
     // MARK: Layout
@@ -112,15 +119,19 @@ final class CreateScheduleVC: NavigationBarVC {
         
         contentVStack.addArrangedSubview(titleTextField)
         contentVStack.addArrangedSubview(UISpacer(20))
-        contentVStack.addArrangedSubview(isAllDayView)
         contentVStack.addArrangedSubview(periodView)
+        contentVStack.addArrangedSubview(UISpacer(12))
+        contentVStack.addArrangedSubview(isAllDayHStack)
         contentVStack.addArrangedSubview(UISpacer(32))
-        contentVStack.addArrangedSubview(needConfirmView)
-        contentVStack.addArrangedSubview(UISpacer(32))
+//        contentVStack.addArrangedSubview(needConfirmView)
+//        contentVStack.addArrangedSubview(UISpacer(32))
         contentVStack.addArrangedSubview(memoTextView)
         contentVStack.addArrangedSubview(UISpacer(32))
         contentVStack.addArrangedSubview(UISpacer())
         contentVStack.addArrangedSubview(submitButton)
+        
+        isAllDayHStack.addArrangedSubview(isAllDayCheckbox)
+        isAllDayHStack.addArrangedSubview(UISpacer())
         
         scrollView.snp.makeConstraints {
             $0.top.horizontalEdges.equalTo(contentLayoutGuide)
@@ -140,7 +151,7 @@ final class CreateScheduleVC: NavigationBarVC {
             .sink { [weak self] in self?.vm.send(.titleChanged($0)) }
             .store(in: &cancellables)
         
-        isAllDayView.allDayToggle.isOnPublisher
+        isAllDayCheckbox.isSelectedPublisher
             .sink { [weak self] in self?.vm.send(.isAllDayChanged($0)) }
             .store(in: &cancellables)
         
@@ -230,27 +241,11 @@ private final class PerioidPickerView: UIStackView {
     /// 종료 일시 컴포넌트를 배치하는 스택 뷰
     private let endAtHStack = UIStackView(alignment: .center)
     
-    /// 시작 지점을 나타내는 아이콘
-    private let startAtDotImageView = {
-        let view = UIImageView()
-        view.image = .scheduleDotFill
-        view.contentMode = .center
-        return view
-    }()
-    
-    /// 종료 지점을 나타내는 아이콘
-    private let endAtDotImageView = {
-        let view = UIImageView()
-        view.image = .scheduleDot
-        view.contentMode = .center
-        return view
-    }()
-    
     /// 시작 일시 안내 레이블
     private let startAtLabel = {
         let style = TextStyle(
             typography: .body1,
-            decoration: .init(foregroundColor: .labelMuted)
+            decoration: .init(foregroundColor: .gray400)
         )
         let label = UILabel()
         label.attributedText = style.toNSAttrStr("시작")
@@ -261,7 +256,7 @@ private final class PerioidPickerView: UIStackView {
     private let endAtLabel = {
         let style = TextStyle(
             typography: .body1,
-            decoration: .init(foregroundColor: .labelMuted)
+            decoration: .init(foregroundColor: .gray400)
         )
         let label = UILabel()
         label.attributedText = style.toNSAttrStr("종료")
@@ -306,25 +301,23 @@ private final class PerioidPickerView: UIStackView {
         layer.borderColor = UIColor.lineSubtle.cgColor
         layer.borderWidth = 1
         
-        layer.cornerRadius = Radius.componentXxlarge
+        layer.cornerRadius = 16
         clipsToBounds = true
         
-        backgroundColor = .fillSubtle
+        backgroundColor = .gray0
     }
     
     // MARK: Layout
     
     private func setupLayout() {
         addArrangedSubview(startAtHStack)
-        addArrangedSubview(UIDivider(height: 1, color: .lineSubtle))
+        addArrangedSubview(UIDivider(height: 1, color: .gray200))
         addArrangedSubview(endAtHStack)
         
-        startAtHStack.addArrangedSubview(startAtDotImageView)
         startAtHStack.addArrangedSubview(startAtLabel)
         startAtHStack.addArrangedSubview(UISpacer())
         startAtHStack.addArrangedSubview(startAtPicker)
         
-        endAtHStack.addArrangedSubview(endAtDotImageView)
         endAtHStack.addArrangedSubview(endAtLabel)
         endAtHStack.addArrangedSubview(UISpacer())
         endAtHStack.addArrangedSubview(endAtPicker)
@@ -372,10 +365,10 @@ private final class NeedConfirmToggleView: UIStackView {
         layer.borderColor = UIColor.lineSubtle.cgColor
         layer.borderWidth = 1
         
-        layer.cornerRadius = Radius.componentXxlarge
+        layer.cornerRadius = 16
         clipsToBounds = true
         
-        backgroundColor = .fillSubtle
+        backgroundColor = .gray0
     }
     
     // MARK: Layout
@@ -386,56 +379,6 @@ private final class NeedConfirmToggleView: UIStackView {
         addArrangedSubview(toggle)
         
         snp.makeConstraints { $0.height.equalTo(56) }
-    }
-}
-
-// MARK: - IsAllDayToggleView
-
-private final class IsAllDayToggleView: UIStackView {
-    
-    // MARK: Components
-    
-    /// 종일 여부 안내 레이블
-    private let allDayLabel = {
-        let style = TextStyle(
-            typography: .body1,
-            decoration: .init(foregroundColor: .labelMuted)
-        )
-        let label = UILabel()
-        label.attributedText = style.toNSAttrStr("종일")
-        return label
-    }()
-    
-    /// 종일 여부 선택 토글
-    let allDayToggle = {
-        let toggle = UISwitch()
-        toggle.transform = .init(scaleX: 0.64, y: 0.64)
-        
-        return toggle
-    }()
-    
-    // MARK: Life Cycle
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupDefaults()
-        setupLayout()
-    }
-    
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: Defaults
-    
-    private func setupDefaults() { alignment = .center }
-    
-    // MARK: Layout
-    
-    private func setupLayout() {
-        addArrangedSubview(allDayLabel)
-        addArrangedSubview(allDayToggle)
-        addArrangedSubview(UISpacer())
     }
 }
 

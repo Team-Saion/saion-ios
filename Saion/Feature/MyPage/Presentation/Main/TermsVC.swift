@@ -67,7 +67,7 @@ final class TermsVC: BackButtonVC {
     // MARK: Defaults
     
     private func setupDefaults() {
-        view.backgroundColor = .backgroundDefault
+        view.backgroundColor = .gray100
         defaultNavBar.titleLabel.text = "약관 확인"
     }
     

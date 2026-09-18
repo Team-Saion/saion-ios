@@ -38,18 +38,18 @@ extension UIColor {
     public static let blue800 = UIColor(resource: .blue800)
     public static let blue900 = UIColor(resource: .blue900)
 
-    // Grey
-    public static let grey0 = UIColor(resource: .grey0)
-    public static let grey50 = UIColor(resource: .grey50)
-    public static let grey100 = UIColor(resource: .grey100)
-    public static let grey200 = UIColor(resource: .grey200)
-    public static let grey300 = UIColor(resource: .grey300)
-    public static let grey400 = UIColor(resource: .grey400)
-    public static let grey500 = UIColor(resource: .grey500)
-    public static let grey600 = UIColor(resource: .grey600)
-    public static let grey700 = UIColor(resource: .grey700)
-    public static let grey800 = UIColor(resource: .grey800)
-    public static let grey900 = UIColor(resource: .grey900)
+    // Gray
+    public static let gray0 = UIColor(resource: .gray0)
+    public static let gray50 = UIColor(resource: .gray50)
+    public static let gray100 = UIColor(resource: .gray100)
+    public static let gray200 = UIColor(resource: .gray200)
+    public static let gray300 = UIColor(resource: .gray300)
+    public static let gray400 = UIColor(resource: .gray400)
+    public static let gray500 = UIColor(resource: .gray500)
+    public static let gray600 = UIColor(resource: .gray600)
+    public static let gray700 = UIColor(resource: .gray700)
+    public static let gray800 = UIColor(resource: .gray800)
+    public static let gray900 = UIColor(resource: .gray900)
 
     // Red
     public static let red50 = UIColor(resource: .red50)
@@ -124,7 +124,7 @@ extension UIColor {
     public static let orange900 = UIColor(resource: .orange900)
 
     // Common
-    public static let common0 = UIColor.grey0
+    public static let common0 = UIColor.gray0
     public static let common100 = UIColor(resource: .common100)
 
     // Opacity
@@ -146,29 +146,33 @@ extension UIColor {
     public static let opacityWhite76 = UIColor(resource: .opacityWhite76)
 
     // MARK: - Semantic Colors
+
+    // Saion
+    public static let saion = UIColor(resource: .saion)
+    public static let saionBg = UIColor(resource: .saionBg)
     
     // Primary
-    public static let primaryDefault = UIColor(resource: .grey900)
+    public static let primaryDefault = UIColor(resource: .gray900)
     public static let primaryStrong = UIColor(resource: .common100)
-    public static let primarySubtle = UIColor(resource: .grey600)
+    public static let primarySubtle = UIColor(resource: .gray600)
     
     // Label
-    public static let labelDefault = UIColor(resource: .grey900)
-    public static let labelStrong = UIColor(resource: .grey800)
-    public static let labelSubtle = UIColor(resource: .grey600)
-    public static let labelDisabled = UIColor(resource: .grey300)
-    public static let labelMuted = UIColor(resource: .grey500)
+    public static let labelDefault = UIColor(resource: .gray900)
+    public static let labelStrong = UIColor(resource: .gray800)
+    public static let labelSubtle = UIColor(resource: .gray600)
+    public static let labelDisabled = UIColor(resource: .gray300)
+    public static let labelMuted = UIColor(resource: .gray500)
     public static let labelInverse = UIColor(resource: .common0)
     
     // Background
     public static let backgroundDefault = UIColor(resource: .common0)
-    public static let backgroundSubtle = UIColor(resource: .grey50)
-    public static let backgroundMuted = UIColor(resource: .grey100)
+    public static let backgroundSubtle = UIColor(resource: .gray50)
+    public static let backgroundMuted = UIColor(resource: .gray100)
     
     // Line
-    public static let lineDefault = UIColor(resource: .grey200)
-    public static let lineStrong = UIColor(resource: .grey300)
-    public static let lineSubtle = UIColor(resource: .grey100)
+    public static let lineDefault = UIColor(resource: .gray200)
+    public static let lineStrong = UIColor(resource: .gray300)
+    public static let lineSubtle = UIColor(resource: .gray100)
     
     // Status
     public static let success = UIColor(resource: .success)
@@ -184,9 +188,9 @@ extension UIColor {
     public static let statusNegativeSubtle = UIColor.errorBg
     
     // Fill
-    public static let fillDefault = UIColor(resource: .grey100)
-    public static let fillSubtle = UIColor(resource: .grey50)
-    public static let fillDisabled = UIColor(resource: .grey200)
+    public static let fillDefault = UIColor(resource: .gray100)
+    public static let fillSubtle = UIColor(resource: .gray50)
+    public static let fillDisabled = UIColor(resource: .gray200)
     
     // Overlay
     public static let overlayDimmer = UIColor(resource: .opacity28)
@@ -225,18 +229,18 @@ extension Color {
     public static let blue800 = Color(.blue800)
     public static let blue900 = Color(.blue900)
 
-    // Grey
-    public static let grey0 = Color(.grey0)
-    public static let grey50 = Color(.grey50)
-    public static let grey100 = Color(.grey100)
-    public static let grey200 = Color(.grey200)
-    public static let grey300 = Color(.grey300)
-    public static let grey400 = Color(.grey400)
-    public static let grey500 = Color(.grey500)
-    public static let grey600 = Color(.grey600)
-    public static let grey700 = Color(.grey700)
-    public static let grey800 = Color(.grey800)
-    public static let grey900 = Color(.grey900)
+    // Gray
+    public static let gray0 = Color(.gray0)
+    public static let gray50 = Color(.gray50)
+    public static let gray100 = Color(.gray100)
+    public static let gray200 = Color(.gray200)
+    public static let gray300 = Color(.gray300)
+    public static let gray400 = Color(.gray400)
+    public static let gray500 = Color(.gray500)
+    public static let gray600 = Color(.gray600)
+    public static let gray700 = Color(.gray700)
+    public static let gray800 = Color(.gray800)
+    public static let gray900 = Color(.gray900)
 
     // Red
     public static let red50 = Color(.red50)
@@ -311,7 +315,7 @@ extension Color {
     public static let orange900 = Color(.orange900)
 
     // Common
-    public static let common0 = Color.grey0
+    public static let common0 = Color.gray0
     public static let common100 = Color(.common100)
 
     // Opacity
@@ -333,29 +337,33 @@ extension Color {
     public static let opacityWhite76 = Color(.opacityWhite76)
 
     // MARK: - Semantic Colors
+
+    // Saion
+    public static let saion = Color(.saion)
+    public static let saionBg = Color(.saionBg)
     
     // Primary
-    public static let primaryDefault = Color(.grey900)
+    public static let primaryDefault = Color(.gray900)
     public static let primaryStrong = Color(.common100)
-    public static let primarySubtle = Color(.grey600)
+    public static let primarySubtle = Color(.gray600)
     
     // Label
-    public static let labelDefault = Color(.grey900)
-    public static let labelStrong = Color(.grey800)
-    public static let labelSubtle = Color(.grey600)
-    public static let labelDisabled = Color(.grey300)
-    public static let labelMuted = Color(.grey500)
+    public static let labelDefault = Color(.gray900)
+    public static let labelStrong = Color(.gray800)
+    public static let labelSubtle = Color(.gray600)
+    public static let labelDisabled = Color(.gray300)
+    public static let labelMuted = Color(.gray500)
     public static let labelInverse = Color(.common0)
     
     // Background
     public static let backgroundDefault = Color(.common0)
-    public static let backgroundSubtle = Color(.grey50)
-    public static let backgroundMuted = Color(.grey100)
+    public static let backgroundSubtle = Color(.gray50)
+    public static let backgroundMuted = Color(.gray100)
     
     // Line
-    public static let lineDefault = Color(.grey200)
-    public static let lineStrong = Color(.grey300)
-    public static let lineSubtle = Color(.grey100)
+    public static let lineDefault = Color(.gray200)
+    public static let lineStrong = Color(.gray300)
+    public static let lineSubtle = Color(.gray100)
     
     // Status
     public static let success = Color(.success)
@@ -371,9 +379,9 @@ extension Color {
     public static let statusNegativeSubtle = Color.errorBg
     
     // Fill
-    public static let fillDefault = Color(.grey100)
-    public static let fillSubtle = Color(.grey50)
-    public static let fillDisabled = Color(.grey200)
+    public static let fillDefault = Color(.gray100)
+    public static let fillSubtle = Color(.gray50)
+    public static let fillDisabled = Color(.gray200)
     
     // Overlay
     public static let overlayDimmer = Color(.opacity28)

@@ -16,31 +16,23 @@ final class AddScheduleCell: UICollectionViewCell {
     
     // MARK: Components
     
-    private let dashedStrokeLayer = {
-        let layer = CAShapeLayer()
-        layer.fillColor = UIColor.clear.cgColor
-        layer.strokeColor = UIColor.lineDefault.cgColor
-        layer.lineDashPattern = [10, 8]
-        layer.lineWidth = 1.5
-        return layer
-    }()
-    
     private let mainHStack = UIStackView(
         alignment: .center,
+        spacing: 4,
         inset: .init(horizontal: 16, vertical: 20)
     )
     
     private let plusImageView = {
         let view = UIImageView()
-        view.image = .plusFill.withTintColor(.grey300)
+        view.image = .plusFill.withTintColor(.gray500)
         view.contentMode = .center
         return view
     }()
     
     private let titleLabel = {
         let style = TextStyle(
-            typography: .title2,
-            decoration: .init(foregroundColor: .labelSubtle)
+            typography: .init(font: .pretendard(size: 16, weight: .medium)),
+            decoration: .init(foregroundColor: .gray500)
         )
         let label = UILabel()
         label.attributedText = style.toNSAttrStr("일정 추가")
@@ -59,20 +51,12 @@ final class AddScheduleCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        dashedStrokeLayer.path = UIBezierPath(
-            roundedRect: contentView.bounds,
-            cornerRadius: Radius.componentXxlarge
-        ).cgPath
-    }
-    
     // 고정 상태 셀로, 재사용 필요 없음
     
     // MARK: Defaults
     
     private func setupDefaults() {
-        contentView.backgroundColor = .backgroundSubtle
+        contentView.backgroundColor = .gray0
         contentView.layer.cornerRadius = Radius.componentXxlarge
         contentView.clipsToBounds = true
     }
@@ -80,9 +64,7 @@ final class AddScheduleCell: UICollectionViewCell {
     // MARK: Layout
     
     private func setupLayout() {
-        contentView.layer.addSublayer(dashedStrokeLayer)
         contentView.addSubview(mainHStack)
-        
         mainHStack.addArrangedSubview(plusImageView)
         mainHStack.addArrangedSubview(titleLabel)
         mainHStack.addArrangedSubview(UISpacer())
@@ -90,3 +72,7 @@ final class AddScheduleCell: UICollectionViewCell {
         mainHStack.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 }
+
+// MARK: - Preview
+
+#Preview { AddScheduleCell() }

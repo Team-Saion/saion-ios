@@ -14,18 +14,6 @@ final class ProfileImageView: UIImageView {
     
     // MARK: Components
     
-    /// 내부 그림자 레이어
-    private let innerShadowLayer = {
-        let layer = CAShapeLayer()
-        layer.fillColor = UIColor.black.cgColor
-        layer.shadowOpacity = 1
-        layer.shadowOffset = CGSize(width: 0, height: -20)
-        layer.shadowRadius = 20
-        layer.fillRule = .evenOdd
-        layer.isHidden = true
-        return layer
-    }()
-    
     /// 폴백 이니셜 레이블
     private lazy var initialLabel = {
         let style = TextStyle(
@@ -51,11 +39,6 @@ final class ProfileImageView: UIImageView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateInnerShadow()
-    }
-    
     // MARK: Defaults
     
     private func setupDefaults() {
@@ -71,51 +54,15 @@ final class ProfileImageView: UIImageView {
     
     private func setupLayout() {
         addSubview(initialLabel)
-        layer.addSublayer(innerShadowLayer)
         
         self.snp.makeConstraints { $0.size.equalTo(sizeMetrics.size) }
         initialLabel.snp.makeConstraints { $0.center.equalToSuperview() }
-    }
-    
-    // MARK: UpdateInnerShadow
-    
-    private func updateInnerShadow() {
-        innerShadowLayer.frame = bounds
-        
-        let cornerRadius = layer.cornerRadius
-        
-        // 외곽 사각형 영역 설정 (그림자 반경보다 넉넉하게 마진 설정)
-        let outerRect = bounds.insetBy(
-            dx: -innerShadowLayer.shadowRadius * 2.0,
-            dy: -innerShadowLayer.shadowRadius * 2.0
-        )
-        let path = UIBezierPath(rect: outerRect)
-        
-        // 내부 둥근 사각형 영역을 반대 방향으로 추가하여 구멍을 뚫음
-        let innerPath = UIBezierPath(
-            roundedRect: bounds,
-            cornerRadius: cornerRadius
-        ).reversing()
-        path.append(innerPath)
-        
-        innerShadowLayer.path = path.cgPath
-        innerShadowLayer.shadowPath = path.cgPath
-        
-        // 안쪽 그림자만 잘 보이도록 마스크 설정
-        let maskLayer = CAShapeLayer()
-        maskLayer.path = UIBezierPath(
-            roundedRect: bounds,
-            cornerRadius: cornerRadius
-        ).cgPath
-        
-        innerShadowLayer.mask = maskLayer
     }
     
     // MARK: Configure
     
     func configure(with state: ProfileImageViewState) {
         // 상태 적용 전처리
-        innerShadowLayer.isHidden = true
         initialLabel.isHidden = true
         image = nil
         
@@ -125,9 +72,6 @@ final class ProfileImageView: UIImageView {
             kf.setImage(with: profileImageURL)
             
         case .fallback(let name, let avatarColor):
-            innerShadowLayer.shadowColor = avatarColor.withAlphaComponent(0.5).cgColor
-            innerShadowLayer.isHidden = false
-            
             initialLabel.text = name
             initialLabel.isHidden = false
             
@@ -155,7 +99,7 @@ enum ProfileImageViewState: Hashable {
             )
         }
     }
-
+    
     init(from domain: MyProfile) {
         if let profileImageURL = domain.profileImageURL {
             self = .image(profileImageURL: profileImageURL)
@@ -165,7 +109,7 @@ enum ProfileImageViewState: Hashable {
             )
             let avatarColor = Int(hexString, radix: 16)
                 .map { UIColor.hex($0) } ?? .black
-
+            
             self = .fallback(
                 name: String(domain.nickname.prefix(2)),
                 avatarColor: avatarColor

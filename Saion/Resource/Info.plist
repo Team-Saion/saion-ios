@@ -4,10 +4,10 @@
 <dict>
 	<key>AppEnvironment</key>
 	<dict>
-		<key>DEMO_ACCESS_TOKEN</key>
-		<string>$(DEMO_ACCESS_TOKEN)</string>
 		<key>BASE_URL</key>
 		<string>$(BASE_URL)</string>
+		<key>DEMO_ACCESS_TOKEN</key>
+		<string>$(DEMO_ACCESS_TOKEN)</string>
 		<key>KAKAO_NATIVE_APP_KEY</key>
 		<string>$(KAKAO_NATIVE_APP_KEY)</string>
 	</dict>
@@ -45,7 +45,5 @@
 			</array>
 		</dict>
 	</dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 </dict>
 </plist>

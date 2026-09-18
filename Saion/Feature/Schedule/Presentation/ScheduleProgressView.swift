@@ -85,8 +85,12 @@ private final class ProgressBar: UIView {
     
     // MARK: Components
     
-    /// 진행률만큼 채워지는 그라데이션 뷰
-    private let progressFillView = ProgressFillView()
+    /// 진행률만큼 채워지는 단색 뷰
+    private let progressFillView = {
+        let view = UIView()
+        view.backgroundColor = .saion
+        return view
+    }()
     
     // MARK: Life Cycle
     
@@ -115,7 +119,7 @@ private final class ProgressBar: UIView {
     // MARK: Defaults
     
     private func setupDefaults() {
-        backgroundColor = .grey100
+        backgroundColor = .gray100
         clipsToBounds = true
     }
     
@@ -131,36 +135,36 @@ private final class ProgressBar: UIView {
     }
 }
 
-// MARK: - ProgressFillView
-
-private final class ProgressFillView: UIView {
-    
-    override class var layerClass: AnyClass { CAGradientLayer.self }
-    
-    private var gradientLayer: CAGradientLayer { layer as! CAGradientLayer }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupDefaults()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        layer.cornerRadius = bounds.height / 2
-    }
-    
-    private func setupDefaults() {
-        clipsToBounds = true
-        gradientLayer.colors = [
-            UIColor.orange500.cgColor,
-            UIColor.orange100.cgColor
-        ]
-        gradientLayer.locations = [0, 1]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
-    }
-}
+//// MARK: - ProgressFillView
+//
+//private final class ProgressFillView: UIView {
+//    
+//    override class var layerClass: AnyClass { CAGradientLayer.self }
+//    
+//    private var gradientLayer: CAGradientLayer { layer as! CAGradientLayer }
+//    
+//    override init(frame: CGRect) {
+//        super.init(frame: frame)
+//        setupDefaults()
+//    }
+//    
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//    
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        layer.cornerRadius = bounds.height / 2
+//    }
+//    
+//    private func setupDefaults() {
+//        clipsToBounds = true
+//        gradientLayer.colors = [
+//            UIColor.orange500.cgColor,
+//            UIColor.orange100.cgColor
+//        ]
+//        gradientLayer.locations = [0, 1]
+//        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+//        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+//    }
+//}
