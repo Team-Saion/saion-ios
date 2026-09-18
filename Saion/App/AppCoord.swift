@@ -66,19 +66,23 @@ final class AppCoord: Coordinator {
     private func setRootWithAnimation(_ vc: UIViewController) {
         guard let window else { return }
         // 처음 루트를 세팅할 때는 즉시 교체
-        guard window.rootViewController != nil
-        else { window.rootViewController = vc; return }
+        guard window.rootViewController != nil else {
+            window.rootViewController = vc
+            return
+        }
         
         UIView.transition(
             with: window,
             duration: 0.32,
-            options: [
-                .transitionCrossDissolve,
-                .allowAnimatedContent,
-                .curveEaseInOut
-            ]
+            options: [.transitionCrossDissolve, .curveEaseInOut]
         ) {
-            window.rootViewController = vc
+            // 루트 교체 시 뷰의 위치·크기 변경이 전환에 섞여 모서리에서 커지는 현상 방지
+            // 새 화면의 배치를 애니메이션 없이 완료해 크로스 디졸브 효과만 유지
+            UIView.performWithoutAnimation {
+                window.rootViewController = vc
+                window.layoutIfNeeded()
+                vc.view.layoutIfNeeded()
+            }
         }
     }
 }
